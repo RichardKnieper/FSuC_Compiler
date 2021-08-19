@@ -4,16 +4,18 @@ FA automata1 = <$"A", { }>;
 // Startzustand A (mit keinen Übergängen)
 
 FA erzeugeAutomat(State name) {
-    return <name, { name - - ['a'-'z'] - - > $"B"^i } >
+    return <name, { name --['a'-'z']--> $"B"^i } >;
     // gib einen endlichen Automaten mit dem Startzustand name und einem
     // Übergang von name zu dem Zustand B (akzeptierend 1) zurück
 }
 
-State A = $"Erster"; State B = $"Zweiter";
-Range C = ['b','c'] + ['w'-'z'];
+State A = $"Erster";
+State B = $"Zweiter";
 Transition T = A - - C - - > B;
 
 if (A.accept == 1 && A.label == "A")
     return erzeugeAutomat(A);
 else
     return automata1;
+
+Range C = ['b','c'] + ['w'-'z'];

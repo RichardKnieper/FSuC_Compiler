@@ -12,8 +12,8 @@ PARSER_END(Parser)
 
 // Lexer
 TOKEN : {
-    "+" | "-" | "*" | "/" | "%" | "++" | "--" | "&&" | "||" | "|" | "!" | "^"| "=" | "," | "."
-    | "[" | "]" | "[]" | "[[" | "]]" | "(" | ")" | "<" | ">" | "{" | "}" | ";" | "$"
+    "+" | "-" | "*" | "/" | "%" | "&&" | "|" | "!" | "^"| "=" | "," | "."
+    | "[" | "]" | "(" | ")" | "<" | ">" | "{" | "}" | ";" | "$"
     | "true" | "false" | "if" | "else" | "while" | "return"
     | <Type : "Range" | "State" | "Transition" | "FA" | "RA" |"int" | "double" | "char" | "boolean">
     | "Set" | "Map"
@@ -26,7 +26,7 @@ TOKEN : {
 }
 
 SKIP : {
-    " " | "\t" | "\n" | "\r"
+    <WS: [" ","\n","\r","\t"]>
     | <Comment: "//" (~["\n"])*>
 }
 
@@ -34,85 +34,54 @@ SKIP : {
 
 // CU -> (decl | stmnt)*
 void cu(): {} {
-    (decl() | stmnt())*
+    (LOOKAHEAD(20) decl() | LOOKAHEAD(20) stmnt())*
 }
 
-// decl -> (Type "[]"? | set | map) Identifier (varDecl | methDecl) ";"
 void decl(): {} {
-    (<Type> ("[]")? | set() | map()) <Identifier> (varDecl() | methDecl()) ";"
+    <Type> <Identifier>  (
+        (("=" (atom() | expr()))? ";") // variable
+        | ("(" (<Type> <Identifier>)* ")" blockStmnt()) // method
+    )
 }
 
-// varDecl ->  "=" expr
-void varDecl(): {} {
-    "=" expr()
+void stmnt(): {} {
+    // if, while, block, audruck
+    returnStmnt() | blockStmnt() | ";"
 }
 
-// set -> "Set<" (Type "[]"? | set | map)+ ">"
-void set(): {} {
-    "Set<" (<Type> ("[]")? | set() | map())+ ">"
+void blockStmnt(): {} {
+    "{" (decl() | stmnt())* "}"
 }
 
-// map -> "Map<" (Type "[]"? | set | map)+ , (Type | set | map)+ ">"
-void map(): {} {
-    "Map<" (<Type> ("[]")? | set() | map())+ "," (<Type> | set() | map())+ ">"
+void returnStmnt(): {} {
+    "return" (atom() | expr()) ";"
 }
 
-// expr -> TODO | range | (state transition?) | fa | atom
 void expr(): {} {
-    range() | ( state() (transition())? ) | fa() | atom()
+    ";" // TODO
 }
 
-// range -> "[" ( CharLiteral ("-" CharLiteral)? ) ("," ( CharLiteral ("-" CharLiteral)? )* "]"
+void plusExpr(): {} {
+    atom() "+" atom()
+}
+
+void atom(): {} {
+    <Identifier> | <CharLiteral> | <StringLiteral> | <IntegerLiteral> | <DoubleLiteral> | <RegexLiteral>
+    | range() | state() | transition() | fa()
+}
+
 void range(): {} {
     "[" <CharLiteral> ("-" <CharLiteral>)? ( "," <CharLiteral> ("-" <CharLiteral>)? )* "]"
 }
 
-// state -> "$" StringLiteral ("^" IntegerLiteral)?
 void state(): {} {
-    "$" <StringLiteral> ("^" <IntegerLiteral>)?
+    "$" <StringLiteral> ("^" (<IntegerLiteral> | <Identifier>) )?
 }
 
-// transition -> ("--" range | "-") "-->" state
 void transition(): {} {
-    ("--" range() | "-") "-->" state()
+    ( ("--"  ( range() | <Identifier> ) ) | "-") "-->" state()
 }
 
-// fa -> "<" state ",{" transition* "}>"
 void fa(): {} {
-    "<" state() ",{" (transition())* "}>"
-}
-
-// methDecl -> "(" (Type Identifier)* ")" block
-void methDecl(): {} {
-    "(" (<Type> <Identifier>)* ")" block()
-}
-
-// methCall -> Identifier ("." Identifier)? "(" ( atom ("," atom)* )? ")"
-void methCall(): {} {
-    <Identifier> ("." <Identifier>)? "(" ( atom() ("," atom())* )? ")"
-}
-
-// block -> "{" (decl | stmnt)* "}"
-void block(): {} {
-    "{" (decl() | stmnt())* "}"
-}
-
-// stmnt -> ifStmnt | whileStmnt | returnStmnt | methCall | TODO
-void stmnt(): {} {
-//    ifStmnt() | whileStmnt() | returnStmnt() |
-    methCall() ";"
-}
-
-// ifStmnt -> TODO
-
-// whileStmnt -> TODO
-
-// returnStmnt -> TODO
-
-// atom -> IntegerLiteral | DoubleLiteral | Idenftifier ("++" | "--")? | ("++" | "--")? Idenftifier
-//         | RegexLiteral | TODO
-void atom(): {} {
-    <IntegerLiteral> | <DoubleLiteral> | <Identifier> ("++" | "--")?
-//    | ("++" | "--")? <Identifier>
-    | <RegexLiteral>
+    "<" ( state() | <Identifier> ) "," "{" ( (<Identifier> | state()) (<Identifier> | transition()) )* "}" ">"
 }
