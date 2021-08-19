@@ -12,11 +12,13 @@ PARSER_END(Parser)
 
 // Lexer
 TOKEN : {
-    "+" | "-" | "*" | "/" | "%" | "++" | "--" | "&&" | "||" | "|" | "!" | "^"| "=" | "," | "."
-    | "[" | "]" | "[]" | "[[" | "]]" | "(" | ")" | "<" | ">" | "{" | "}" | ";" | "$"
-    | "true" | "false" | "if" | "else" | "while" | "return"
+    "+" | "-" | "*" | "/" | "%" | "&&" | "|" | "!" | "^"| "=" | "," | "."
+    | "[" | "]" | "[]" | "(" | ")" | "<" | ">" | "{" | "}" | ";" | "$"
+    | "if" | "else" | "while" | "return"
     | <Type : "Range" | "State" | "Transition" | "FA" | "RA" |"int" | "double" | "char" | "boolean">
     | "Set" | "Map"
+    | <BoolLiteral : "true" | "false">
+    | <BoolOp : ">=" | "<=" | "==" | "!=">
     | <Identifier : ["A"-"Z", "a"-"z", "_"](["A"-"Z", "a"-"z", "_", "0" - "9"])*>
     | <CharLiteral : "'" ["A"-"Z", "a"-"z", "?", "!"] "'">
     | <StringLiteral : "\"" ["A"-"Z", "a"-"z", "_"](["A"-"Z", "a"-"z", "_", "0"-"9"])* "\"">
@@ -26,8 +28,8 @@ TOKEN : {
 }
 
 SKIP : {
-    " " | "\t" | "\n" | "\r"
-    | <Comment: "//" (~["\n"])*>
+    <WS: [" ","\n","\r","\t"]>
+    | <Comment: "//" (~["\n", "\r"])*>
 }
 
 // Parser
@@ -44,7 +46,7 @@ void decl(): {} {
 
 // varDecl ->  "=" expr
 void varDecl(): {} {
-    "=" expr()
+    "=" expr() ";"
 }
 
 // set -> "Set<" (Type "[]"? | set | map)+ ">"
@@ -52,14 +54,14 @@ void set(): {} {
     "Set<" (<Type> ("[]")? | set() | map())+ ">"
 }
 
-// map -> "Map<" (Type "[]"? | set | map)+ , (Type | set | map)+ ">"
+// map -> "Map<" (Type "[]"? | set | map)+ , (Type "[]"? | set | map)+ ">"
 void map(): {} {
-    "Map<" (<Type> ("[]")? | set() | map())+ "," (<Type> | set() | map())+ ">"
+    "Map<" (<Type> ("[]")? | set() | map())+ "," (<Type> ("[]")? | set() | map())+ ">"
 }
 
-// expr -> TODO | range | (state transition?) | fa | atom
+// expr -> range | (state transition?) | fa | atom | bool | calc | TODO
 void expr(): {} {
-    range() | ( state() (transition())? ) | fa() | atom()
+    range() | ( state() (transition())? ) | LOOKAHEAD(2) fa() | LOOKAHEAD(2) atom() | LOOKAHEAD(2) bool() | LOOKAHEAD(2) calc()
 }
 
 // range -> "[" ( CharLiteral ("-" CharLiteral)? ) ("," ( CharLiteral ("-" CharLiteral)? )* "]"
@@ -69,17 +71,17 @@ void range(): {} {
 
 // state -> "$" StringLiteral ("^" IntegerLiteral)?
 void state(): {} {
-    "$" <StringLiteral> ("^" <IntegerLiteral>)?
+    "$" <StringLiteral> ("^" ( <IntegerLiteral> | <Identifier> ) )?
 }
 
-// transition -> ("--" range | "-") "-->" state
+// transition -> (("--" (range | Identifier)) | "-") "-->" state
 void transition(): {} {
-    ("--" range() | "-") "-->" state()
+    ( ("--"  ( range() | <Identifier> ) ) | "-") "-->" state()
 }
 
-// fa -> "<" state ",{" transition* "}>"
+// fa -> "<" (state | Identifier) ",{" ((Identifier | state) (Identifier | transition))* "}>"
 void fa(): {} {
-    "<" state() ",{" (transition())* "}>"
+    "<" ( state() | <Identifier> ) "," "{" ( (<Identifier> | state()) (<Identifier> | transition()) )* "}" ">"
 }
 
 // methDecl -> "(" (Type Identifier)* ")" block
@@ -97,22 +99,46 @@ void block(): {} {
     "{" (decl() | stmnt())* "}"
 }
 
-// stmnt -> ifStmnt | whileStmnt | returnStmnt | methCall | TODO
+// stmnt -> ifStmnt | whileStmnt | returnStmnt | methCall | block | TODO
 void stmnt(): {} {
-//    ifStmnt() | whileStmnt() | returnStmnt() |
-    methCall() ";"
+    ifStmnt() | whileStmnt() | returnStmnt() | methCall() | block() ";"
 }
 
-// ifStmnt -> TODO
+// ifStmnt -> "if(" expr ")" stmnt ("else" stmnt)?
+void ifStmnt(): {} {
+    "if(" expr() ")" ( "else" stmnt() )?
+}
 
-// whileStmnt -> TODO
+// whileStmnt -> "while(" expr ")" stmnt
+void whileStmnt(): {} {
+    "while(" expr() ")" stmnt()
+}
 
-// returnStmnt -> TODO
+// returnStmnt -> "return" (expr | methCall)
+void returnStmnt(): {} {
+//    "return" ( expr() | methCall() ) ";"
+    "return" fa() ";"
+}
 
-// atom -> IntegerLiteral | DoubleLiteral | Idenftifier ("++" | "--")? | ("++" | "--")? Idenftifier
+// bool -> atom | negation | ("(" bool ")") ((">" | "<" | BoolOp) bool)?
+void bool(): {} {
+    (atom() | negation() | ("(" bool() ")") )  ( LOOKAHEAD(2) (">" | "<" | <BoolOp>) bool() )?
+}
+
+// negation -> "!" bool
+void negation(): {} {
+    "!" bool()
+}
+
+// calc -> atom | ("(" calc ")") (("+" | "-" | "*" | "/" | "%") calc)?
+void calc(): {} {
+    ( atom() | ("(" calc() ")") )  ( ("+" | "-" | "*" | "/" | "%") calc() )?
+}
+
+
+// atom -> IntegerLiteral | DoubleLiteral | Idenftifier
 //         | RegexLiteral | TODO
 void atom(): {} {
-    <IntegerLiteral> | <DoubleLiteral> | <Identifier> ("++" | "--")?
-//    | ("++" | "--")? <Identifier>
+    <IntegerLiteral> | <DoubleLiteral> | <BoolLiteral> | <StringLiteral> | <Identifier>
     | <RegexLiteral>
 }

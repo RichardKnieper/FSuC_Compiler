@@ -9,21 +9,27 @@ public interface ParserConstants {
   /** End of File. */
   int EOF = 0;
   /** RegularExpression Id. */
-  int Type = 35;
+  int Type = 28;
   /** RegularExpression Id. */
-  int Identifier = 38;
+  int BoolLiteral = 31;
   /** RegularExpression Id. */
-  int CharLiteral = 39;
+  int BoolOp = 32;
   /** RegularExpression Id. */
-  int StringLiteral = 40;
+  int Identifier = 33;
   /** RegularExpression Id. */
-  int IntegerLiteral = 41;
+  int CharLiteral = 34;
   /** RegularExpression Id. */
-  int DoubleLiteral = 42;
+  int StringLiteral = 35;
   /** RegularExpression Id. */
-  int RegexLiteral = 43;
+  int IntegerLiteral = 36;
   /** RegularExpression Id. */
-  int Comment = 48;
+  int DoubleLiteral = 37;
+  /** RegularExpression Id. */
+  int RegexLiteral = 38;
+  /** RegularExpression Id. */
+  int WS = 39;
+  /** RegularExpression Id. */
+  int Comment = 40;
 
   /** Lexical state. */
   int DEFAULT = 0;
@@ -36,10 +42,7 @@ public interface ParserConstants {
     "\"*\"",
     "\"/\"",
     "\"%\"",
-    "\"++\"",
-    "\"--\"",
     "\"&&\"",
-    "\"||\"",
     "\"|\"",
     "\"!\"",
     "\"^\"",
@@ -49,8 +52,6 @@ public interface ParserConstants {
     "\"[\"",
     "\"]\"",
     "\"[]\"",
-    "\"[[\"",
-    "\"]]\"",
     "\"(\"",
     "\")\"",
     "\"<\"",
@@ -59,8 +60,6 @@ public interface ParserConstants {
     "\"}\"",
     "\";\"",
     "\"$\"",
-    "\"true\"",
-    "\"false\"",
     "\"if\"",
     "\"else\"",
     "\"while\"",
@@ -68,22 +67,16 @@ public interface ParserConstants {
     "<Type>",
     "\"Set\"",
     "\"Map\"",
+    "<BoolLiteral>",
+    "<BoolOp>",
     "<Identifier>",
     "<CharLiteral>",
     "<StringLiteral>",
     "<IntegerLiteral>",
     "<DoubleLiteral>",
     "<RegexLiteral>",
-    "\" \"",
-    "\"\\t\"",
-    "\"\\n\"",
-    "\"\\r\"",
+    "<WS>",
     "<Comment>",
-    "\"Set<\"",
-    "\"Map<\"",
-    "\"-->\"",
-    "\",{\"",
-    "\"}>\"",
   };
 
 }

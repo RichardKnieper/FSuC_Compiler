@@ -1,10 +1,10 @@
 int i = 12;
-FA automata1 = <$"A", { }>;
+FA automata1 = <$"A",{ }>;
 // automata1 referenziert auf einen endlichen Automaten mit dem
 // Startzustand A (mit keinen Übergängen)
 
 FA erzeugeAutomat(State name) {
-    return <name, { name - - ['a'-'z'] - - > $"B"^i } >
+    return <name, { name -- ['a'-'z'] --> $"B"^i } >
     // gib einen endlichen Automaten mit dem Startzustand name und einem
     // Übergang von name zu dem Zustand B (akzeptierend 1) zurück
 }
