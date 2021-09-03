@@ -1,89 +1,0 @@
-/**
- * JavaCC template file created by SF JavaCC plugin 1.5.28+ wizard for JavaCC 1.5.0+
- */options{  static = true;}PARSER_BEGIN(fare)
-public class fare{  public static void main(String args []) throws ParseException  {    fare parser = new fare(System.in);    while (true)    {      System.out.println("Reading from standard input...");      System.out.print("Enter an expression like \"1+(2+3)*4;\" :");      try      {        switch (fare.one_line())        {          case 0 :           System.out.println("OK.");          break;          case 1 :           System.out.println("Goodbye.");          break;          default :           break;        }      }      catch (Exception e)      {        System.out.println("NOK.");        System.out.println(e.getMessage());        fare.ReInit(System.in);      }      catch (Error e)      {        System.out.println("Oops.");        System.out.println(e.getMessage());        break;      }    }  }}PARSER_END(fare)SKIP :
-{
-  // White space
-  " "
-| "\t"
-| "\n"
-| "\r"
-// Single Line
-| <"//" (~["\n","\r"])* ("\n"|"\r"|"\r\n")>
-// Multi Line 
-| <"/*" (~["*"])* "*" (~["/"] (~["*"])* "*")* "/">
-}
-
-// Token operator
-TOKEN: {
-  		< OPENBRACE: "{">
-    |   < CLOSEBRACE: "}">
-    |   < OPENBRACKET: "[">
-    |   < CLOSEBRACKET: "]">
-    |   < COMMA: ",">
-    |   < COLON: ":">
-    |   < DOT: ".">
-    |   < PLUS: "+">
-    |   < MINUS: "-">
-    | 	< STAR: "*" >
-	| 	< DIVIDE: "/" >
-	| 	< MOD: "%" >
-	| 	< PLUSPLUS: "++" >
-	| 	< NOT: "!" >
-    | 	< DOLA: "$">
-    | 	< BITWISEXOR: "^">
-    | 	< MINUSMINUS: "--" >
-    | 	< POINTERTO: "-->" >
-    | 	< LESSTHAN: "<" >
-	| 	< GREATERTHAN: ">" >
-	| 	< QUESTIONMARK: "?" >
-	| 	< BITWISEOR: "|" >
-	| "if" | "else" | "while" | "return"
-}
-
-// Token keyword
-TOKEN: {
-	 < STRING: "String" >
-	| < CHAR: "char" >
-	| < BOOLEAN: "boolean" >
-	| < INTEGER: "int" >
-	| < RANG: "Rang" >
-	| < STATE: "State" >
-	| < TRANSITION: "Transition" >
-	| < LONG: "long" >
-	| < REGULAREXPRESSION: "RE">
-	| < FINITEAUTOMATA: "FA">
-}
-
-// Token literale
-TOKEN: {
-	<	charL : "'" (	(~["'","\\","\n","\r"])	| 		("\\" ("0x" | "0X")["0"-"9","a"-"f","A"-"F"]["0"-"9","a"-"f","A"-"F"])	)	 "'" >
- 	|
-	<	stringL: "\"" ( (~["\"","\\"]) | ("\\" ( ["n","t","b","r","f","\\","\""] ) ) )* "\""	>
-	|
-	<	integerL: "0" | ["1"-"9"](["0"-"9"])*	>
-	| 
-	< 	identifier: <letter> (<letter>|<digit>)* >
- 	|
- 	<	booleanL: "true" | "false" | "True" | "False"  >
-	|
-	
-  	< 	letter: ["_","a"-"z","A"-"Z"] >
-	|
-  	< 	digit: ["0"-"9"] >
- 	|
- 	< character_descriptor : <charL> (<MINUS><charL>)?> 
-} 
-
-
-/*
-< 	rangL:	<OPENBRACKET> <character_descriptor> (<COMMA> <character_descriptor>)*    <CLOSEBRACKET>	>
-	|
-	<	stateL: <DOLA> <stringL> (<BITWISEXOR><integerL>)?	>  
-	|
-	< 	transitionL: <stateL>(<POINTERTO><stateL>|<MINUSMINUS><rangL><MINUSMINUS><stateL>	>
-	|
-	<   faL: <LESSTHAN> (<stateL>(<COMMA><OPENBRACE><transitionL><CLOSEBRACE>)+ <GREATERTHAN>) | <DIVIDE><DIVIDE>	>
-	| 
-*/
-

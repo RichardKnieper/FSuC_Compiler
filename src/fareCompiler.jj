@@ -1,0 +1,275 @@
+/**
+ * JavaCC template file created by SF JavaCC plugin 1.5.28+ wizard for JavaCC 1.5.0+
+ */options{  static = true;
+  DEBUG_PARSER = true;}PARSER_BEGIN(fareCompiler)package fare;
+
+public class fareCompiler{  public static void main(String args []) throws ParseException  {    fareCompiler parser = new fareCompiler(System.in);
+    parser.cu();
+         }}PARSER_END(fareCompiler)SKIP :
+{
+  // White space
+  " "
+| "\t"
+| "\n"
+| "\r"
+// Single Line
+| <"//" (~["\n","\r"])* ("\n"|"\r"|"\r\n")>
+// Multi Line 
+| <"/*" (~["*"])* "*" (~["/"] (~["*"])* "*")* "/">
+}
+
+// Token operator
+TOKEN: {
+  		< OPENBRACE: "{">
+    |   < CLOSEBRACE: "}">
+    |   < OPENBRACKET: "[">
+    |   < CLOSEBRACKET: "]">
+    |   < COMMA: ",">
+    |   < COLON: ":">
+    |   < DOT: ".">
+    |   < PLUS: "+">
+    |   < MINUS: "-">
+    | 	< STAR: "*" >
+	| 	< DIVIDE: "/" >
+	| 	< MOD: "%" >
+	| 	< PLUSPLUS: "++" >
+	| 	< NOT: "!" >
+    | 	< DOLA: "$">
+    | 	< BITWISEXOR: "^">
+    | 	< MINUSMINUS: "--" >
+    | 	< POINTERTO: "-->" >
+    | 	< LESSTHAN: "<" >
+	| 	< GREATERTHAN: ">" >
+	| 	< QUESTIONMARK: "?" >
+	| 	< BITWISEOR: "|" >
+	| 	< SEMICOLON: ";" >
+	| "if" | "else" | "while" | "return" | "print"
+}
+
+// Token keyword
+TOKEN: {
+	 < STRING: "String" >
+	| < CHAR: "char" >
+	| < BOOLEAN: "boolean" >
+	| < INTEGER: "int" >
+	| < RANG: "Rang" >
+	| < STATE: "State" >
+	| < TRANSITION: "Transition" >
+	| < LONG: "long" >
+	| < REGULAREXPRESSION: "RE">
+	| < FINITEAUTOMATA: "FA">
+}
+
+// Token literale
+TOKEN: {
+	<	charL : "'" (	(~["'","\\","\n","\r"])	| 		("\\" ("0x" | "0X")["0"-"9","a"-"f","A"-"F"]["0"-"9","a"-"f","A"-"F"])	)	 "'" >
+ 	|
+	<	stringL: "\"" ( (~["\"","\\"]) | ("\\" ( ["n","t","b","r","f","\\","\""] ) ) )* "\""	>
+	|
+	<	integerL: "0" | ["1"-"9"](["0"-"9"])*	>
+	| 
+	< 	identifier: <letter> (<letter>|<digit>)* >
+ 	|
+ 	<	booleanL: "true" | "false" | "True" | "False"  >
+	|	
+  	< 	letter: ["_","a"-"z","A"-"Z"] >
+	|
+  	< 	digit: ["0"-"9"] >
+  	|
+ 	< character_descriptor : <charL> (<MINUS><charL>)?>
+ 	
+} 
+
+// Parser
+// cu - > (declaration|stmt)*
+void cu():
+{
+}
+{
+  (declaration() | stmt())*
+}
+
+//  decl -> type <identifier> ";"
+// declaration - > type <identifier> ("=" atom() | assignExpr)? ";"
+void declaration():
+{}
+{
+	type() <identifier> ("=" atom())? ";"
+}
+
+// type -> "STRING" | "CHAR" | "BOOLEAN"| "INTEGER"| "RANG"| "STATE"| "TRANSITION"| "LONG"
+//					| "REGULAREXPRESSION" | "FINITEAUTOMATA"
+void type():
+{
+}
+{
+	  < STRING >
+	| < CHAR >
+	| < BOOLEAN >
+	| < INTEGER >
+	| < RANG >
+	| < STATE >
+	| < TRANSITION >
+	| < LONG >
+	| < REGULAREXPRESSION>
+	| < FINITEAUTOMATA>
+}
+
+// stmnt -> printStmnt | emptyStmnt | whileStmnt | ifStmnt | exprStmnt | blockStmt
+void stmt():
+{
+}
+{
+  printStmt() | emptyStmt() | whileStmt() | ifStmt() | exprStmt() | blockStmt()
+}
+
+// emptyStmnt -> ";"
+void emptyStmt():
+{
+}
+{
+  <SEMICOLON>
+}
+
+// whileStmnt -> "while" "(" expr ")" stmnt
+void whileStmt():
+{
+}
+{
+  "while" "(" expr() ")" stmt()
+}
+
+// ifStmnt -> "if" "(" expr ")" stmnt ("else" stmnt)?
+void ifStmt():
+{
+}
+{
+//  "if" "(" expr() ")" stmt() ("else" stmt())?
+ "if" "(" expr() ")" stmt() [LOOKAHEAD(1) "else" stmt()]
+}
+
+// blockStmt -> "{" (declaration | stmnt )*  "}"
+void blockStmt():
+{
+}
+{
+  "{" (declaration() | stmt())* "}"
+}
+
+// exprStmnt -> expr ";"
+void exprStmt():
+{
+}
+{
+ expr() ";"
+}
+
+// printStmnt -> "print" expr ";"
+void printStmt():
+{
+}
+{
+  "print" expr() ";"
+}
+
+void expr():
+{
+}
+{
+  compExpr() (LOOKAHEAD(2)("&&" | "||") compExpr())*
+}
+
+void compExpr():
+{
+}
+{
+  assignExpr() (LOOKAHEAD(2)("=="|"!="|"<="|">="|"<"|">") assignExpr())?
+}
+
+void assignExpr():
+{
+}
+{
+  LOOKAHEAD(2) <identifier> "=" expr() | sumExpr()
+}
+
+void sumExpr():
+{
+}
+{
+  prodExpr() (("+"|"-") prodExpr())*
+}
+
+void prodExpr():
+{
+}
+{
+  atom() (("*"|"/") atom())*
+}
+
+void atom():
+{
+}
+{
+  "!" atom() | ("+"|"-") atom() | <charL> | <stringL> | <integerL>
+  | <identifier> | <booleanL> | "(" expr() ")" | range() | state() | transition() | fa()
+}
+
+//< 	range -> "[" <character_descriptor> ("," <character_descriptor>)*    <CLOSEBRACKET>	>
+void range():
+{
+}
+{
+  <OPENBRACKET> character_descriptor() (<COMMA> character_descriptor())*    <CLOSEBRACKET>
+}
+
+// character_descriptor - > charL> ("-"<charL>)?
+void character_descriptor():
+{
+}
+{
+  <charL> (<MINUS><charL>)?
+}
+
+// stateL - > "$" <stringL> ("^"<integerL>)?
+void state():
+{
+}
+{
+  <DOLA> <stringL> (<BITWISEXOR><integerL>)?
+}
+// trasition - > "$"<string>|<identifier> "-->" ("$"<string>|<identifier>) | "--" range -- "$"<string>|<identifier>
+void transition():
+{
+}
+{
+  LOOKAHEAD(2) (<DOLA><stringL>|<identifier>) <POINTERTO> (<DOLA><stringL>|<identifier>)
+  								| <MINUSMINUS> range() <MINUSMINUS> (<DOLA><stringL>|<identifier>)
+ // <DOLA><identifier>((<POINTERTO><DOLA> <identifier>)|(<MINUSMINUS>range()<MINUSMINUS><DOLA>atom()))
+}
+
+void fa():
+{
+}
+{
+  <LESSTHAN> (<DOLA><stringL>(<COMMA><OPENBRACE>(transition())?<CLOSEBRACE>)+ <GREATERTHAN>) 
+}
+
+
+
+
+
+
+
+/*
+< 	rangL:	<OPENBRACKET> <character_descriptor> (<COMMA> <character_descriptor>)*    <CLOSEBRACKET>	>
+	|
+	<	stateL: <DOLA> <stringL> (<BITWISEXOR><integerL>)?	>  
+	|
+	< 	transitionL: <stateL>(<POINTERTO><stateL>|<MINUSMINUS><rangL><MINUSMINUS><stateL>	>
+	|
+	<   faL: <LESSTHAN> (<stateL>(<COMMA><OPENBRACE><transitionL><CLOSEBRACE>)+ <GREATERTHAN>) | <DIVIDE><DIVIDE>	>
+	| |
+ 	< character_descriptor : <charL> (<MINUS><charL>)?> 
+*/
+
