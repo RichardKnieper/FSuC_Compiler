@@ -12,6 +12,7 @@ FA erzeugeAutomat(State name) {
 State A = $"Erster"; State B = $"Zweiter";
 Range C = ['b','c'] + ['w'-'z'];
 Transition T = A - - C - - > B;
+Transition T2 = A -- C - -> B;
 
 String test = "abc";
 Set<String> testSet = {"abv", "cde"};

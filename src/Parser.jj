@@ -23,6 +23,7 @@ TOKEN : {
     | <IntegerLiteral : "0" | (["1"-"9"] (["0"-"9"])*)>
     | <RegexLiteral : "/" (["A"-"Z"] | ["a"-"z"] | ["0"-"9"] | "(" | ")" | "[" | "]" | "+" | "*" | "|" | "?" | "-")+ "/">
     | <Identifier : ["A"-"Z", "a"-"z", "_"](["A"-"Z", "a"-"z", "_", "0" - "9"])*>
+    | <Arrow : "- - >" | "-- >" | "- ->" | "-->">
 }
 
 SKIP :
@@ -45,38 +46,38 @@ void cu(): {} {
     (decl() | stmnt())*
 }
 
-// decl -> <Type> <Identifier> (varDecl | methDecl | ";")
+// decl -> type() <Identifier> (varDecl | methDecl | ";")
 void decl(): {} {
     type() <Identifier> (varDecl() | methDecl() | ";")
 }
 
-// varDecl -> "=" atom ";"
+// varDecl -> "=" expr ";"
 void varDecl(): {} {
     "=" expr() ";"
 }
 
-// methDecl -> "(" (<Type> <Identifier> ("," <Type> <Identifier>)*)? ")" stmnt
+// methDecl -> "(" (type <Identifier> ("," type <Identifier>)*)? ")" stmnt
 void methDecl(): {} {
     "(" (type() <Identifier> ("," type() <Identifier>)*)? ")" stmnt()
 }
 
-// stmnt -> returnStmnt | ifStmnt | whileStmnt | blockStmnt | expr | ";"
+// stmnt -> (<Identifier> ".")? methCall "";" | returnStmnt | ifStmnt | whileStmnt | blockStmnt | expr | ";"
 void stmnt(): {} {
     LOOKAHEAD(4) (LOOKAHEAD(2) <Identifier> ".")? methCall() ";"
     | returnStmnt() | ifStmnt() | whileStmnt() | LOOKAHEAD(3) blockStmnt() | expr() | ";"
 }
 
-// returnStmnt -> "return" atom ";"
+// returnStmnt -> "return" expr ";"
 void returnStmnt(): {} {
     "return" expr() ";"
 }
 
-// ifStmnt -> "if" "(" atom ")" stmnt ("else" stmnt)?
+// ifStmnt -> "if" "(" expr ")" stmnt ("else" stmnt)?
 void ifStmnt(): {} {
     "if" "("  expr() ")" stmnt() (LOOKAHEAD(1)"else" stmnt())?
 }
 
-// whileStmnt -> "while" "(" atom ")" stmnt
+// whileStmnt -> "while" "(" expr ")" stmnt
 void whileStmnt(): {} {
     "while" "(" expr() ")" stmnt()
 }
@@ -86,24 +87,33 @@ void blockStmnt(): {} {
     "{" (decl() | stmnt())* "}"
 }
 
+/*
+ */
+// type -> arrayType | <Type> | setType | mapType
 void type(): {} {
     LOOKAHEAD(2) arrayType() | <Type> | setType() | mapType()
 }
 
+// setType -> "Set" "<" <Type> ">"
 void setType(): {} {
     "Set" "<" <Type> ">"
 }
 
+// mapType -> "Map" "<" <Type> , <Type> ">"
 void mapType(): {} {
     "Map" "<" <Type> "," <Type> ">"
 }
 
+// arrayType -> <Type> "[]"
 void arrayType(): {} {
     <Type> "[]"
 }
 
-// atom -> "!" atom | ("+" | "-") atom | <Character> | <String> | <Integer> | <Boolean> | <Identifier>
-//         | expr | range | state | transition | fa | methCall
+// atom -> "!" atom | <Character> | <String> | <Integer> | <Boolean>
+//         | set | map | array
+//         | range | fa
+//         | (<Identifier> ".")? methCall
+//         | (state | <Identifier> ("." <Identifier>)*) (transition)?
 void atom(): {} {
     "!" atom() | <CharLiteral> | <StringLiteral> | <IntegerLiteral> | <BoolLiteral>
     | set() | LOOKAHEAD(3) map() | array()
@@ -112,24 +122,27 @@ void atom(): {} {
     | (state() | <Identifier> ("." <Identifier>)*) (LOOKAHEAD(3) transition())?
 }
 
+// set -> "{" (atom ("," atom)*)? "}"
 void set(): {} {
     "{" (atom() ("," atom())*)? "}"
 }
 
+// map -> "[[" (atom ":" atom ("," atom ":" atom)*)? "]]"
 void map(): {} {
     "[[" (atom() ":" atom() ("," atom() ":" atom())*)? "]]"
 }
 
+// array -> "[[" (atom ("," atom)*)? "]]"
 void array(): {} {
     "[[" (atom() ("," atom())*)? "]]"
 }
 
-// methCall -> (<Idenfier> ".")? <Identifier> "(" (atom ("," atom)*)? ")"
+// methCall -> <Identifier> "(" (atom ("," atom)*)? ")"
 void methCall(): {} {
     <Identifier> "(" (atom() ("," atom())*)? ")"
 }
 
-// range -> "[" <Char> ("-" <Char)? ("," <Char> ("-" <Char)?)* "]"
+// range -> "[" <Char> ("-" <Char)? ("," <Char> ("-" <Char)?)* "]" ("+" (range | <Identifier>))*
 void range(): {} {
     "[" <CharLiteral> ("-" <CharLiteral>)? ("," <CharLiteral> ("-" <CharLiteral> )?)* "]"
     (LOOKAHEAD(2) "+" (range() | <Identifier>))*
@@ -137,15 +150,15 @@ void range(): {} {
 
 // state -> "$" <String> ("^" (<Integer> | <Identifier>))?
 void state(): {} {
-    "$" <StringLiteral> ("^" (<IntegerLiteral> | <Identifier>))?
+    "$" <StringLiteral> (LOOKAHEAD(2) "^" (<IntegerLiteral> | <Identifier>))?
 }
 
-// transition -> (state | <Identifier>) (("--" (range | <Identifier)) | "-") "-->" (state | <Identifier>)
+// transition -> (("-" "-" | "--") (range | <Identifier>) | "-") <Arrow> (state | <Identifier>)
 void transition(): {} {
-    (("-" "-" (range() | <Identifier>)) | "-") "-" "-" ">" (state() | <Identifier>)
+    (LOOKAHEAD(2) ( "-" "-" | "--") (range() | <Identifier>) | "-") <Arrow> (state() | <Identifier>)
 }
 
-// fa -> "<" (state | <Identifier>) ",{" (transition ("," transition)*)? "}>"
+// fa -> "<" (state | <Identifier>) ",{" (<Identifier> (transition)? ("," <Identifier (transition)?)?)? "}" ">"
 void fa(): {} {
     "<" (state() | <Identifier>) "," "{" (<Identifier>(transition())? ("," <Identifier>(transition())?)?)? "}" ">"
     (LOOKAHEAD(2) "+" (fa() | <Identifier>))*
@@ -166,15 +179,17 @@ void sumExpr(): {} {
     prodExpr() (("+"|"-") prodExpr())*
 }
 
-// prodExpr -> atom (("*" | "/") atom)*
+// prodExpr -> intersectionExpr (("*" | "/") intersectionExpr)*
 void prodExpr(): {} {
     intersectionExpr() (("*"|"/") intersectionExpr())*
 }
 
+// intersectionExpr -> preOrPostIncrementExpr ("^" preOrPostIncrementExpr)*
 void intersectionExpr(): {} {
     preOrPostIncrementExpr() ("^" preOrPostIncrementExpr())*
 }
 
+// preOrPostIncrementExpr -> ("++" | "--") atom | atom ("++" | "--")?
 void preOrPostIncrementExpr(): {} {
     LOOKAHEAD(2) ("++" | "--") atom()
     | LOOKAHEAD(2) atom() ("++" | "--")?

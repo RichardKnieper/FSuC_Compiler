@@ -22,6 +22,8 @@ public interface ParserConstants {
   int RegexLiteral = 41;
   /** RegularExpression Id. */
   int Identifier = 42;
+  /** RegularExpression Id. */
+  int Arrow = 43;
 
   /** Lexical state. */
   int DEFAULT = 0;
@@ -71,13 +73,13 @@ public interface ParserConstants {
     "<IntegerLiteral>",
     "<RegexLiteral>",
     "<Identifier>",
+    "<Arrow>",
     "\" \"",
     "\"\\t\"",
     "\"\\n\"",
     "\"\\r\"",
-    "<token of kind 47>",
     "<token of kind 48>",
-    "\"-->\"",
+    "<token of kind 49>",
     "\"==\"",
     "\"!=\"",
     "\"<=\"",
