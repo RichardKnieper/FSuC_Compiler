@@ -38,6 +38,7 @@ TOKEN: {
     | 	< BITWISEXOR: "^">
     | 	< MINUSMINUS: "--" >
     | 	< POINTERTO: "-->" >
+    | 	< MAXPOINTERTO: "--->" >
     | 	< LESSTHAN: "<" >
 	| 	< GREATERTHAN: ">" >
 	| 	< QUESTIONMARK: "?" >
@@ -75,8 +76,7 @@ TOKEN: {
   	< 	letter: ["_","a"-"z","A"-"Z"] >
 	|
   	< 	digit: ["0"-"9"] >
-  	|
- 	< character_descriptor : <charL> (<MINUS><charL>)?>
+  	
  	
 } 
 
@@ -94,7 +94,7 @@ void cu():
 void declaration():
 {}
 {
-	type() <identifier> ("=" atom())? ";"
+	type() <identifier> ("=" atom() | "(" <STATE> <identifier> ")" stmt() )? ";"
 }
 
 // type -> "STRING" | "CHAR" | "BOOLEAN"| "INTEGER"| "RANG"| "STATE"| "TRANSITION"| "LONG"
@@ -120,7 +120,15 @@ void stmt():
 {
 }
 {
-  printStmt() | emptyStmt() | whileStmt() | ifStmt() | exprStmt() | blockStmt()
+  printStmt() | emptyStmt() | whileStmt() | ifStmt() | LOOKAHEAD(2) exprStmt() | blockStmt() |  returnStmt()
+}
+
+void returnStmt():
+{
+}
+{
+  "return" <LESSTHAN> (<identifier><COMMA><OPENBRACE>transition()<CLOSEBRACE><GREATERTHAN>) | 
+  (<charL> | <stringL> | <integerL> | <identifier> | <booleanL> )
 }
 
 // emptyStmnt -> ";"
@@ -212,7 +220,7 @@ void atom():
 }
 {
   "!" atom() | ("+"|"-") atom() | <charL> | <stringL> | <integerL>
-  | <identifier> | <booleanL> | "(" expr() ")" | range() | state() | transition() | fa()
+  | <identifier> | <booleanL> | "(" expr() ")" | range() | state() |  fa()
 }
 
 //< 	range -> "[" <character_descriptor> ("," <character_descriptor>)*    <CLOSEBRACKET>	>
@@ -236,15 +244,15 @@ void state():
 {
 }
 {
-  <DOLA> <stringL> (<BITWISEXOR><integerL>)?
+  <DOLA> <stringL> (<BITWISEXOR>(<integerL>|<identifier>))?
 }
 // trasition - > "$"<string>|<identifier> "-->" ("$"<string>|<identifier>) | "--" range -- "$"<string>|<identifier>
 void transition():
 {
 }
 {
-  LOOKAHEAD(2) (<DOLA><stringL>|<identifier>) <POINTERTO> (<DOLA><stringL>|<identifier>)
-  								| <MINUSMINUS> range() <MINUSMINUS> (<DOLA><stringL>|<identifier>)
+  LOOKAHEAD(2) (<DOLA><stringL>|<identifier>) <MAXPOINTERTO> (<DOLA><stringL>|<identifier>)
+  								| (<DOLA><stringL>|<identifier>) <MINUSMINUS> range() <POINTERTO> ((<DOLA><stringL>(<BITWISEXOR>(<integerL>|<identifier>))?)|(<identifier>(<BITWISEXOR>(<integerL>|<identifier>))?))
  // <DOLA><identifier>((<POINTERTO><DOLA> <identifier>)|(<MINUSMINUS>range()<MINUSMINUS><DOLA>atom()))
 }
 
