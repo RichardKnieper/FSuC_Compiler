@@ -13,9 +13,9 @@ PARSER_END(Parser)
 // Lexer
 TOKEN : {
     "+" | "-" | "*" | "/" | "%" | "++" | "--" | "&&" | "||" | "|" | "!" | "^"| "=" | "," | "."
-    | "[" | "]" | "[]" | "[[" | "]]" | "(" | ")" | "<" | ">" | "{" | "}" | ";" | "$"
+    | "[" | "]" | "[]" | "[[" | "]]" | "(" | ")" | "<" | ">" | "{" | "}" | ";" | "$" | ":"
     | "if" | "else" | "while" | "return"
-    | <Type : "Range" | "State" | "Transition" | "FA" | "RA" |"int" | "double" | "char" | "boolean">
+    | <Type : "String" | "Range" | "State" | "Transition" | "FA" | "RA" |"int" | "double" | "char" | "boolean">
     | "Set" | "Map"
     | <BoolLiteral : "true" | "false">
     | <CharLiteral : "'" ["A"-"Z", "a"-"z", "?", "!"] "'">
@@ -47,7 +47,7 @@ void cu(): {} {
 
 // decl -> <Type> <Identifier> (varDecl | methDecl | ";")
 void decl(): {} {
-    <Type> <Identifier> (varDecl() | methDecl() | ";")
+    type() <Identifier> (varDecl() | methDecl() | ";")
 }
 
 // varDecl -> "=" atom ";"
@@ -57,12 +57,12 @@ void varDecl(): {} {
 
 // methDecl -> "(" (<Type> <Identifier> ("," <Type> <Identifier>)*)? ")" stmnt
 void methDecl(): {} {
-    "(" (<Type> <Identifier> ("," <Type> <Identifier>)*)? ")" stmnt()
+    "(" (type() <Identifier> ("," type() <Identifier>)*)? ")" stmnt()
 }
 
 // stmnt -> returnStmnt | ifStmnt | whileStmnt | blockStmnt | expr | ";"
 void stmnt(): {} {
-    returnStmnt() | ifStmnt() | whileStmnt() | blockStmnt() | expr() | ";"
+    returnStmnt() | ifStmnt() | whileStmnt() | LOOKAHEAD(3) blockStmnt() | expr() | ";"
 }
 
 // returnStmnt -> "return" atom ";"
@@ -85,12 +85,41 @@ void blockStmnt(): {} {
     "{" (decl() | stmnt())* "}"
 }
 
+void type(): {} {
+    LOOKAHEAD(2) arrayType() | <Type> | setType() | mapType()
+}
+
+void setType(): {} {
+    "Set" "<" <Type> ">"
+}
+
+void mapType(): {} {
+    "Map" "<" <Type> "," <Type> ">"
+}
+
+void arrayType(): {} {
+    <Type> "[]"
+}
+
 // atom -> "!" atom | ("+" | "-") atom | <Character> | <String> | <Integer> | <Boolean> | <Identifier>
 //         | expr | range | state | transition | fa | methCall
 void atom(): {} {
     "!" atom() | <CharLiteral> | <StringLiteral> | <IntegerLiteral> | <BoolLiteral>
+    | set() | LOOKAHEAD(3) map() | array()
     | range() | fa() | LOOKAHEAD(2) methCall()
     | (state() | <Identifier> ("." <Identifier>)*) (LOOKAHEAD(3) transition())?
+}
+
+void set(): {} {
+    "{" (atom() ("," atom())*)? "}"
+}
+
+void map(): {} {
+    "[[" (atom() ":" atom() ("," atom() ":" atom())*)? "]]"
+}
+
+void array(): {} {
+    "[[" (atom() ("," atom())*)? "]]"
 }
 
 // methCall -> (<Idenfier> ".")? <Identifier> "(" (atom ("," atom)*)? ")"

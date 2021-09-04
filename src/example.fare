@@ -13,6 +13,11 @@ State A = $"Erster"; State B = $"Zweiter";
 Range C = ['b','c'] + ['w'-'z'];
 Transition T = A -- C --> B;
 
+String test = "abc";
+Set<String> testSet = {"abv", "cde"};
+Map<String, boolean> testMap = [["true": true]];
+String[] testArray = [["a", "b"]];
+
 if (A.accept == 1 && A.label == "A")
     return erzeugeAutomat(A);
 else

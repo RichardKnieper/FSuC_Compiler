@@ -9,19 +9,19 @@ public interface ParserConstants {
   /** End of File. */
   int EOF = 0;
   /** RegularExpression Id. */
-  int Type = 33;
+  int Type = 34;
   /** RegularExpression Id. */
-  int BoolLiteral = 36;
+  int BoolLiteral = 37;
   /** RegularExpression Id. */
-  int CharLiteral = 37;
+  int CharLiteral = 38;
   /** RegularExpression Id. */
-  int StringLiteral = 38;
+  int StringLiteral = 39;
   /** RegularExpression Id. */
-  int IntegerLiteral = 39;
+  int IntegerLiteral = 40;
   /** RegularExpression Id. */
-  int RegexLiteral = 40;
+  int RegexLiteral = 41;
   /** RegularExpression Id. */
-  int Identifier = 41;
+  int Identifier = 42;
 
   /** Lexical state. */
   int DEFAULT = 0;
@@ -57,6 +57,7 @@ public interface ParserConstants {
     "\"}\"",
     "\";\"",
     "\"$\"",
+    "\":\"",
     "\"if\"",
     "\"else\"",
     "\"while\"",
@@ -74,8 +75,8 @@ public interface ParserConstants {
     "\"\\t\"",
     "\"\\n\"",
     "\"\\r\"",
-    "<token of kind 46>",
     "<token of kind 47>",
+    "<token of kind 48>",
     "\"-->\"",
     "\"==\"",
     "\"!=\"",
