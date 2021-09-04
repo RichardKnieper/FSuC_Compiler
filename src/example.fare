@@ -22,3 +22,5 @@ if (A.accept == 1 && A.label == "A")
     return erzeugeAutomat(A);
 else
     return automata1;
+
+int l = test.length();

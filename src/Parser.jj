@@ -106,7 +106,8 @@ void arrayType(): {} {
 void atom(): {} {
     "!" atom() | <CharLiteral> | <StringLiteral> | <IntegerLiteral> | <BoolLiteral>
     | set() | LOOKAHEAD(3) map() | array()
-    | range() | fa() | LOOKAHEAD(2) methCall()
+    | range() | fa()
+    | LOOKAHEAD(4) (LOOKAHEAD(2) <Identifier> ".")? methCall()
     | (state() | <Identifier> ("." <Identifier>)*) (LOOKAHEAD(3) transition())?
 }
 
