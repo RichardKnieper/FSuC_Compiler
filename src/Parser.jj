@@ -47,7 +47,7 @@ void cu(): {} {
 
 // decl -> <Type> <Identifier> (varDecl | methDecl | ";")
 void decl(): {} {
-    <Type> <Identifier> (varDecl() | methDecl()) ";"
+    <Type> <Identifier> (varDecl() | methDecl() | ";")
 }
 
 // varDecl -> "=" atom ";"
@@ -72,7 +72,7 @@ void returnStmnt(): {} {
 
 // ifStmnt -> "if" "(" atom ")" stmnt ("else" stmnt)?
 void ifStmnt(): {} {
-    "if" "(" atomOrExpr() ")" stmnt() [LOOKAHEAD(1)"else" stmnt()]
+    "if" "(" atomOrExpr() ")" stmnt() (LOOKAHEAD(1)"else" stmnt())?
 }
 
 // whileStmnt -> "while" "(" atom ")" stmnt
@@ -92,14 +92,14 @@ void atomOrExpr(): {} {
 // atom -> "!" atom | ("+" | "-") atom | <Character> | <String> | <Integer> | <Boolean> | <Identifier>
 //         | expr | range | state | transition | fa | methCall
 void atom(): {} {
-    "!" atom() | ("+" | "-") atom() | <CharLiteral> | <StringLiteral> | <IntegerLiteral> | <BoolLiteral>
+    "!" atom() | <CharLiteral> | <StringLiteral> | <IntegerLiteral> | <BoolLiteral>
     | range() | fa() | LOOKAHEAD(2) methCall()
     | (state() | <Identifier>) (LOOKAHEAD(3) transition())?
 }
 
 // methCall -> (<Idenfier> ".")? <Identifier> "(" (atom ("," atom)*)? ")"
 void methCall(): {} {
-    (<Identifier> ".")? <Identifier> "(" (atom() ("," atom())*)? ")"
+    (LOOKAHEAD(2) <Identifier> ".")? <Identifier> "(" (atom() ("," atom())*)? ")"
 }
 
 // range -> "[" <Char> ("-" <Char)? ("," <Char> ("-" <Char)?)* "]"
@@ -117,9 +117,9 @@ void transition(): {} {
     (("--" (range() | <Identifier>)) | "-") "-->" (state() | <Identifier>)
 }
 
-// fa -> "<$" <String> ",{" (transition ("," transition)*)? "}>"
+// fa -> "<" (state | <Identifier>) ",{" (transition ("," transition)*)? "}>"
 void fa(): {} {
-    "<$" <StringLiteral> ",{" (transition() ("," transition())*)? "}>"
+    "<" (state() | <Identifier>) "," "{" (<Identifier>(transition())? ("," <Identifier>(transition())?)?)? "}" ">"
 }
 
 // expr -> "(" expr ")" | compExpr (("&&" | "||") compExpr)*
@@ -129,7 +129,7 @@ void expr(): {} {
 
 // compExpr -> sumExpr (("=="|"!="|"<="|">="|"<"|">") sumExpr)*
 void compExpr(): {} {
-    sumExpr() (("=="|"!="|"<="|">="|"<"|">") sumExpr())*
+    sumExpr() (LOOKAHEAD(2)("=="|"!="|"<="|">="|"<"|">") sumExpr())*
 }
 
 // sumExpr -> prodExpr (("+" | "-") prodExpr)*
