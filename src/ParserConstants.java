@@ -9,21 +9,19 @@ public interface ParserConstants {
   /** End of File. */
   int EOF = 0;
   /** RegularExpression Id. */
-  int Type = 35;
+  int Type = 33;
   /** RegularExpression Id. */
-  int Identifier = 38;
+  int BoolLiteral = 36;
   /** RegularExpression Id. */
-  int CharLiteral = 39;
+  int CharLiteral = 37;
   /** RegularExpression Id. */
-  int StringLiteral = 40;
+  int StringLiteral = 38;
   /** RegularExpression Id. */
-  int IntegerLiteral = 41;
+  int IntegerLiteral = 39;
   /** RegularExpression Id. */
-  int DoubleLiteral = 42;
+  int RegexLiteral = 40;
   /** RegularExpression Id. */
-  int RegexLiteral = 43;
-  /** RegularExpression Id. */
-  int Comment = 48;
+  int Identifier = 41;
 
   /** Lexical state. */
   int DEFAULT = 0;
@@ -59,8 +57,6 @@ public interface ParserConstants {
     "\"}\"",
     "\";\"",
     "\"$\"",
-    "\"true\"",
-    "\"false\"",
     "\"if\"",
     "\"else\"",
     "\"while\"",
@@ -68,22 +64,26 @@ public interface ParserConstants {
     "<Type>",
     "\"Set\"",
     "\"Map\"",
-    "<Identifier>",
+    "<BoolLiteral>",
     "<CharLiteral>",
     "<StringLiteral>",
     "<IntegerLiteral>",
-    "<DoubleLiteral>",
     "<RegexLiteral>",
+    "<Identifier>",
     "\" \"",
     "\"\\t\"",
     "\"\\n\"",
     "\"\\r\"",
-    "<Comment>",
-    "\"Set<\"",
-    "\"Map<\"",
+    "<token of kind 46>",
+    "<token of kind 47>",
     "\"-->\"",
+    "\"<$\"",
     "\",{\"",
     "\"}>\"",
+    "\"==\"",
+    "\"!=\"",
+    "\"<=\"",
+    "\">=\"",
   };
 
 }

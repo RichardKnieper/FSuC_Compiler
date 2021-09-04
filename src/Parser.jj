@@ -14,14 +14,15 @@ PARSER_END(Parser)
 TOKEN : {
     "+" | "-" | "*" | "/" | "%" | "++" | "--" | "&&" | "||" | "|" | "!" | "^"| "=" | "," | "."
     | "[" | "]" | "[]" | "[[" | "]]" | "(" | ")" | "<" | ">" | "{" | "}" | ";" | "$"
-    | "true" | "false" | "if" | "else" | "while" | "return"
+    | "if" | "else" | "while" | "return"
     | <Type : "Range" | "State" | "Transition" | "FA" | "RA" |"int" | "double" | "char" | "boolean">
     | "Set" | "Map"
-    | <Identifier : ["A"-"Z", "a"-"z", "_"](["A"-"Z", "a"-"z", "_", "0" - "9"])*>
+    | <BoolLiteral : "true" | "false">
     | <CharLiteral : "'" ["A"-"Z", "a"-"z", "?", "!"] "'">
     | <StringLiteral : "\"" ["A"-"Z", "a"-"z", "_"](["A"-"Z", "a"-"z", "_", "0"-"9"])* "\"">
     | <IntegerLiteral : "0" | (["1"-"9"] (["0"-"9"])*)>
     | <RegexLiteral : "/" (<StringLiteral> | <CharLiteral> | "(" | ")" | "[" | "]" | "+" | "*" | "|")+ "/" >
+    | <Identifier : ["A"-"Z", "a"-"z", "_"](["A"-"Z", "a"-"z", "_", "0" - "9"])*>
 }
 
 SKIP :
@@ -51,38 +52,92 @@ void decl(): {} {
 
 // varDecl -> "=" atom ";"
 void varDecl(): {} {
-
+    "=" atomOrExpr() ";"
 }
 
-// methDecl -> "(" (<Type> <Identifier> ("," <Type> <Identifier>)? ")" stmnt
+// methDecl -> "(" (<Type> <Identifier> ("," <Type> <Identifier>)*)? ")" stmnt
+void methDecl(): {} {
+    "(" (<Type> <Identifier> ("," <Type> <Identifier>)*)? ")" stmnt()
+}
 
 // stmnt -> returnStmnt | ifStmnt | whileStmnt | blockStmnt | expr | ";"
+void stmnt(): {} {
+    returnStmnt() | ifStmnt() | whileStmnt() | blockStmnt() | expr() | ";"
+}
 
 // returnStmnt -> "return" atom ";"
+void returnStmnt(): {} {
+    "return" atomOrExpr() ";"
+}
 
 // ifStmnt -> "if" "(" atom ")" stmnt ("else" stmnt)?
+void ifStmnt(): {} {
+    "if" "(" atomOrExpr() ")" stmnt() [LOOKAHEAD(1)"else" stmnt()]
+}
 
 // whileStmnt -> "while" "(" atom ")" stmnt
+void whileStmnt(): {} {
+    "while" "(" atomOrExpr() ")" stmnt()
+}
 
 // blockStmnt -> "{" (decl | stmnt)* "}"
+void blockStmnt(): {} {
+    "{" (decl() | stmnt())* "}"
+}
+
+void atomOrExpr(): {} {
+    LOOKAHEAD(3) atom() | expr()
+}
 
 // atom -> "!" atom | ("+" | "-") atom | <Character> | <String> | <Integer> | <Boolean> | <Identifier>
 //         | expr | range | state | transition | fa | methCall
+void atom(): {} {
+    "!" atom() | ("+" | "-") atom() | <CharLiteral> | <StringLiteral> | <IntegerLiteral> | <BoolLiteral>
+    | range() | fa() | LOOKAHEAD(2) methCall()
+    | (state() | <Identifier>) (LOOKAHEAD(3) transition())?
+}
 
 // methCall -> (<Idenfier> ".")? <Identifier> "(" (atom ("," atom)*)? ")"
+void methCall(): {} {
+    (<Identifier> ".")? <Identifier> "(" (atom() ("," atom())*)? ")"
+}
 
 // range -> "[" <Char> ("-" <Char)? ("," <Char> ("-" <Char)?)* "]"
+void range(): {} {
+    "[" <CharLiteral> ("-" <CharLiteral>)? ("," <CharLiteral> ("-" <CharLiteral> )?)* "]"
+}
 
 // state -> "$" <String> ("^" (<Integer> | <Identifier>))?
+void state(): {} {
+    "$" <StringLiteral> ("^" (<IntegerLiteral> | <Identifier>))?
+}
 
 // transition -> (state | <Identifier>) (("--" (range | <Identifier)) | "-") "-->" (state | <Identifier>)
+void transition(): {} {
+    (("--" (range() | <Identifier>)) | "-") "-->" (state() | <Identifier>)
+}
 
 // fa -> "<$" <String> ",{" (transition ("," transition)*)? "}>"
+void fa(): {} {
+    "<$" <StringLiteral> ",{" (transition() ("," transition())*)? "}>"
+}
 
 // expr -> "(" expr ")" | compExpr (("&&" | "||") compExpr)*
+void expr(): {} {
+    ("(" expr() ")") | (compExpr() (("&&" | "||") compExpr())*)
+}
 
 // compExpr -> sumExpr (("=="|"!="|"<="|">="|"<"|">") sumExpr)*
+void compExpr(): {} {
+    sumExpr() (("=="|"!="|"<="|">="|"<"|">") sumExpr())*
+}
 
 // sumExpr -> prodExpr (("+" | "-") prodExpr)*
+void sumExpr(): {} {
+    prodExpr() (("+"|"-") prodExpr())*
+}
 
 // prodExpr -> atom (("*" | "/") atom)*
+void prodExpr(): {} {
+    atom() (("*"|"/") atom())*
+}
