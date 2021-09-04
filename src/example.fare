@@ -24,3 +24,5 @@ else
     return automata1;
 
 int l = test.length();
+test.charAt(12, 3);
+erzeugeAutomat("test");

@@ -62,7 +62,8 @@ void methDecl(): {} {
 
 // stmnt -> returnStmnt | ifStmnt | whileStmnt | blockStmnt | expr | ";"
 void stmnt(): {} {
-    returnStmnt() | ifStmnt() | whileStmnt() | LOOKAHEAD(3) blockStmnt() | expr() | ";"
+    LOOKAHEAD(4) (LOOKAHEAD(2) <Identifier> ".")? methCall() ";"
+    | returnStmnt() | ifStmnt() | whileStmnt() | LOOKAHEAD(3) blockStmnt() | expr() | ";"
 }
 
 // returnStmnt -> "return" atom ";"
