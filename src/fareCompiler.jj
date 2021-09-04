@@ -81,12 +81,12 @@ TOKEN: {
 } 
 
 // Parser
-// cu - > (declaration|stmt)*
+// cu - > (declaration|stmnt)*
 void cu():
 {
 }
 {
-  (declaration() | stmt())*
+  (declaration() | stmnt())*
 }
 
 //  decl -> type <identifier> ";"
@@ -94,7 +94,11 @@ void cu():
 void declaration():
 {}
 {
-	type() <identifier> ("=" atom() | "(" <STATE> <identifier> ")" stmt() )? ";"
+	//type() <identifier> ("=" atom())? ";"
+	type() <identifier>  ( LOOKAHEAD(2) 
+        ( ("=" atom()|transition())? ";") // variable
+        | ("(" (type() <identifier>)* ")" blockStmnt()) // method
+    )
 }
 
 // type -> "STRING" | "CHAR" | "BOOLEAN"| "INTEGER"| "RANG"| "STATE"| "TRANSITION"| "LONG"
@@ -115,15 +119,15 @@ void type():
 	| < FINITEAUTOMATA>
 }
 
-// stmnt -> printStmnt | emptyStmnt | whileStmnt | ifStmnt | exprStmnt | blockStmt
-void stmt():
+// stmnt -> printStmnt | emptyStmnt | whileStmnt | ifStmnt | exprStmnt | blockStmnt
+void stmnt():
 {
 }
 {
-  printStmt() | emptyStmt() | whileStmt() | ifStmt() | LOOKAHEAD(2) exprStmt() | blockStmt() |  returnStmt()
+  printStmnt() | emptyStmnt() | whileStmnt() | ifStmnt() | LOOKAHEAD(2) exprStmnt() | blockStmnt() |  returnStmnt()
 }
 
-void returnStmt():
+void returnStmnt():
 {
 }
 {
@@ -132,7 +136,7 @@ void returnStmt():
 }
 
 // emptyStmnt -> ";"
-void emptyStmt():
+void emptyStmnt():
 {
 }
 {
@@ -140,32 +144,32 @@ void emptyStmt():
 }
 
 // whileStmnt -> "while" "(" expr ")" stmnt
-void whileStmt():
+void whileStmnt():
 {
 }
 {
-  "while" "(" expr() ")" stmt()
+  "while" "(" expr() ")" stmnt()
 }
 
 // ifStmnt -> "if" "(" expr ")" stmnt ("else" stmnt)?
-void ifStmt():
+void ifStmnt():
 {
 }
 {
-//  "if" "(" expr() ")" stmt() ("else" stmt())?
- "if" "(" expr() ")" stmt() [LOOKAHEAD(1) "else" stmt()]
+//  "if" "(" expr() ")" stmnt() ("else" stmnt())?
+ "if" "(" expr() ")" stmnt() [LOOKAHEAD(1) "else" stmnt()]
 }
 
-// blockStmt -> "{" (declaration | stmnt )*  "}"
-void blockStmt():
+// blockStmnt -> "{" (declaration | stmnt )*  "}"
+void blockStmnt():
 {
 }
 {
-  "{" (declaration() | stmt())* "}"
+  "{" (declaration() | stmnt())* "}"
 }
 
 // exprStmnt -> expr ";"
-void exprStmt():
+void exprStmnt():
 {
 }
 {
@@ -173,7 +177,7 @@ void exprStmt():
 }
 
 // printStmnt -> "print" expr ";"
-void printStmt():
+void printStmnt():
 {
 }
 {
@@ -220,7 +224,7 @@ void atom():
 }
 {
   "!" atom() | ("+"|"-") atom() | <charL> | <stringL> | <integerL>
-  | <identifier> | <booleanL> | "(" expr() ")" | range() | state() |  fa()
+  | <identifier> | <booleanL> | "(" expr() ")" | range() | state() |  fa() 
 }
 
 //< 	range -> "[" <character_descriptor> ("," <character_descriptor>)*    <CLOSEBRACKET>	>
