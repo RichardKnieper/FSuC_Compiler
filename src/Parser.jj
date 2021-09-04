@@ -52,7 +52,7 @@ void decl(): {} {
 
 // varDecl -> "=" atom ";"
 void varDecl(): {} {
-    "=" atomOrExpr() ";"
+    "=" expr() ";"
 }
 
 // methDecl -> "(" (<Type> <Identifier> ("," <Type> <Identifier>)*)? ")" stmnt
@@ -67,17 +67,17 @@ void stmnt(): {} {
 
 // returnStmnt -> "return" atom ";"
 void returnStmnt(): {} {
-    "return" atomOrExpr() ";"
+    "return" expr() ";"
 }
 
 // ifStmnt -> "if" "(" atom ")" stmnt ("else" stmnt)?
 void ifStmnt(): {} {
-    "if" "(" atomOrExpr() ")" stmnt() (LOOKAHEAD(1)"else" stmnt())?
+    "if" "("  expr() ")" stmnt() (LOOKAHEAD(1)"else" stmnt())?
 }
 
 // whileStmnt -> "while" "(" atom ")" stmnt
 void whileStmnt(): {} {
-    "while" "(" atomOrExpr() ")" stmnt()
+    "while" "(" expr() ")" stmnt()
 }
 
 // blockStmnt -> "{" (decl | stmnt)* "}"
@@ -85,26 +85,23 @@ void blockStmnt(): {} {
     "{" (decl() | stmnt())* "}"
 }
 
-void atomOrExpr(): {} {
-    LOOKAHEAD(3) atom() | expr()
-}
-
 // atom -> "!" atom | ("+" | "-") atom | <Character> | <String> | <Integer> | <Boolean> | <Identifier>
 //         | expr | range | state | transition | fa | methCall
 void atom(): {} {
     "!" atom() | <CharLiteral> | <StringLiteral> | <IntegerLiteral> | <BoolLiteral>
     | range() | fa() | LOOKAHEAD(2) methCall()
-    | (state() | <Identifier>) (LOOKAHEAD(3) transition())?
+    | (state() | <Identifier> ("." <Identifier>)*) (LOOKAHEAD(3) transition())?
 }
 
 // methCall -> (<Idenfier> ".")? <Identifier> "(" (atom ("," atom)*)? ")"
 void methCall(): {} {
-    (LOOKAHEAD(2) <Identifier> ".")? <Identifier> "(" (atom() ("," atom())*)? ")"
+    <Identifier> "(" (atom() ("," atom())*)? ")"
 }
 
 // range -> "[" <Char> ("-" <Char)? ("," <Char> ("-" <Char)?)* "]"
 void range(): {} {
     "[" <CharLiteral> ("-" <CharLiteral>)? ("," <CharLiteral> ("-" <CharLiteral> )?)* "]"
+    (LOOKAHEAD(2) "+" (range() | <Identifier>))*
 }
 
 // state -> "$" <String> ("^" (<Integer> | <Identifier>))?
@@ -120,6 +117,7 @@ void transition(): {} {
 // fa -> "<" (state | <Identifier>) ",{" (transition ("," transition)*)? "}>"
 void fa(): {} {
     "<" (state() | <Identifier>) "," "{" (<Identifier>(transition())? ("," <Identifier>(transition())?)?)? "}" ">"
+    (LOOKAHEAD(2) "+" (fa() | <Identifier>))*
 }
 
 // expr -> "(" expr ")" | compExpr (("&&" | "||") compExpr)*
