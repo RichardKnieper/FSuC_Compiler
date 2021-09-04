@@ -11,7 +11,7 @@ FA erzeugeAutomat(State name) {
 
 State A = $"Erster"; State B = $"Zweiter";
 Range C = ['b','c'] + ['w'-'z'];
-Transition T = A -- C --> B;
+Transition T = A - - C - - > B;
 
 String test = "abc";
 Set<String> testSet = {"abv", "cde"};
@@ -26,3 +26,8 @@ else
 int l = test.length();
 test.charAt(12, 3);
 erzeugeAutomat("test");
+int a = b++;
+int c = --a;
+b++;
+--c;
+int d = a++ - 12;

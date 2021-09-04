@@ -21,7 +21,7 @@ TOKEN : {
     | <CharLiteral : "'" ["A"-"Z", "a"-"z", "?", "!"] "'">
     | <StringLiteral : "\"" ["A"-"Z", "a"-"z", "_"](["A"-"Z", "a"-"z", "_", "0"-"9"])* "\"">
     | <IntegerLiteral : "0" | (["1"-"9"] (["0"-"9"])*)>
-    | <RegexLiteral : "/" (<StringLiteral> | <CharLiteral> | "(" | ")" | "[" | "]" | "+" | "*" | "|")+ "/" >
+    | <RegexLiteral : "/" (["A"-"Z"] | ["a"-"z"] | ["0"-"9"] | "(" | ")" | "[" | "]" | "+" | "*" | "|" | "?" | "-")+ "/">
     | <Identifier : ["A"-"Z", "a"-"z", "_"](["A"-"Z", "a"-"z", "_", "0" - "9"])*>
 }
 
@@ -142,7 +142,7 @@ void state(): {} {
 
 // transition -> (state | <Identifier>) (("--" (range | <Identifier)) | "-") "-->" (state | <Identifier>)
 void transition(): {} {
-    (("--" (range() | <Identifier>)) | "-") "-->" (state() | <Identifier>)
+    (("-" "-" (range() | <Identifier>)) | "-") "-" "-" ">" (state() | <Identifier>)
 }
 
 // fa -> "<" (state | <Identifier>) ",{" (transition ("," transition)*)? "}>"
@@ -168,5 +168,14 @@ void sumExpr(): {} {
 
 // prodExpr -> atom (("*" | "/") atom)*
 void prodExpr(): {} {
-    atom() (("*"|"/") atom())*
+    intersectionExpr() (("*"|"/") intersectionExpr())*
+}
+
+void intersectionExpr(): {} {
+    preOrPostIncrementExpr() ("^" preOrPostIncrementExpr())*
+}
+
+void preOrPostIncrementExpr(): {} {
+    LOOKAHEAD(2) ("++" | "--") atom()
+    | LOOKAHEAD(2) atom() ("++" | "--")?
 }
