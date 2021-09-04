@@ -21,20 +21,68 @@ TOKEN : {
     | <CharLiteral : "'" ["A"-"Z", "a"-"z", "?", "!"] "'">
     | <StringLiteral : "\"" ["A"-"Z", "a"-"z", "_"](["A"-"Z", "a"-"z", "_", "0"-"9"])* "\"">
     | <IntegerLiteral : "0" | (["1"-"9"] (["0"-"9"])*)>
-    | <DoubleLiteral : <IntegerLiteral> "." (["0"-"9"])* | "." (["0"-"9"])+>
     | <RegexLiteral : "/" (<StringLiteral> | <CharLiteral> | "(" | ")" | "[" | "]" | "+" | "*" | "|")+ "/" >
 }
 
-SKIP : {
-    " " | "\t" | "\n" | "\r"
-    | <Comment: "//" (~["\n"])*>
+SKIP :
+{
+    // White space
+    " "
+    | "\t"
+    | "\n"
+    | "\r"
+    // Single Line Comment
+    | <"//" (~["\n","\r"])* ("\n"|"\r"|"\r\n")>
+    // Multi Line Comment
+    | <"/*" (~["*"])* "*" (~["/"] (~["*"])* "*")* "/">
 }
 
 // Parser
 
 // CU -> (decl | stmnt)*
 void cu(): {} {
+    (decl() | stmnt())*
+}
+
+// decl -> <Type> <Identifier> (varDecl | methDecl | ";")
+void decl(): {} {
+    <Type> <Identifier> (varDecl() | methDecl()) ";"
+}
+
+// varDecl -> "=" atom ";"
+void varDecl(): {} {
 
 }
 
+// methDecl -> "(" (<Type> <Identifier> ("," <Type> <Identifier>)? ")" stmnt
 
+// stmnt -> returnStmnt | ifStmnt | whileStmnt | blockStmnt | expr | ";"
+
+// returnStmnt -> "return" atom ";"
+
+// ifStmnt -> "if" "(" atom ")" stmnt ("else" stmnt)?
+
+// whileStmnt -> "while" "(" atom ")" stmnt
+
+// blockStmnt -> "{" (decl | stmnt)* "}"
+
+// atom -> "!" atom | ("+" | "-") atom | <Character> | <String> | <Integer> | <Boolean> | <Identifier>
+//         | expr | range | state | transition | fa | methCall
+
+// methCall -> (<Idenfier> ".")? <Identifier> "(" (atom ("," atom)*)? ")"
+
+// range -> "[" <Char> ("-" <Char)? ("," <Char> ("-" <Char)?)* "]"
+
+// state -> "$" <String> ("^" (<Integer> | <Identifier>))?
+
+// transition -> (state | <Identifier>) (("--" (range | <Identifier)) | "-") "-->" (state | <Identifier>)
+
+// fa -> "<$" <String> ",{" (transition ("," transition)*)? "}>"
+
+// expr -> "(" expr ")" | compExpr (("&&" | "||") compExpr)*
+
+// compExpr -> sumExpr (("=="|"!="|"<="|">="|"<"|">") sumExpr)*
+
+// sumExpr -> prodExpr (("+" | "-") prodExpr)*
+
+// prodExpr -> atom (("*" | "/") atom)*
