@@ -44,10 +44,10 @@ SKIP :
 // CU -> (decl | stmnt)*
 CuNode cu(): {
 	CuNode node = new CuNode();
-	Node declStmnt;
+	Node declOrStmnt;
   } {
-    ((declStmnt=decl() | declStmnt=stmnt()) { node.declStmntList.add(declStmnt); })*
-    { return node }
+    ((declOrStmnt=decl() | declOrStmnt=stmnt()) { node.declOrStmntList.add(declOrStmnt); })*
+    { return node; }
 }
 
 // decl -> type() <Identifier> (varDecl | methDecl | ";")
@@ -57,33 +57,33 @@ DeclNode decl(): {
 	DeclNode node = null;
 } {
     type = type() identifier=<Identifier> (node = varDecl(type, identifier) | node = methDecl(type, identifier) | ";")
-    { return node == null ? new DeclNode(type, identifier) : node }
+    { return node == null ? new DeclNode(type, identifier) : node; }
 }
 
 // varDecl -> "=" expr ";"
-VarDeclNode varDecl(Object type, Token identifier): {
+VarDeclNode varDecl(TypeNode type, Token identifier): {
 	ExprNode expr;
   } {
     "=" expr = expr() ";"
-    {  return new VarDeclNode(type, identifier, expr) }
+    {  return new VarDeclNode(type, identifier, expr); }
 }
 
 // methDecl -> "(" (type <Identifier> ("," type <Identifier>)*)? ")" stmnt
 MethDeclNode methDecl(TypeNode type, Token identifier): {
-	MethDeclNode node = new MethDeclNode(type, identifer);
+	MethDeclNode node = new MethDeclNode(type, identifier);
 	TypeNode firstType, lastType;
 	Token firstIdentifier, lastIdentifier;
   } {
-    "(" (firstType = type() firstIdentifier = <Identifier> ("," lastType = type() lastIdentifier = <Identifier> { node.params.put(lastIdentifier, lastType) })* { node.params.put(firstIdentifier, firstType } )? ")" stmnt()
+    "(" (firstType = type() firstIdentifier = <Identifier> ("," lastType = type() lastIdentifier = <Identifier> { node.params.put(lastIdentifier, lastType); })* { node.params.put(firstIdentifier, firstType); } )? ")" stmnt()
+    { return node; }
 }
 
-// stmnt -> (<Identifier> ".")? methCall "";" | returnStmnt | ifStmnt | whileStmnt | blockStmnt | expr | ";"
+// stmnt -> returnStmnt | ifStmnt | whileStmnt | blockStmnt | expr | ";"
 StmntNode stmnt(): {
-	StmntNode node;
+	StmntNode node = null;
   } {
-    (      LOOKAHEAD(4) (LOOKAHEAD(2) <Identifier> ".")? node = methCall() ";"
-    | node = returnStmnt() | node = ifStmnt() | node = whileStmnt() | LOOKAHEAD(3) node = blockStmnt() | node = expr() | ";"
-	) {	return Node; }
+    (node = returnStmnt() | node = ifStmnt() | node = whileStmnt() | LOOKAHEAD(3) node = blockStmnt() | node = expr() | ";")
+	{ return node; }
 }
 
 // returnStmnt -> "return" expr ";"
@@ -113,34 +113,33 @@ WhileNode whileStmnt(): {
 // blockStmnt -> "{" (decl | stmnt)* "}"
 BlockStmntNode blockStmnt(): {
 	BlockStmntNode node = new BlockStmntNode();
-	Node node;
+	Node declOrStmnt;
   } {
-    "{" ((node = decl() | node = stmnt()) { node.declStmntList.add(node); })* "}"
+    "{" ((declOrStmnt = decl() | declOrStmnt = stmnt()) { node.declOrStmntList.add(declOrStmnt); })* "}"
     { return node; }
 }
 
-/*
- */
 // type -> arrayType | <Type> | setType | mapType
 TypeNode type(): {
-	TypeNode node;
-	Token type;
+	TypeNode node = null;
+	Token type = null;
   } {
-    LOOKAHEAD(2) node=arrayType() | type=<Type> | node=setType() | node=mapType()
-    { if(type==NULL)
-		return node;
-	else {
-		return Type.of(token.image);
-	}
+    (LOOKAHEAD(2) node=arrayType() | type=<Type> | node=setType() | node=mapType())
+    {
+        if(type == null) {
+            return node;
+        } else {
+            return new TypeNode(VariableType.of(type.image));
+        }
     }
 }
 
 // setType -> "Set" "<" <Type> ">"
 SetTypeNode setType(): {
-Token type;
+    Token type;
   } {
     "Set" "<" type=<Type> ">"
-    { return new SetTypeNode(Type.of(type.image));}
+    { return new SetTypeNode(VariableType.of(type.image));}
 }
 
 // mapType -> "Map" "<" <Type> , <Type> ">"
@@ -148,16 +147,16 @@ MapTypeNode mapType(): {
 	Token key,value;
   } {
     "Map" "<" key=<Type> "," value=<Type> ">"
-    { return new MapTypeNode(Type.of(key.image),Type.of(value.image)); }
+    { return new MapTypeNode(VariableType.of(key.image),VariableType.of(value.image)); }
 }
 
 // arrayType -> <Type> "[]"
 
 ArrayTypeNode arrayType(): {
-Token type;
+    Token type;
   } {
-    <Type> "[]"
-    { return new ArrayTypeNode(Type.of(type.image));}
+    type = <Type> "[]"
+    { return new ArrayTypeNode(VariableType.of(type.image));}
 }
 
 // atom -> "!" atom | <Character> | <String> | <Integer> | <Boolean>
@@ -166,8 +165,12 @@ Token type;
 //         | (<Identifier> ".")? methCall
 //         | (state | <Identifier> ("." <Identifier>)*) (transition)?
 AtomNode atom(): {
-	Token token;
+	Token token = null;
+	Token attribute;
 	AtomNode atom;
+	MethCallNode methCall;
+	StateLitNode state = null;
+	TransitionLitNode transition = null;
   } {
     "!" atom = atom() { return new NegationNode(atom); }
     | token = <CharLiteral> { return new LitNode(token); }
@@ -175,17 +178,28 @@ AtomNode atom(): {
     | token = <IntegerLiteral> { return new LitNode(token); }
     | token = <BoolLiteral> { return new LitNode(token); }
     | atom = set() { return atom; }
-    | LOOKAHEAD(3) atom = map() { } 
+    | LOOKAHEAD(3) atom = map() { return atom; }
     | atom = array() { return atom; }
-    | range()
-    | fa()
-    | LOOKAHEAD(4) (LOOKAHEAD(2) token = <Identifier> ".")? methCall()
-    | (state() | token = <Identifier> ("." <Identifier>)*) (LOOKAHEAD(3) transition())?
+    | atom = range() { return atom; }
+    | atom = fa() { return atom; }
+    | LOOKAHEAD(4) (LOOKAHEAD(2) token = <Identifier> ".")? methCall = methCall() { return new ClassMethCallNode(token, methCall); }
+    | LOOKAHEAD(2) token = <Identifier> "." attribute = <Identifier> { return new ReadClassAttributeNode(token, attribute); }
+    | (state = state() | token = <Identifier>) (LOOKAHEAD(3) transition = transition())? {
+        if (transition == null) {
+            if (token == null) {
+                return state;
+            } else {
+                return new IdentifierNode(token);
+            }
+        } else {
+            return new TransitionLitWithStartNode(token, state, transition);
+        }
+    }
 }
 
 // set -> "{" (atom ("," atom)*)? "}"
 SetLitNode set(): {
-  	SetListNode node = new SetLitNode();
+  	SetLitNode node = new SetLitNode();
 	AtomNode first, last;
   } {
     "{" (first = atom() ("," last = atom() { node.elementList.add(last); } )* { node.elementList.add(first); })? "}"
@@ -195,9 +209,9 @@ SetLitNode set(): {
 // map -> "[[" (atom ":" atom ("," atom ":" atom)*)? "]]"
 MapLitNode map(): {
 	MapLitNode node = new MapLitNode();
-	AtomNode fistKey, firstValue, lastKey, lastValue;
+	AtomNode firstKey, firstValue, lastKey, lastValue;
   } {
-    "[[" (firstKey = atom() ":" firstValue = atom() ("," lastKey = atom() ":" lastValue = atom() { node.elemnts.put(lastKey, lastValue);} )* { node.elements.put(firstKey, firstValue); })? "]]"
+    "[[" (firstKey = atom() ":" firstValue = atom() ("," lastKey = atom() ":" lastValue = atom() { node.elements.put(lastKey, lastValue);} )* { node.elements.put(firstKey, firstValue); })? "]]"
     {  return node; }
 }
 
@@ -213,17 +227,31 @@ ArrayLitNode array(): {
 // methCall -> <Identifier> "(" (atom ("," atom)*)? ")"
 MethCallNode methCall(): {
   	MethCallNode node = new MethCallNode();
-	Token t;
+	Token identifier;
 	AtomNode first, last;
   } {
-    t = <Identifier> "(" ( first = atom() ("," last = atom() { node.elementList.add(last); })*{ node.elementList.add(0, first); })? ")"
-    { node.token = t; return node; } 
+    identifier = <Identifier> "(" ( first = atom() ("," last = atom() { node.elementList.add(last); })*{ node.elementList.add(0, first); })? ")"
+    { node.identifier = identifier; return node; }
 }
 
 // range -> "[" <Char> ("-" <Char)? ("," <Char> ("-" <Char)?)* "]" ("+" (range | <Identifier>))*
-void range(): {} {
-    "[" <CharLiteral> ("-" <CharLiteral>)? ("," <CharLiteral> ("-" <CharLiteral> )?)* "]"
-    (LOOKAHEAD(2) "+" (range() | <Identifier>))*
+RangeLitNode range(): {
+    RangeLitNode node = new RangeLitNode();
+    RangeLitNode additionRange = null;
+    Token additionIdentifier = null;
+    Token a;
+    Token b = null;
+ } {
+    "[" a = <CharLiteral> ("-" b = <CharLiteral>)? { node.add(a, b); b=null; } ("," a = <CharLiteral> ("-" b = <CharLiteral> )? { node.add(a, b); b=null; })* "]"
+    (LOOKAHEAD(2) "+" (additionRange = range() | additionIdentifier = <Identifier>) {
+        if(additionRange == null)
+            node.add(additionIdentifier);
+        else
+            range().add(additionRange);
+        additionRange = null;
+        additionIdentifier = null;
+        })*
+    { return node; }
 }
 
 // state -> "$" <String> ("^" (<Integer> | <Identifier>))?
@@ -241,43 +269,92 @@ TransitionLitNode transition(): {
 	RangeLitNode range = null;
 	StateLitNode state = null;
   } {
-    (LOOKAHEAD(2) ( "-" "-" | "--") (range = range() | rangeIdentifier = <Identifier>) | "-") <Arrow> ( state= state() | stateIdentifier= <Identifier>)
-    { return new TransitionLitNode(range,state,rangeIdentifier,stateIdentifier); }
+    (LOOKAHEAD(2) ( "-" "-" | "--") (range = range() | rangeIdentifier = <Identifier>) | "-") <Arrow> ( state = state() | stateIdentifier = <Identifier>)
+    { return new TransitionLitNode(rangeIdentifier, stateIdentifier, range, state); }
 }
 
-// fa -> "<" (state | <Identifier>) ",{" (<Identifier> (transition)? ("," <Identifier (transition)?)?)? "}" ">"
-void fa(): {} {
-    "<" (state() | <Identifier>) "," "{" (<Identifier>(transition())? ("," <Identifier>(transition())?)?)? "}" ">"
-    (LOOKAHEAD(2) "+" (fa() | <Identifier>))*
+// fa -> "<" (state | <Identifier>) ",{" (<Identifier> (transition)? ("," <Identifier (transition)?)*)? "}" ">"
+FaLitNode fa(): {
+    FaLitNode node = new FaLitNode(null, null);
+    StateLitNode state = null;
+    TransitionLitNode transition = null;
+    Token identifier = null;
+    FaLitNode additionalFa = null;
+ } {
+    "<" (state = state() | identifier = <Identifier>) {
+        if(state == null)
+            node.startStateIdentifier = identifier;
+        else
+            node.startState = state;
+            }
+     "," "{" (identifier = <Identifier>(transition = transition())? { node.add(identifier, transition); transition = null; }
+     ("," identifier = <Identifier>(transition = transition())? { node.add(identifier, transition); transition = null; } )*)? "}" ">"
+    (LOOKAHEAD(2) "+" (additionalFa = fa() | identifier = <Identifier>) {
+        if(additionalFa == null)
+            node.add(identifier);
+        else
+            node.add(additionalFa);
+        additionalFa = null;
+        identifier = null;
+         })*
+    { return node; }
 }
 
-// expr -> "(" expr ")" | compExpr (("&&" | "||") compExpr)*
-void expr(): {} {
-    ("(" expr() ")") | (compExpr() (("&&" | "||") compExpr())*)
+// expr -> "(" expr ")" | compExpr (("&&" | "||") compExpr)?
+ExprNode expr(): {
+    ExprNode node;
+    CompExprNode a;
+    CompExprNode b = null;
+    Token op = null;
+} {
+    "(" node = expr() ")" { return new BracketExpr(node); }
+    | a = compExpr() ((op = "&&" | op = "||") b = compExpr())? { return new AndOrExpr(a, op, b); }
 }
 
-// compExpr -> sumExpr (("=="|"!="|"<="|">="|"<"|">") sumExpr)*
-void compExpr(): {} {
-    sumExpr() (LOOKAHEAD(2)("=="|"!="|"<="|">="|"<"|">") sumExpr())*
+// compExpr -> sumExpr (("=="|"!="|"<="|">="|"<"|">") sumExpr)?
+CompExprNode compExpr(): {
+    SumExprNode a;
+    SumExprNode b = null;
+    Token op = null;
+ } {
+    a = sumExpr() (LOOKAHEAD(2)(op="==" | op="!=" | op="<=" | op=">=" | op="<" | op=">") b = sumExpr())?
+    { return new CompExprNode(a, op, b); }
 }
 
-// sumExpr -> prodExpr (("+" | "-") prodExpr)*
-void sumExpr(): {} {
-    prodExpr() (("+"|"-") prodExpr())*
+// sumExpr -> prodExpr (("+" | "-") prodExpr)?
+SumExprNode sumExpr(): {
+    ProdExprNode a;
+    ProdExprNode b = null;
+    Token op = null;
+ } {
+    a = prodExpr() ((op="+" | op="-") b = prodExpr())?
+    { return new SumExprNode(a, op, b); }
 }
 
-// prodExpr -> intersectionExpr (("*" | "/") intersectionExpr)*
-void prodExpr(): {} {
-    intersectionExpr() (("*"|"/") intersectionExpr())*
+// prodExpr -> intersectionExpr (("*" | "/") intersectionExpr)?
+ProdExprNode prodExpr(): {
+    IntersectionExprNode a;
+    IntersectionExprNode b = null;
+    Token op = null;
+ } {
+    a = intersectionExpr() ((op="*" | op="/") b = intersectionExpr())?
+    { return new ProdExprNode(a, op, b); }
 }
 
-// intersectionExpr -> preOrPostIncrementExpr ("^" preOrPostIncrementExpr)*
-void intersectionExpr(): {} {
-    preOrPostIncrementExpr() ("^" preOrPostIncrementExpr())*
+// intersectionExpr -> preOrPostIncrementExpr ("^" preOrPostIncrementExpr)?
+IntersectionExprNode intersectionExpr(): {
+    PreOrPostIncrementExprNode a;
+    PreOrPostIncrementExprNode b = null;
+ } {
+    a = preOrPostIncrementExpr() ("^" b = preOrPostIncrementExpr())?
+    {  return new IntersectionExprNode(a, b); }
 }
 
 // preOrPostIncrementExpr -> ("++" | "--") atom | atom ("++" | "--")?
-void preOrPostIncrementExpr(): {} {
-    LOOKAHEAD(2) ("++" | "--") atom()
-    | LOOKAHEAD(2) atom() ("++" | "--")?
+PreOrPostIncrementExprNode preOrPostIncrementExpr(): {
+    AtomNode atom;
+    Token op = null;
+ } {
+    LOOKAHEAD(2) (op="++" | op="--") atom = atom() { return new PreOrPostIncrementExprNode(atom, op, null); }
+    | LOOKAHEAD(2) atom = atom() (op="++" | op="--")? { return new PreOrPostIncrementExprNode(atom, null, op); }
 }
