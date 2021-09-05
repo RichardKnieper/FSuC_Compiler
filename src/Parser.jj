@@ -42,71 +42,122 @@ SKIP :
 // Parser
 
 // CU -> (decl | stmnt)*
-void cu(): {} {
-    (decl() | stmnt())*
+CuNode cu(): {
+	CuNode node = new CuNode();
+	Node declStmnt;
+  } {
+    ((declStmnt=decl() | declStmnt=stmnt()) { node.declStmntList.add(declStmnt); })*
+    { return node }
 }
 
 // decl -> type() <Identifier> (varDecl | methDecl | ";")
-void decl(): {} {
-    type() <Identifier> (varDecl() | methDecl() | ";")
+DeclNode decl(): {
+	Token identifier;
+	TypeNode type;
+	DeclNode node = null;
+} {
+    type = type() identifier=<Identifier> (node = varDecl(type, identifier) | node = methDecl(type, identifier) | ";")
+    { return node == null ? new DeclNode(type, identifier) : node }
 }
 
 // varDecl -> "=" expr ";"
-void varDecl(): {} {
-    "=" expr() ";"
+VarDeclNode varDecl(Object type, Token identifier): {
+	ExprNode expr;
+  } {
+    "=" expr = expr() ";"
+    {  return new VarDeclNode(type, identifier, expr) }
 }
 
 // methDecl -> "(" (type <Identifier> ("," type <Identifier>)*)? ")" stmnt
-void methDecl(): {} {
-    "(" (type() <Identifier> ("," type() <Identifier>)*)? ")" stmnt()
+MethDeclNode methDecl(TypeNode type, Token identifier): {
+	MethDeclNode node = new MethDeclNode(type, identifer);
+	TypeNode firstType, lastType;
+	Token firstIdentifier, lastIdentifier;
+  } {
+    "(" (firstType = type() firstIdentifier = <Identifier> ("," lastType = type() lastIdentifier = <Identifier> { node.params.put(lastIdentifier, lastType) })* { node.params.put(firstIdentifier, firstType } )? ")" stmnt()
 }
 
 // stmnt -> (<Identifier> ".")? methCall "";" | returnStmnt | ifStmnt | whileStmnt | blockStmnt | expr | ";"
-void stmnt(): {} {
-    LOOKAHEAD(4) (LOOKAHEAD(2) <Identifier> ".")? methCall() ";"
-    | returnStmnt() | ifStmnt() | whileStmnt() | LOOKAHEAD(3) blockStmnt() | expr() | ";"
+StmntNode stmnt(): {
+	StmntNode node;
+  } {
+    (      LOOKAHEAD(4) (LOOKAHEAD(2) <Identifier> ".")? node = methCall() ";"
+    | node = returnStmnt() | node = ifStmnt() | node = whileStmnt() | LOOKAHEAD(3) node = blockStmnt() | node = expr() | ";"
+	) {	return Node; }
 }
 
 // returnStmnt -> "return" expr ";"
-void returnStmnt(): {} {
-    "return" expr() ";"
+ReturnStmntNode returnStmnt(): {
+	ExprNode expr;
+  } {
+    "return" expr = expr() ";"
+    { return new ReturnStmntNode(expr); }      
 }
 
 // ifStmnt -> "if" "(" expr ")" stmnt ("else" stmnt)?
-void ifStmnt(): {} {
-    "if" "("  expr() ")" stmnt() (LOOKAHEAD(1)"else" stmnt())?
+IfNode ifStmnt(): {
+	StmntNode ifExpr, ifStmnt, elseStmnt = null;
+  } {
+    "if" "("  ifExpr = expr() ")" ifStmnt = stmnt() (LOOKAHEAD(1)"else" elseStmnt=stmnt())?
+    { return new IfNode(ifExpr,ifStmnt,elseStmnt); }
 }
 
 // whileStmnt -> "while" "(" expr ")" stmnt
-void whileStmnt(): {} {
-    "while" "(" expr() ")" stmnt()
+WhileNode whileStmnt(): {
+	StmntNode whileExpr, whileStmnt;
+  } {
+    "while" "(" whileExpr=expr() ")" whileStmnt=stmnt()
+    { return new WhileNode(whileExpr,whileStmnt); } 
 }
 
 // blockStmnt -> "{" (decl | stmnt)* "}"
-void blockStmnt(): {} {
-    "{" (decl() | stmnt())* "}"
+BlockStmntNode blockStmnt(): {
+	BlockStmntNode node = new BlockStmntNode();
+	Node node;
+  } {
+    "{" ((node = decl() | node = stmnt()) { node.declStmntList.add(node); })* "}"
+    { return node; }
 }
 
 /*
  */
 // type -> arrayType | <Type> | setType | mapType
-void type(): {} {
-    LOOKAHEAD(2) arrayType() | <Type> | setType() | mapType()
+TypeNode type(): {
+	TypeNode node;
+	Token type;
+  } {
+    LOOKAHEAD(2) node=arrayType() | type=<Type> | node=setType() | node=mapType()
+    { if(type==NULL)
+		return node;
+	else {
+		return Type.of(token.image);
+	}
+    }
 }
 
 // setType -> "Set" "<" <Type> ">"
-void setType(): {} {
-    "Set" "<" <Type> ">"
+SetTypeNode setType(): {
+Token type;
+  } {
+    "Set" "<" type=<Type> ">"
+    { return new SetTypeNode(Type.of(type.image));}
 }
 
 // mapType -> "Map" "<" <Type> , <Type> ">"
-void mapType(): {} {
-    "Map" "<" <Type> "," <Type> ">"
+MapTypeNode mapType(): {
+	Token key,value;
+  } {
+    "Map" "<" key=<Type> "," value=<Type> ">"
+    { return new MapTypeNode(Type.of(key.image),Type.of(value.image)); }
 }
 
 // arrayType -> <Type> "[]"
-void arrayType(): {} {
+
+ArrayTypeNode arrayType(): {
+Token type;
+  } {
     <Type> "[]"
+    { return new ArrayTypeNode(Type.of(type.image));}
 }
 
 // atom -> "!" atom | <Character> | <String> | <Integer> | <Boolean>
@@ -114,32 +165,59 @@ void arrayType(): {} {
 //         | range | fa
 //         | (<Identifier> ".")? methCall
 //         | (state | <Identifier> ("." <Identifier>)*) (transition)?
-void atom(): {} {
-    "!" atom() | <CharLiteral> | <StringLiteral> | <IntegerLiteral> | <BoolLiteral>
-    | set() | LOOKAHEAD(3) map() | array()
-    | range() | fa()
-    | LOOKAHEAD(4) (LOOKAHEAD(2) <Identifier> ".")? methCall()
-    | (state() | <Identifier> ("." <Identifier>)*) (LOOKAHEAD(3) transition())?
+AtomNode atom(): {
+	Token token;
+	AtomNode atom;
+  } {
+    "!" atom = atom() { return new NegationNode(atom); }
+    | token = <CharLiteral> { return new LitNode(token); }
+    | token = <StringLiteral> { return new LitNode(token); }
+    | token = <IntegerLiteral> { return new LitNode(token); }
+    | token = <BoolLiteral> { return new LitNode(token); }
+    | atom = set() { return atom; }
+    | LOOKAHEAD(3) atom = map() { } 
+    | atom = array() { return atom; }
+    | range()
+    | fa()
+    | LOOKAHEAD(4) (LOOKAHEAD(2) token = <Identifier> ".")? methCall()
+    | (state() | token = <Identifier> ("." <Identifier>)*) (LOOKAHEAD(3) transition())?
 }
 
 // set -> "{" (atom ("," atom)*)? "}"
-void set(): {} {
-    "{" (atom() ("," atom())*)? "}"
+SetLitNode set(): {
+  	SetListNode node = new SetLitNode();
+	AtomNode first, last;
+  } {
+    "{" (first = atom() ("," last = atom() { node.elementList.add(last); } )* { node.elementList.add(first); })? "}"
+    { return node; }
 }
 
 // map -> "[[" (atom ":" atom ("," atom ":" atom)*)? "]]"
-void map(): {} {
-    "[[" (atom() ":" atom() ("," atom() ":" atom())*)? "]]"
+MapLitNode map(): {
+	MapLitNode node = new MapLitNode();
+	AtomNode fistKey, firstValue, lastKey, lastValue;
+  } {
+    "[[" (firstKey = atom() ":" firstValue = atom() ("," lastKey = atom() ":" lastValue = atom() { node.elemnts.put(lastKey, lastValue);} )* { node.elements.put(firstKey, firstValue); })? "]]"
+    {  return node; }
 }
 
 // array -> "[[" (atom ("," atom)*)? "]]"
-void array(): {} {
-    "[[" (atom() ("," atom())*)? "]]"
+ArrayLitNode array(): {
+	ArrayLitNode node = new ArrayLitNode();
+	AtomNode first, last;
+  } {
+    "[[" (first=atom() ("," last = atom() { node.elementList.add(last); } )* { node.elementList.add(0, first); })? "]]"
+     { return node; }
 }
 
 // methCall -> <Identifier> "(" (atom ("," atom)*)? ")"
-void methCall(): {} {
-    <Identifier> "(" (atom() ("," atom())*)? ")"
+MethCallNode methCall(): {
+  	MethCallNode node = new MethCallNode();
+	Token t;
+	AtomNode first, last;
+  } {
+    t = <Identifier> "(" ( first = atom() ("," last = atom() { node.elementList.add(last); })*{ node.elementList.add(0, first); })? ")"
+    { node.token = t; return node; } 
 }
 
 // range -> "[" <Char> ("-" <Char)? ("," <Char> ("-" <Char)?)* "]" ("+" (range | <Identifier>))*
@@ -149,13 +227,22 @@ void range(): {} {
 }
 
 // state -> "$" <String> ("^" (<Integer> | <Identifier>))?
-void state(): {} {
-    "$" <StringLiteral> (LOOKAHEAD(2) "^" (<IntegerLiteral> | <Identifier>))?
+StateLitNode state(): {
+	Token label, accept = null;
+  } {
+    "$" label = <StringLiteral> (LOOKAHEAD(2) "^" (accept = <IntegerLiteral> | accept = <Identifier>))?
+    { return new StateLitNode(label,accept); }
 }
 
 // transition -> (("-" "-" | "--") (range | <Identifier>) | "-") <Arrow> (state | <Identifier>)
-void transition(): {} {
-    (LOOKAHEAD(2) ( "-" "-" | "--") (range() | <Identifier>) | "-") <Arrow> (state() | <Identifier>)
+TransitionLitNode transition(): {
+	Token rangeIdentifier = null;
+	Token stateIdentifier = null;
+	RangeLitNode range = null;
+	StateLitNode state = null;
+  } {
+    (LOOKAHEAD(2) ( "-" "-" | "--") (range = range() | rangeIdentifier = <Identifier>) | "-") <Arrow> ( state= state() | stateIdentifier= <Identifier>)
+    { return new TransitionLitNode(range,state,rangeIdentifier,stateIdentifier); }
 }
 
 // fa -> "<" (state | <Identifier>) ",{" (<Identifier> (transition)? ("," <Identifier (transition)?)?)? "}" ">"
