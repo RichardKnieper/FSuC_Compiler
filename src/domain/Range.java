@@ -1,3 +1,4 @@
+package domain;
 
 // Eine Menge von Buchstaben
 

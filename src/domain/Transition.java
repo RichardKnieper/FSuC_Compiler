@@ -1,3 +1,5 @@
+package domain;
+
 public class Transition extends AbstractTransition {
     private Range range;
 

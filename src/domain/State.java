@@ -1,3 +1,5 @@
+package domain;
+
 public class State {
     String label;
     int accept;
