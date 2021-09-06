@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 public class Node {
-
+	
 }
 
 class CuNode extends Node {
@@ -69,7 +69,7 @@ class VarDeclNode extends DeclNode {
 }
 
 class MethDeclNode extends DeclNode {
-    Map<Token, TypeNode> params = new HashMap<>();
+    Map<Token, ParamWrapper> params = new HashMap<>();
     public MethDeclNode(TypeNode type, Token identifier) {
         super(type, identifier);
     }
@@ -340,6 +340,8 @@ class PreOrPostIncrementExprNode extends ExprNode {
     public PreOrPostIncrementExprNode(AtomNode atom, Token pre, Token post) {
         this.atom = atom;
         this.pre = pre;
-        this.post = post;
+        this.post = post; 
     }
 }
+
+

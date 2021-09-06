@@ -73,8 +73,11 @@ MethDeclNode methDecl(TypeNode type, Token identifier): {
 	MethDeclNode node = new MethDeclNode(type, identifier);
 	TypeNode firstType, lastType;
 	Token firstIdentifier, lastIdentifier;
+	int countIndex = 1;
   } {
-    "(" (firstType = type() firstIdentifier = <Identifier> ("," lastType = type() lastIdentifier = <Identifier> { node.params.put(lastIdentifier, lastType); })* { node.params.put(firstIdentifier, firstType); } )? ")" stmnt()
+    "(" (firstType = type() firstIdentifier = <Identifier> ("," lastType = type() lastIdentifier = <Identifier>
+    { node.params.put(lastIdentifier,new ParamWrapper(countIndex++,lastType,lastIdentifier));})*
+    { node.params.put(firstIdentifier, new ParamWrapper(0,firstType,firstIdentifier));})? ")" stmnt()
     { return node; }
 }
 
@@ -210,7 +213,7 @@ SetLitNode set(): {
 MapLitNode map(): {
 	MapLitNode node = new MapLitNode();
 	AtomNode firstKey, firstValue, lastKey, lastValue;
-  } {
+} {
     "[[" (firstKey = atom() ":" firstValue = atom() ("," lastKey = atom() ":" lastValue = atom() { node.elements.put(lastKey, lastValue);} )* { node.elements.put(firstKey, firstValue); })? "]]"
     {  return node; }
 }
@@ -219,7 +222,7 @@ MapLitNode map(): {
 ArrayLitNode array(): {
 	ArrayLitNode node = new ArrayLitNode();
 	AtomNode first, last;
-  } {
+} {
     "[[" (first=atom() ("," last = atom() { node.elementList.add(last); } )* { node.elementList.add(0, first); })? "]]"
      { return node; }
 }
@@ -229,7 +232,7 @@ MethCallNode methCall(): {
   	MethCallNode node = new MethCallNode();
 	Token identifier;
 	AtomNode first, last;
-  } {
+} {
     identifier = <Identifier> "(" ( first = atom() ("," last = atom() { node.elementList.add(last); })*{ node.elementList.add(0, first); })? ")"
     { node.identifier = identifier; return node; }
 }
@@ -241,13 +244,13 @@ RangeLitNode range(): {
     Token additionIdentifier = null;
     Token a;
     Token b = null;
- } {
+} {
     "[" a = <CharLiteral> ("-" b = <CharLiteral>)? { node.add(a, b); b=null; } ("," a = <CharLiteral> ("-" b = <CharLiteral> )? { node.add(a, b); b=null; })* "]"
     (LOOKAHEAD(2) "+" (additionRange = range() | additionIdentifier = <Identifier>) {
         if(additionRange == null)
             node.add(additionIdentifier);
         else
-            range().add(additionRange);
+            node.add(additionRange);
         additionRange = null;
         additionIdentifier = null;
         })*
