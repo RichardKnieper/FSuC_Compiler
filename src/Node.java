@@ -1,4 +1,5 @@
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -7,7 +8,7 @@ import java.util.Map;
 
 abstract public class Node {
 	public abstract String toString(String indent);
-
+	
 	public void semantischeAnalyse(SymbolTabelle tabelle, List<CompilerError> errors) {
 	}
 }
@@ -27,6 +28,7 @@ class CuNode extends Node {
 	}
 
 	public void semantischeAnalyse(SymbolTabelle tabelle, List<CompilerError> errors) {
+		System.out.println("CuNode");
 		for (Node node : declOrStmntList) {
 			node.semantischeAnalyse(tabelle, errors);
 		}
@@ -44,6 +46,7 @@ class BlockStmntNode extends StmntNode {
 	}
 
 	public void semantischeAnalyse(SymbolTabelle tabelle, List<CompilerError> errors) {
+		System.out.println("BlockStmntNode");
 		SymbolTabelle newSt = new SymbolTabelle(tabelle);
 		for (Node node : declOrStmntList) {
 			node.semantischeAnalyse(newSt, errors);
@@ -136,7 +139,9 @@ class DeclNode extends Node {
 	}
 
 	public void semantischeAnalyse(SymbolTabelle tabelle, List<CompilerError> errors) {
-		// type.semantischeAnalyse(tabelle, errors);
+		System.out.println("DeclNode");
+		type.semantischeAnalyse(tabelle, errors);
+		System.out.println(VariableType.printType(type.variableType));
 		if (!tabelle.add(identifier.image, this))
 			errors.add(new CompilerError("Error: " + identifier.image + " already exists in line: "
 					+ tabelle.find(identifier.image).identifier.beginLine));
@@ -157,8 +162,12 @@ class VarDeclNode extends DeclNode {
 	}
 
 	public void semantischeAnalyse(SymbolTabelle tabelle, List<CompilerError> errors) {
-		// type.semantischeAnalyse(tabelle, errors);
-		if (VariableType.sameTypeAs(type.variableType, expr.realType)) {
+		System.out.println("VarDeclNode");
+		expr.semantischeAnalyse(tabelle, errors);
+		type.semantischeAnalyse(tabelle, errors);
+		System.out.println(VariableType.printType(type.variableType));
+		System.out.println(VariableType.printType(expr.realType));
+		if (VariableType.sameTypeAs(type.variableType, expr.realType )) {
 			if (!tabelle.add(identifier.image, this))
 				errors.add(new CompilerError("Error: " + identifier.image + " already exists in line: "
 						+ tabelle.find(identifier.image).identifier.beginLine));
@@ -207,6 +216,7 @@ class TypeNode extends Node {
 		return indent + "TypeNode" + "\n";
 	}
 
+	
 }
 
 //Todo typeNode
@@ -322,15 +332,15 @@ class LitNode extends AtomNode {
 	public void semantischeAnalyse(SymbolTabelle tabelle, List<CompilerError> errors) {
 		switch (token.kind) {
 		case 37:
-			realType = VariableType.booleanT;
+			realType = VariableType.booleanT; break;
 		case 38:
-			realType = VariableType.charT;
+			realType = VariableType.charT; break;
 		case 39:
-			realType = VariableType.stringT;
+			realType = VariableType.stringT; break;
 		case 40:
-			realType = VariableType.intT;
+			realType = VariableType.intT; break;
 		default:
-			realType = VariableType.errorT;
+			realType = VariableType.errorT; break;
 		}
 	}
 }
@@ -344,7 +354,7 @@ class SetLitNode extends AtomNode {
 			res += "\n" + node.toString(indent + "\t");
 		return res;
 	}
-	
+
 	public void semantischeAnalyse(SymbolTabelle tabelle, List<CompilerError> errors) {
 		for (AtomNode node : elementList) {
 			node.semantischeAnalyse(tabelle, errors);
@@ -361,13 +371,21 @@ class ArrayLitNode extends AtomNode {
 			res += "\n" + node.toString(indent + "\t");
 		return res;
 	}
+
 	public void semantischeAnalyse(SymbolTabelle tabelle, List<CompilerError> errors) {
 		boolean temp = true;
-		for (int i=0;i<elementList.size()-1;i++) {
-			temp = temp && VariableType.sameTypeAs(elementList.get(i).realType, (elementList.get(i+1).realType));			
+		for (int i = 0; i < elementList.size() - 1; i++) {
+			AtomNode first = elementList.get(i);
+			AtomNode second = elementList.get(i + 1);
+			first.semantischeAnalyse(tabelle, errors);
+			second.semantischeAnalyse(tabelle, errors);
+			temp = temp && VariableType.sameTypeAs(first.realType, (second.realType));
 		}
-		if(!temp) {
-			errors.add(new CompilerError("Error: The elements in an array must be of the same type."));			
+		if (temp) {
+			realType = elementList.get(1).realType;
+		} else {
+			errors.add(new CompilerError("Error: The elements in an array must be of the same type."));
+			realType = VariableType.errorT;
 		}
 	}
 }
@@ -382,7 +400,17 @@ class MapLitNode extends AtomNode {
 		}
 		return res;
 	}
-
+	/*
+	 * public void semantischeAnalyse(SymbolTabelle tabelle, List<CompilerError>
+	 * errors) { Iterator it = elements.entrySet().iterator(); Map.Entry<AtomNode,
+	 * AtomNode> first = null; boolean temp = true; if(it.hasNext()) { first =
+	 * (Map.Entry)it.next(); } while (it.hasNext()) { Map.Entry<AtomNode, AtomNode>
+	 * second = (Map.Entry)it.next(); first.getKey().semantischeAnalyse(tabelle,
+	 * errors); first.getValue().semantischeAnalyse(tabelle, errors);
+	 * second.getKey().semantischeAnalyse(tabelle, errors);
+	 * second.getValue().semantischeAnalyse(tabelle, errors); temp = temp &&
+	 * VariableType.sameTypeAs()}; }
+	 */
 }
 
 class MethCallNode extends AtomNode {
@@ -397,6 +425,16 @@ class MethCallNode extends AtomNode {
 		for (AtomNode node : elementList)
 			res += "\n" + node.toString(indent + "\t");
 		return res;
+	}
+
+	public void semantischeAnalyse(SymbolTabelle tabelle, List<CompilerError> errors) {
+		if (tabelle.find(identifier.image) != null) {
+			for (AtomNode node : elementList) {
+				node.semantischeAnalyse(tabelle, errors);
+			}
+		} else {
+			errors.add(new CompilerError("Error: Class " + identifier.image + " does not exist"));
+		}
 	}
 }
 
@@ -413,6 +451,14 @@ class ClassMethCallNode extends MethCallNode {
 		return indent + "ClassMethCallNode:\n" + ((objectIdentifier != null) ? objectIdentifier.image : "")
 				+ methCallNode.toString(indent + "\t") + "\n";
 	}
+
+	public void semantischeAnalyse(SymbolTabelle tabelle, List<CompilerError> errors) {
+		if (tabelle.find(objectIdentifier.image) != null) {
+			methCallNode.semantischeAnalyse(tabelle, errors);
+		} else {
+			errors.add(new CompilerError("Error: Class " + objectIdentifier.image + " does not exist"));
+		}
+	}
 }
 
 class StateLitNode extends AtomNode {
@@ -426,6 +472,13 @@ class StateLitNode extends AtomNode {
 
 	public String toString(String indent) {
 		return indent + "StateLitNode: " + label.image + ((accept != null) ? accept.image : "");
+	}
+
+	public void semantischeAnalyse(SymbolTabelle tabelle, List<CompilerError> errors) {
+		if (accept != null && accept.kind == 40) {
+			if (tabelle.find(accept.image) == null)
+				errors.add(new CompilerError("Error: Class " + accept.image + " does not exist"));
+		}
 	}
 }
 
@@ -449,6 +502,22 @@ class TransitionLitNode extends AtomNode {
 				+ ((endStateIdentifier != null) ? endStateIdentifier.image : "")
 				+ ((endState != null) ? endState.toString(indent + "\t") : "");
 	}
+
+	public void semantischeAnalyse(SymbolTabelle tabelle, List<CompilerError> errors) {
+		if (rangeIdentifier != null) {
+			if (tabelle.find(rangeIdentifier.image) == null)
+				errors.add(new CompilerError("Error: Class " + rangeIdentifier.image + " does not exist"));
+		} else if (range != null) {
+			range.semantischeAnalyse(tabelle, errors);
+		}
+		if (endStateIdentifier != null) {
+			if (tabelle.find(endStateIdentifier.image) == null)
+				errors.add(new CompilerError("Error: Class " + endStateIdentifier.image + " does not exist"));
+		} else if (endState != null) {
+			endState.semantischeAnalyse(tabelle, errors);
+		}
+		realType = VariableType.transitionT;
+	}
 }
 
 class TransitionLitWithStartNode extends AtomNode {
@@ -469,8 +538,22 @@ class TransitionLitWithStartNode extends AtomNode {
 				+ ((startState != null) ? startState.toString(indent + "\t") : "")
 				+ ((transitionLitNode != null) ? transitionLitNode.toString(indent + "\t") : "");
 	}
+
+	public void semantischeAnalyse(SymbolTabelle tabelle, List<CompilerError> errors) {
+		if (startStateIdentifier != null) {
+			if (tabelle.find(startStateIdentifier.image) == null)
+				errors.add(new CompilerError("Error: Class " + startStateIdentifier.image + " does not exist"));
+		} else {
+			startState.semantischeAnalyse(tabelle, errors);
+		}
+		if (transitionLitNode != null) {
+			transitionLitNode.semantischeAnalyse(tabelle, errors);
+		}
+		realType = VariableType.transitionT;
+	}
 }
 
+//todo
 class RangeLitNode extends AtomNode {
 	List<Range> ranges = new LinkedList<>();
 
@@ -511,6 +594,10 @@ class RangeLitNode extends AtomNode {
 		 * token:additionsIdentifier) res += "\n"+ token.image; return res;
 		 */
 		return indent + "RangeLitNode";
+	}
+
+	public void semantischeAnalyse(SymbolTabelle tabelle, List<CompilerError> errors) {
+		realType = VariableType.rangeT;
 	}
 }
 
@@ -568,6 +655,10 @@ class FaLitNode extends AtomNode {
 		 */
 		return indent + "FaLitNode";
 	}
+
+	public void semantischeAnalyse(SymbolTabelle tabelle, List<CompilerError> errors) {
+		realType = VariableType.faT;
+	}
 }
 
 abstract class ExprNode extends StmntNode {
@@ -583,6 +674,10 @@ class BracketExpr extends ExprNode {
 
 	public String toString(String indent) {
 		return indent + "BracketExpr " + "\n" + ((expr != null) ? expr.toString(indent + "\t") : "");
+	}
+
+	public void semantischeAnalyse(SymbolTabelle tabelle, List<CompilerError> errors) {
+		expr.semantischeAnalyse(tabelle, errors);
 	}
 }
 
@@ -601,6 +696,19 @@ class AndOrExpr extends ExprNode {
 		return indent + "AndOrExpr " + "\n" + ((expr != null) ? expr.toString(indent + "\t") : "") + "\n"
 				+ ((secondExpr != null) ? secondExpr.toString(indent + "\t") : "");
 	}
+
+	public void semantischeAnalyse(SymbolTabelle tabelle, List<CompilerError> errors) {
+		expr.semantischeAnalyse(tabelle, errors);
+		if (secondExpr != null) {
+			secondExpr.semantischeAnalyse(tabelle, errors);
+			if (VariableType.sameTypeAs(expr.realType, secondExpr.realType)) {
+				realType = expr.realType;
+			} else {
+				realType = VariableType.errorT;
+				errors.add(new CompilerError("Error: Type by " + op.image + " in line " + op.beginLine + " mismatch"));
+			}
+		}
+	}
 }
 
 class CompExprNode extends ExprNode {
@@ -618,6 +726,20 @@ class CompExprNode extends ExprNode {
 		return indent + "CompExprNode " + ((op != null) ? op.image : "") + "\n"
 				+ ((expr != null) ? expr.toString(indent + "\t") : "") + "\n"
 				+ ((secondExpr != null) ? secondExpr.toString(indent + "\t") : "");
+	}
+
+	public void semantischeAnalyse(SymbolTabelle tabelle, List<CompilerError> errors) {
+		System.out.println("CompExprNode");
+		expr.semantischeAnalyse(tabelle, errors);
+		if (secondExpr != null) {
+			secondExpr.semantischeAnalyse(tabelle, errors);
+			if (VariableType.sameTypeAs(expr.realType, secondExpr.realType)) {
+				realType = expr.realType;
+			} else {
+				realType = VariableType.errorT;
+				errors.add(new CompilerError("Error: Type by " + op.image + " in line " + op.beginLine + " mismatch"));
+			}
+		}
 	}
 }
 
@@ -638,6 +760,20 @@ class SumExprNode extends ExprNode {
 				+ ((secondExpr != null) ? secondExpr.toString(indent + "\t") : "");
 	}
 
+	public void semantischeAnalyse(SymbolTabelle tabelle, List<CompilerError> errors) {
+		System.out.println("SumExprNode");
+		expr.semantischeAnalyse(tabelle, errors);
+		if (secondExpr != null) {
+			secondExpr.semantischeAnalyse(tabelle, errors);
+			if (VariableType.sameTypeAs(expr.realType, secondExpr.realType)) {
+				realType = expr.realType;
+			} else {
+				realType = VariableType.errorT;
+				errors.add(new CompilerError("Error: Type by " + op.image + " in line " + op.beginLine + " mismatch"));
+			}
+		}
+	}
+
 }
 
 class ProdExprNode extends ExprNode {
@@ -656,6 +792,20 @@ class ProdExprNode extends ExprNode {
 				+ ((expr != null) ? expr.toString(indent + "\t") : "") + "\n"
 				+ ((secondExpr != null) ? secondExpr.toString(indent + "\t") : "");
 	}
+
+	public void semantischeAnalyse(SymbolTabelle tabelle, List<CompilerError> errors) {
+		System.out.println("ProdExprNode");
+		expr.semantischeAnalyse(tabelle, errors);
+		if (secondExpr != null) {
+			secondExpr.semantischeAnalyse(tabelle, errors);
+			if (VariableType.sameTypeAs(expr.realType, secondExpr.realType)) {
+				realType = expr.realType;
+			} else {
+				realType = VariableType.errorT;
+				errors.add(new CompilerError("Error: Type by " + op.image + " in line " + op.beginLine + " mismatch"));
+			}
+		}
+	}
 }
 
 class IntersectionExprNode extends ExprNode {
@@ -670,6 +820,13 @@ class IntersectionExprNode extends ExprNode {
 	public String toString(String indent) {
 		return indent + "IntersectionExprNode " + "\n" + ((a != null) ? a.toString(indent + "\t") : "") + "\n"
 				+ ((b != null) ? b.toString(indent + "\t") : "");
+	}
+
+	public void semantischeAnalyse(SymbolTabelle tabelle, List<CompilerError> errors) {
+		System.out.println("IntersectionExprNode");
+		a.semantischeAnalyse(tabelle, errors);
+		if (b != null)
+			b.semantischeAnalyse(tabelle, errors);
 	}
 }
 
@@ -687,5 +844,13 @@ class PreOrPostIncrementExprNode extends ExprNode {
 	public String toString(String indent) {
 		return indent + "IntersectionExprNode " + "\n" + atom.toString(indent + "\t") + "\n"
 				+ ((pre != null) ? pre.image : "") + ((post != null) ? post.image : "");
+	}
+
+	public void semantischeAnalyse(SymbolTabelle tabelle, List<CompilerError> errors) {
+		System.out.println("PreOrPostIncrementExprNode");
+		atom.semantischeAnalyse(tabelle, errors);
+		realType = atom.realType;
+		System.out.println(VariableType.printType(atom.realType));
+		
 	}
 }

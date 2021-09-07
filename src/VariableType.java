@@ -66,6 +66,7 @@ public class VariableType {
 		switch (s) {
 			case "boolean": return VariableType.booleanT;
 			case "String": return VariableType.stringT;
+			case "char": return VariableType.charT;
 			case "int": return VariableType.intT;
 			case "Range": return VariableType.rangeT;
 			case "Transition": return VariableType.transitionT;
@@ -75,6 +76,30 @@ public class VariableType {
 			default:
 			return errorT; 
 	}
+	}
+	
+	static String printType(VariableType vt) {
+		if(vt == VariableType.booleanT)
+			return "boolean";
+		if(vt == VariableType.stringT)
+			return "String";
+		if(vt == VariableType.charT)
+			return "char";
+		if(vt == VariableType.intT)
+			return "int";
+		if(vt == VariableType.rangeT)
+			return "Range";
+		if(vt == VariableType.transitionT)
+			return "Transition";
+		if(vt == VariableType.stateT)
+			return "State";
+		if(vt == VariableType.faT)
+			return "FA";
+		if(vt == VariableType.raT)
+			return "RA";
+		if(vt == VariableType.errorT)
+			return "error";
+		return "Undefine";
 	}
 	
 
