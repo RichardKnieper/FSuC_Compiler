@@ -37,20 +37,29 @@ public class VariableType {
 		}
 	}
 	
-	static boolean sameTypeAs(MapVariableType first, MapVariableType second) {
-		return first.keyVariableType == second.keyVariableType && first.valueVariableType == second.valueVariableType;
+	
+	static public boolean sameTypeAs(MapVariableType first, MapVariableType second) {
+		return ((first.keyVariableType == second.keyVariableType) || (first.keyVariableType == charT && second.keyVariableType == intT || first.keyVariableType == intT && second.keyVariableType == charT)) 
+				&& ((first.valueVariableType == second.valueVariableType) || (first.valueVariableType == charT && second.valueVariableType == intT || first.valueVariableType == intT && second.valueVariableType == charT)) 
+				;
 	}
 	
-	static boolean sameTypeAs(SetVariableType first, SetVariableType second) {
-		return first.variableType == second.variableType;
+	static public boolean sameTypeAs(SetVariableType first, SetVariableType second) {
+		return first.variableType == second.variableType  
+				|| first.variableType == charT && second.variableType == intT 
+				|| first.variableType == intT && second.variableType == charT;
 	}
 	
-	static boolean sameTypeAs(ArrayVariableType first, ArrayVariableType second) {
-		return first.variableType == second.variableType;
+	static public boolean sameTypeAs(ArrayVariableType first, ArrayVariableType second) {
+		return first.variableType == second.variableType  
+				|| first.variableType == charT && second.variableType == intT 
+				|| first.variableType == intT && second.variableType == charT;
 	}
 
-	static boolean sameTypeAs(VariableType first, VariableType second) {
-		return first == second;
+	static public boolean sameTypeAs(VariableType first, VariableType second) {
+		return first == second  
+				|| first == charT && second == intT 
+				|| first == intT && second == charT;
 	}
 	
 	static VariableType of(String s) {
@@ -67,4 +76,8 @@ public class VariableType {
 			return errorT; 
 	}
 	}
+	
+
+	
+	
 }
