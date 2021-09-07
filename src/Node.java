@@ -8,7 +8,7 @@ import java.util.Map;
 
 abstract public class Node {
 	public abstract String toString(String indent);
-	
+
 	public void semantischeAnalyse(SymbolTabelle tabelle, List<CompilerError> errors) {
 	}
 }
@@ -28,7 +28,7 @@ class CuNode extends Node {
 	}
 
 	public void semantischeAnalyse(SymbolTabelle tabelle, List<CompilerError> errors) {
-		System.out.println("CuNode");
+
 		for (Node node : declOrStmntList) {
 			node.semantischeAnalyse(tabelle, errors);
 		}
@@ -46,7 +46,7 @@ class BlockStmntNode extends StmntNode {
 	}
 
 	public void semantischeAnalyse(SymbolTabelle tabelle, List<CompilerError> errors) {
-		System.out.println("BlockStmntNode");
+
 		SymbolTabelle newSt = new SymbolTabelle(tabelle);
 		for (Node node : declOrStmntList) {
 			node.semantischeAnalyse(newSt, errors);
@@ -139,9 +139,9 @@ class DeclNode extends Node {
 	}
 
 	public void semantischeAnalyse(SymbolTabelle tabelle, List<CompilerError> errors) {
-		System.out.println("DeclNode");
+
 		type.semantischeAnalyse(tabelle, errors);
-		System.out.println(VariableType.printType(type.variableType));
+
 		if (!tabelle.add(identifier.image, this))
 			errors.add(new CompilerError("Error: " + identifier.image + " already exists in line: "
 					+ tabelle.find(identifier.image).identifier.beginLine));
@@ -162,12 +162,11 @@ class VarDeclNode extends DeclNode {
 	}
 
 	public void semantischeAnalyse(SymbolTabelle tabelle, List<CompilerError> errors) {
-		System.out.println("VarDeclNode");
+
 		expr.semantischeAnalyse(tabelle, errors);
 		type.semantischeAnalyse(tabelle, errors);
-		System.out.println(VariableType.printType(type.variableType));
-		System.out.println(VariableType.printType(expr.realType));
-		if (VariableType.sameTypeAs(type.variableType, expr.realType )) {
+
+		if (VariableType.sameTypeAs(type.variableType, expr.realType)) {
 			if (!tabelle.add(identifier.image, this))
 				errors.add(new CompilerError("Error: " + identifier.image + " already exists in line: "
 						+ tabelle.find(identifier.image).identifier.beginLine));
@@ -216,7 +215,6 @@ class TypeNode extends Node {
 		return indent + "TypeNode" + "\n";
 	}
 
-	
 }
 
 //Todo typeNode
@@ -332,15 +330,20 @@ class LitNode extends AtomNode {
 	public void semantischeAnalyse(SymbolTabelle tabelle, List<CompilerError> errors) {
 		switch (token.kind) {
 		case 37:
-			realType = VariableType.booleanT; break;
+			realType = VariableType.booleanT;
+			break;
 		case 38:
-			realType = VariableType.charT; break;
+			realType = VariableType.charT;
+			break;
 		case 39:
-			realType = VariableType.stringT; break;
+			realType = VariableType.stringT;
+			break;
 		case 40:
-			realType = VariableType.intT; break;
+			realType = VariableType.intT;
+			break;
 		default:
-			realType = VariableType.errorT; break;
+			realType = VariableType.errorT;
+			break;
 		}
 	}
 }
@@ -729,7 +732,7 @@ class CompExprNode extends ExprNode {
 	}
 
 	public void semantischeAnalyse(SymbolTabelle tabelle, List<CompilerError> errors) {
-		System.out.println("CompExprNode");
+
 		expr.semantischeAnalyse(tabelle, errors);
 		if (secondExpr != null) {
 			secondExpr.semantischeAnalyse(tabelle, errors);
@@ -761,7 +764,7 @@ class SumExprNode extends ExprNode {
 	}
 
 	public void semantischeAnalyse(SymbolTabelle tabelle, List<CompilerError> errors) {
-		System.out.println("SumExprNode");
+
 		expr.semantischeAnalyse(tabelle, errors);
 		if (secondExpr != null) {
 			secondExpr.semantischeAnalyse(tabelle, errors);
@@ -794,7 +797,7 @@ class ProdExprNode extends ExprNode {
 	}
 
 	public void semantischeAnalyse(SymbolTabelle tabelle, List<CompilerError> errors) {
-		System.out.println("ProdExprNode");
+
 		expr.semantischeAnalyse(tabelle, errors);
 		if (secondExpr != null) {
 			secondExpr.semantischeAnalyse(tabelle, errors);
@@ -823,7 +826,7 @@ class IntersectionExprNode extends ExprNode {
 	}
 
 	public void semantischeAnalyse(SymbolTabelle tabelle, List<CompilerError> errors) {
-		System.out.println("IntersectionExprNode");
+
 		a.semantischeAnalyse(tabelle, errors);
 		if (b != null)
 			b.semantischeAnalyse(tabelle, errors);
@@ -847,10 +850,9 @@ class PreOrPostIncrementExprNode extends ExprNode {
 	}
 
 	public void semantischeAnalyse(SymbolTabelle tabelle, List<CompilerError> errors) {
-		System.out.println("PreOrPostIncrementExprNode");
+
 		atom.semantischeAnalyse(tabelle, errors);
 		realType = atom.realType;
-		System.out.println(VariableType.printType(atom.realType));
-		
+
 	}
 }
