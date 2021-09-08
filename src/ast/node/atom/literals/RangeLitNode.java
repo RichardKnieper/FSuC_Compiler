@@ -65,11 +65,11 @@ public class RangeLitNode extends AtomNode {
 			String identifier = i.image;
 			DeclNode temp = tabelle.find(identifier);
 			if (temp == null) {
-				errors.add(new CompilerError("Error: " + identifier + "is not defined in line: "
+				errors.add(new CompilerError("Error: " + identifier + " is not defined in line: "
 						+ i.beginLine));
 				hasError = true;
 			} else if (!temp.type.variableType.hasSameTypeAs(VariableType.rangeT)) {
-				errors.add(new CompilerError("Error: " + identifier + "is not a Range in line: "
+				errors.add(new CompilerError("Error: " + identifier + " is not a Range in line: "
 						+ i.beginLine));
 				hasError = true;
 			}

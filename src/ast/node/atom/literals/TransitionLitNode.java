@@ -9,6 +9,9 @@ import jj.Token;
 
 import java.util.List;
 
+/**
+ * Only exists when encapsulated by {@link TransitionLitWithStartNode}.
+ */
 public class TransitionLitNode extends AtomNode {
 	public Token rangeIdentifier, endStateIdentifier;
 	public RangeLitNode range;
@@ -30,54 +33,44 @@ public class TransitionLitNode extends AtomNode {
 				+ ((endState != null) ? endState.toString(indent + "\t") : "");
 	}
 
+	@SuppressWarnings("DuplicatedCode")
 	public VariableType semantischeAnalyse(SymbolTabelle tabelle, List<CompilerError> errors) {
 		boolean hasError = false;
 
-		if (range == null) {
+		if (rangeIdentifier != null) {
 			DeclNode temp = tabelle.find(rangeIdentifier.image);
 			if (temp == null) {
-				errors.add(new CompilerError("Error: " + rangeIdentifier.image + "is not defined in line: "
+				errors.add(new CompilerError("Error: " + rangeIdentifier.image + " is not defined in line: "
 						+ rangeIdentifier.beginLine));
 				hasError = true;
 			} else if (!temp.type.variableType.hasSameTypeAs(VariableType.rangeT)) {
-				errors.add(new CompilerError("Error: " + rangeIdentifier + "is not a Range in line: "
+				errors.add(new CompilerError("Error: " + rangeIdentifier.image + " is not a Range in line: "
 						+ rangeIdentifier.beginLine));
 				hasError = true;
 			}
-		} else {
+		} else if (range != null){
 			if (range.semantischeAnalyse(tabelle, errors).isError()) {
 				hasError = true;
 			}
 		}
 
 		if (endState == null) {
-			DeclNode temp = tabelle.find(rangeIdentifier.image);
+			DeclNode temp = tabelle.find(endStateIdentifier.image);
 			if (temp == null) {
-				errors.add(new CompilerError("Error: " + rangeIdentifier.image + "is not defined in line: "
-						+ rangeIdentifier.beginLine));
+				errors.add(new CompilerError("Error: " + rangeIdentifier.image + " is not defined in line: "
+						+ endStateIdentifier.beginLine));
 				hasError = true;
-			} else if (!temp.type.variableType.hasSameTypeAs(VariableType.rangeT)) {
-				errors.add(new CompilerError("Error: " + rangeIdentifier + "is not a Range in line: "
-						+ rangeIdentifier.beginLine));
+			} else if (!temp.type.variableType.hasSameTypeAs(VariableType.stateT)) {
+				errors.add(new CompilerError("Error: " + endStateIdentifier.image + " is not a State in line: "
+						+ endStateIdentifier.beginLine));
 				hasError = true;
 			}
 		} else {
-			endState.semantischeAnalyse(tabelle, errors);
+			if (endState.semantischeAnalyse(tabelle, errors).isError()) {
+				hasError = true;
+			}
 		}
 
-		if (rangeIdentifier != null) {
-			if (tabelle.find(rangeIdentifier.image) == null)
-				errors.add(new CompilerError("Error: Class " + rangeIdentifier.image + " does not exist"));
-		} else if (range != null) {
-			range.semantischeAnalyse(tabelle, errors);
-		}
-
-		if (endStateIdentifier != null) {
-			if (tabelle.find(endStateIdentifier.image) == null)
-				errors.add(new CompilerError("Error: Class " + endStateIdentifier.image + " does not exist"));
-		} else if (endState != null) {
-			endState.semantischeAnalyse(tabelle, errors);
-		}
-		realType = VariableType.transitionT;
+		return hasError ? VariableType.errorT : VariableType.transitionT;
 	}
 }

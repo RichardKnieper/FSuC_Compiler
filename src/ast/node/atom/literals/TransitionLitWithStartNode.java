@@ -4,6 +4,7 @@ import ast.CompilerError;
 import ast.SymbolTabelle;
 import ast.VariableType;
 import ast.node.atom.AtomNode;
+import ast.node.decl.DeclNode;
 import jj.Token;
 
 import java.util.List;
@@ -27,16 +28,31 @@ public class TransitionLitWithStartNode extends AtomNode {
 				+ ((transitionLitNode != null) ? transitionLitNode.toString(indent + "\t") : "");
 	}
 
-	public void semantischeAnalyse(SymbolTabelle tabelle, List<CompilerError> errors) {
+	@SuppressWarnings("DuplicatedCode")
+	public VariableType semantischeAnalyse(SymbolTabelle tabelle, List<CompilerError> errors) {
+		boolean hasError = false;
+
 		if (startStateIdentifier != null) {
-			if (tabelle.find(startStateIdentifier.image) == null)
-				errors.add(new CompilerError("Error: Class " + startStateIdentifier.image + " does not exist"));
+			DeclNode temp = tabelle.find(startStateIdentifier.image);
+			if (temp == null) {
+				errors.add(new CompilerError("Error: " + startStateIdentifier.image + "is not defined in line: "
+						+ startStateIdentifier.beginLine));
+				hasError = true;
+			} else if (!temp.type.variableType.hasSameTypeAs(VariableType.stateT)) {
+				errors.add(new CompilerError("Error: " + startStateIdentifier.image + "is not a State in line: "
+						+ startStateIdentifier.beginLine));
+				hasError = true;
+			}
 		} else {
-			startState.semantischeAnalyse(tabelle, errors);
+			if (startState.semantischeAnalyse(tabelle, errors).isError()) {
+				hasError = true;
+			}
 		}
-		if (transitionLitNode != null) {
-			transitionLitNode.semantischeAnalyse(tabelle, errors);
+
+		if (transitionLitNode.semantischeAnalyse(tabelle, errors).isError()) {
+			hasError = true;
 		}
-		realType = VariableType.transitionT;
+
+		return hasError ? VariableType.errorT : VariableType.transitionT;
 	}
 }

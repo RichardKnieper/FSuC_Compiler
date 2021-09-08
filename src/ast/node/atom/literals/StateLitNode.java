@@ -35,10 +35,10 @@ public class StateLitNode extends AtomNode {
         if (accept.kind == ParserConstants.Identifier) {
             DeclNode temp = tabelle.find(accept.image);
             if (temp == null) {
-                errors.add(new CompilerError("Error: " + accept.image + "is not defined in line: "
+                errors.add(new CompilerError("Error: " + accept.image + " is not defined in line: "
                         + accept.beginLine));
             } else if (!temp.type.variableType.hasSameTypeAs(VariableType.intT)) {
-                errors.add(new CompilerError("Error: " + accept.image + "is not an int in line: "
+                errors.add(new CompilerError("Error: " + accept.image + " is not an int in line: "
                         + accept.beginLine));
             } else {
             	return VariableType.stateT;

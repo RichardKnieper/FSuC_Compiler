@@ -16,7 +16,7 @@ public class VariableType { // TODO find better name
 	public static VariableType noReturnType = new VariableType();
 
 	public static class ArrayVariableType extends VariableType {
-		VariableType variableType;
+		public VariableType variableType;
 		public ArrayVariableType(VariableType variableType) {
 			super();
 			this.variableType = variableType;
@@ -24,7 +24,7 @@ public class VariableType { // TODO find better name
 	}
 	
 	public static class SetVariableType extends VariableType {
-		VariableType variableType;
+		public VariableType variableType;
 		public SetVariableType(VariableType variableType) {
 			super();
 			this.variableType = variableType;
@@ -32,8 +32,8 @@ public class VariableType { // TODO find better name
 	}
 	
 	public static class MapVariableType extends VariableType {
-		VariableType keyVariableType;
-		VariableType valueVariableType;
+		public VariableType keyVariableType;
+		public VariableType valueVariableType;
 		public MapVariableType(VariableType keyVariableType, VariableType valueVariableType) {
 			super();
 			this.keyVariableType = keyVariableType;
@@ -128,5 +128,10 @@ public class VariableType { // TODO find better name
 		if(vt == VariableType.errorT)
 			return "error";
 		return "Undefine";
+	}
+
+	@Override
+	public String toString() {
+		return VariableType.printType(this);
 	}
 }

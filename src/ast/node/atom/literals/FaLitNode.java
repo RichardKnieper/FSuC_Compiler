@@ -71,11 +71,11 @@ public class FaLitNode extends AtomNode {
 		if (startState == null) {
 			DeclNode temp = tabelle.find(startStateIdentifier.image);
 			if (temp == null) {
-				errors.add(new CompilerError("Error: " + startStateIdentifier.image + "is not defined in line: "
+				errors.add(new CompilerError("Error: " + startStateIdentifier.image + " is not defined in line: "
 						+ startStateIdentifier.beginLine));
 				hasError = true;
 			} else if (!temp.type.variableType.hasSameTypeAs(VariableType.stateT)) {
-				errors.add(new CompilerError("Error: " + startStateIdentifier.image + "is not a State in line: "
+				errors.add(new CompilerError("Error: " + startStateIdentifier.image + " is not a State in line: "
 						+ startStateIdentifier.beginLine));
 				hasError = true;
 			}
@@ -90,11 +90,11 @@ public class FaLitNode extends AtomNode {
 			if (transition.transitionLitNode == null) {
 				DeclNode temp = tabelle.find(transition.identifier.image);
 				if (temp == null) {
-					errors.add(new CompilerError("Error: " + transition.identifier.image + "is not defined in line: "
+					errors.add(new CompilerError("Error: " + transition.identifier.image + " is not defined in line: "
 							+ startStateIdentifier.beginLine));
 					hasError = true;
 				} else if (!temp.type.variableType.hasSameTypeAs(VariableType.transitionT)) {
-					errors.add(new CompilerError("Error: " + transition.identifier.image + "is not a Transition in line: "
+					errors.add(new CompilerError("Error: " + transition.identifier.image + " is not a Transition in line: "
 							+ transition.identifier.beginLine));
 					hasError = true;
 				}
@@ -116,11 +116,11 @@ public class FaLitNode extends AtomNode {
 			String identifier = i.image;
 			DeclNode temp = tabelle.find(identifier);
 			if (temp == null) {
-				errors.add(new CompilerError("Error: " + identifier + "is not defined in line: "
+				errors.add(new CompilerError("Error: " + identifier + " is not defined in line: "
 						+ i.beginLine));
 				hasError = true;
 			} else if (!temp.type.variableType.hasSameTypeAs(VariableType.faT)) {
-				errors.add(new CompilerError("Error: " + identifier + "is not a FA in line: "
+				errors.add(new CompilerError("Error: " + identifier + " is not a FA in line: "
 						+ i.beginLine));
 				hasError = true;
 			}

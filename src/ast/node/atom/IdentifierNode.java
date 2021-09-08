@@ -2,6 +2,8 @@ package ast.node.atom;
 
 import ast.CompilerError;
 import ast.SymbolTabelle;
+import ast.VariableType;
+import ast.node.decl.DeclNode;
 import jj.Token;
 
 import java.util.List;
@@ -17,8 +19,12 @@ public class IdentifierNode extends AtomNode {
 		return indent + "IdentifierNode: " + identifier.image;
 	}
 
-	public void semantischeAnalyse(SymbolTabelle tabelle, List<CompilerError> errors) {
-		if (tabelle.find(identifier.image) == null)
+	public VariableType semantischeAnalyse(SymbolTabelle tabelle, List<CompilerError> errors) {
+		DeclNode temp = tabelle.find(identifier.image);
+		if (temp == null) {
 			errors.add(new CompilerError("Error: " + identifier.image + " cannot be resolved to a variable"));
+			return VariableType.errorT;
+		}
+		return temp.type.variableType;
 	}
 }
