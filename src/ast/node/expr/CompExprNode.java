@@ -25,16 +25,32 @@ public class CompExprNode extends ExprNode {
 				+ ((secondExpr != null) ? secondExpr.toString(indent + "\t") : "");
 	}
 
-	public void semantischeAnalyse(SymbolTabelle tabelle, List<CompilerError> errors) {
-		expr.semantischeAnalyse(tabelle, errors);
+	public VariableType semantischeAnalyse(SymbolTabelle tabelle, List<CompilerError> errors) {
+		VariableType exprType = expr.semantischeAnalyse(tabelle, errors);
 		if (secondExpr != null) {
-			secondExpr.semantischeAnalyse(tabelle, errors);
-			if (VariableType.hasSameTypeAs(expr.realType, secondExpr.realType)) {
-				realType = expr.realType;
-			} else {
-				realType = VariableType.errorT;
-				errors.add(new CompilerError("Error: Type by " + op.image + " in line " + op.beginLine + " mismatch"));
-			}
+			VariableType secondExprType = secondExpr.semantischeAnalyse(tabelle, errors);
+			if (secondExprType.hasSameTypeAs(exprType)) {
+				if (op.image.equals("!=") || op.image.equals("==")) {
+					if ((secondExprType.hasSameTypeAs(VariableType.booleanT))
+							|| (secondExprType.hasSameTypeAs(VariableType.intT))) {
+						return VariableType.booleanT;
+					} else {
+						errors.add(new CompilerError("Error: In line " + op.beginLine + ", " + op.image
+								+ " accept only Boolean or Integer."));
+						return VariableType.errorT;
+					}
+				} else {
+					if (secondExprType.hasSameTypeAs(VariableType.intT)) {
+						return VariableType.booleanT;
+					} else {
+						errors.add(new CompilerError(
+								"Error: In line " + op.beginLine + ", " + op.image + " accept only Integer."));
+						return VariableType.errorT;
+					}
+				}
+			} else
+				return VariableType.errorT;
 		}
+		return exprType;
 	}
 }

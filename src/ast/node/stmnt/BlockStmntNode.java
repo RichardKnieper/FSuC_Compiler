@@ -2,6 +2,7 @@ package ast.node.stmnt;
 
 import ast.CompilerError;
 import ast.SymbolTabelle;
+import ast.VariableType;
 import ast.node.Node;
 
 import java.util.LinkedList;
@@ -17,11 +18,12 @@ public class BlockStmntNode extends StmntNode {
 		return res;
 	}
 
-	public void semantischeAnalyse(SymbolTabelle tabelle, List<CompilerError> errors) {
-
+	public VariableType semantischeAnalyse(SymbolTabelle tabelle, List<CompilerError> errors) {
+		
 		SymbolTabelle newSt = new SymbolTabelle(tabelle);
 		for (Node node : declOrStmntList) {
 			node.semantischeAnalyse(newSt, errors);
 		}
+		return VariableType.noReturnType;
 	}
 }

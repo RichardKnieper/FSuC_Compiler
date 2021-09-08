@@ -20,13 +20,21 @@ public class IfStmntNode extends StmntNode {
 				+ (elseStmnt != null ? "\n" + elseStmnt.toString(indent + "\t") : "");
 	}
 
-	public void semantischeAnalyse(SymbolTabelle tabelle, List<CompilerError> errors) {
-		ifExpr.semantischeAnalyse(tabelle, errors);
-		if (ifExpr.realType != VariableType.booleanT && ifExpr.realType != VariableType.errorT) {
-			errors.add(new CompilerError("Error: IF-condition must be boolean"));
+	public VariableType semantischeAnalyse(SymbolTabelle tabelle, List<CompilerError> errors) {
+		VariableType ifExprVariable = ifExpr.semantischeAnalyse(tabelle, errors);
+		if (ifExprVariable == VariableType.errorT) {
+            return VariableType.errorT;
+        }
+		
+		if(ifExprVariable.hasSameTypeAs(VariableType.booleanT)) {
+			ifStmnt.semantischeAnalyse(tabelle, errors);
+			if (elseStmnt != null)
+				elseStmnt.semantischeAnalyse(tabelle, errors);
+			return VariableType.noReturnType;
 		}
-		ifStmnt.semantischeAnalyse(tabelle, errors);
-		if (elseStmnt != null)
-			elseStmnt.semantischeAnalyse(tabelle, errors);
+		else {
+			errors.add(new CompilerError("Error: IF-condition must be boolean"));
+			return VariableType.errorT;
+		}	
 	}
 }

@@ -23,16 +23,23 @@ public class AndOrExpr extends ExprNode {
 				+ ((secondExpr != null) ? secondExpr.toString(indent + "\t") : "");
 	}
 
-	public void semantischeAnalyse(SymbolTabelle tabelle, List<CompilerError> errors) {
-		expr.semantischeAnalyse(tabelle, errors);
+	public VariableType semantischeAnalyse(SymbolTabelle tabelle, List<CompilerError> errors) {
+		VariableType exprType = expr.semantischeAnalyse(tabelle, errors);
 		if (secondExpr != null) {
-			secondExpr.semantischeAnalyse(tabelle, errors);
-			if (VariableType.hasSameTypeAs(expr.realType, secondExpr.realType)) {
-				realType = expr.realType;
+			VariableType secondExprType = secondExpr.semantischeAnalyse(tabelle, errors);
+			if (secondExprType.hasSameTypeAs(exprType)) {
+				if(secondExprType.hasSameTypeAs(VariableType.booleanT)){
+					return secondExprType;
+				} else {
+					errors.add(new CompilerError("Error: Type by " + op.image + " in line " + op.beginLine + " must be boolean."));
+					return VariableType.errorT;
+				}
+			
 			} else {
-				realType = VariableType.errorT;
 				errors.add(new CompilerError("Error: Type by " + op.image + " in line " + op.beginLine + " mismatch"));
+				return VariableType.errorT;
 			}
 		}
+		return exprType;
 	}
 }

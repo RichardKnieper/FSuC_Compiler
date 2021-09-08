@@ -22,6 +22,6 @@ public class ReturnStmntNode extends StmntNode {
 	}
 
 	public VariableType semantischeAnalyse(SymbolTabelle tabelle, List<CompilerError> errors) {
-		expr.semantischeAnalyse(tabelle, errors);
+		return expr.semantischeAnalyse(tabelle, errors);
 	}
 }

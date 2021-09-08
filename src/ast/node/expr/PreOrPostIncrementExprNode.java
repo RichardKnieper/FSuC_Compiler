@@ -2,6 +2,7 @@ package ast.node.expr;
 
 import ast.CompilerError;
 import ast.SymbolTabelle;
+import ast.VariableType;
 import ast.node.atom.AtomNode;
 import jj.Token;
 
@@ -23,8 +24,26 @@ public class PreOrPostIncrementExprNode extends ExprNode {
 				+ ((pre != null) ? pre.image : "") + ((post != null) ? post.image : "");
 	}
 
-	public void semantischeAnalyse(SymbolTabelle tabelle, List<CompilerError> errors) {
-		atom.semantischeAnalyse(tabelle, errors);
-		realType = atom.realType;
+	public VariableType semantischeAnalyse(SymbolTabelle tabelle, List<CompilerError> errors) {
+		VariableType atomType = atom.semantischeAnalyse(tabelle, errors);
+		if (post != null) {
+			if (atomType.hasSameTypeAs(VariableType.intT))
+				return VariableType.intT;
+			else {
+				errors.add(new CompilerError("Error: Before " + post.image + " in line " + post.beginLine
+						+ " must be values of type Integer."));
+				return VariableType.errorT;
+			}
+		}
+		if (pre != null) {
+			if (atomType.hasSameTypeAs(VariableType.intT))
+				return VariableType.intT;
+			else {
+				errors.add(new CompilerError("Error: After " + pre.image + " in line " + pre.beginLine
+						+ " must be values of type Integer."));
+				return VariableType.errorT;
+			}
+		}
+		return atomType;
 	}
 }

@@ -2,6 +2,7 @@ package ast.node.expr;
 
 import ast.CompilerError;
 import ast.SymbolTabelle;
+import ast.VariableType;
 
 import java.util.List;
 
@@ -16,7 +17,8 @@ public class BracketExpr extends ExprNode {
 		return indent + "BracketExpr " + "\n" + ((expr != null) ? expr.toString(indent + "\t") : "");
 	}
 
-	public void semantischeAnalyse(SymbolTabelle tabelle, List<CompilerError> errors) {
-		expr.semantischeAnalyse(tabelle, errors);
+	public VariableType semantischeAnalyse(SymbolTabelle tabelle, List<CompilerError> errors) {
+		VariableType exprType = expr.semantischeAnalyse(tabelle, errors);
+		return exprType;
 	}
 }
