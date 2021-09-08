@@ -73,12 +73,13 @@ MethDeclNode methDecl(TypeNode type, Token identifier): {
 	MethDeclNode node = new MethDeclNode(type, identifier);
 	TypeNode firstType, lastType;
 	Token firstIdentifier, lastIdentifier;
-	int countIndex = 1;
+	StmntNode body = null;
+	int countIndex = 0;
   } {
     "(" (firstType = type() firstIdentifier = <Identifier> ("," lastType = type() lastIdentifier = <Identifier>
     { node.params.put(lastIdentifier,new ParamWrapper(countIndex++,lastType,lastIdentifier));})*
-    { node.params.put(firstIdentifier, new ParamWrapper(0,firstType,firstIdentifier));})? ")" stmnt()
-    { return node; }
+    { node.params.put(firstIdentifier, new ParamWrapper(0,firstType,firstIdentifier));})? ")" body = stmnt()
+    { node.body = body; return node; }
 }
 
 // stmnt -> returnStmnt | ifStmnt | whileStmnt | blockStmnt | expr | ";"

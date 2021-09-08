@@ -1,5 +1,4 @@
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -178,6 +177,7 @@ class VarDeclNode extends DeclNode {
 
 class MethDeclNode extends DeclNode {
 	Map<Token, ParamWrapper> params = new HashMap<>();
+	StmntNode body = null;
 
 	public MethDeclNode(TypeNode type, Token identifier) {
 		super(type, identifier);
