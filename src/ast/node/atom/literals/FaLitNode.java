@@ -74,15 +74,15 @@ public class FaLitNode extends AtomNode {
 				errors.add(new CompilerError("Error: " + startStateIdentifier.image + "is not defined in line: "
 						+ startStateIdentifier.beginLine));
 				hasError = true;
-			} else if (temp.type.variableType.hasSameTypeAs(VariableType.stateT)) {
+			} else if (!temp.type.variableType.hasSameTypeAs(VariableType.stateT)) {
 				errors.add(new CompilerError("Error: " + startStateIdentifier.image + "is not a State in line: "
 						+ startStateIdentifier.beginLine));
 				hasError = true;
 			}
 		} else {
 			VariableType startStateType = startState.semantischeAnalyse(tabelle, errors);
-			if (startStateType.hasSameTypeAs(VariableType.stateT)) {
-				return VariableType.errorT;
+			if (!startStateType.hasSameTypeAs(VariableType.stateT)) {
+				hasError = true;
 			}
 		}
 
@@ -93,15 +93,15 @@ public class FaLitNode extends AtomNode {
 					errors.add(new CompilerError("Error: " + transition.identifier.image + "is not defined in line: "
 							+ startStateIdentifier.beginLine));
 					hasError = true;
-				} else if (temp.type.variableType.hasSameTypeAs(VariableType.transitionT)) {
+				} else if (!temp.type.variableType.hasSameTypeAs(VariableType.transitionT)) {
 					errors.add(new CompilerError("Error: " + transition.identifier.image + "is not a Transition in line: "
 							+ transition.identifier.beginLine));
 					hasError = true;
 				}
 			} else {
 				VariableType transitionType = transition.transitionLitNode.semantischeAnalyse(tabelle, errors);
-				if (transitionType.hasSameTypeAs(VariableType.transitionT)) {
-					return VariableType.errorT;
+				if (!transitionType.hasSameTypeAs(VariableType.transitionT)) {
+					hasError = true;
 				}
 			}
 		}
@@ -112,6 +112,19 @@ public class FaLitNode extends AtomNode {
 			hasError = true;
 		}
 
+		for (Token i : additionsIdentifier) {
+			String identifier = i.image;
+			DeclNode temp = tabelle.find(identifier);
+			if (temp == null) {
+				errors.add(new CompilerError("Error: " + identifier + "is not defined in line: "
+						+ i.beginLine));
+				hasError = true;
+			} else if (!temp.type.variableType.hasSameTypeAs(VariableType.faT)) {
+				errors.add(new CompilerError("Error: " + identifier + "is not a FA in line: "
+						+ i.beginLine));
+				hasError = true;
+			}
+		}
 
 		return hasError ? VariableType.errorT : VariableType.faT;
 	}

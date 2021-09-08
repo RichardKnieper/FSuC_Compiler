@@ -4,6 +4,7 @@ import ast.CompilerError;
 import ast.SymbolTabelle;
 import ast.VariableType;
 import ast.node.atom.AtomNode;
+import ast.node.decl.DeclNode;
 import jj.Token;
 
 import java.util.LinkedList;
@@ -51,7 +52,29 @@ public class RangeLitNode extends AtomNode {
 		return indent + "RangeLitNode";
 	}
 
-	public void semantischeAnalyse(SymbolTabelle tabelle, List<CompilerError> errors) {
-		realType = VariableType.rangeT;
+	public VariableType semantischeAnalyse(SymbolTabelle tabelle, List<CompilerError> errors) {
+		boolean hasError = false;
+
+		boolean errorInAdditionalRange = additionsRange.stream()
+				.anyMatch(addition -> addition.semantischeAnalyse(tabelle, errors).isError());
+		if (errorInAdditionalRange) {
+			hasError = true;
+		}
+
+		for (Token i : additionsIdentifier) {
+			String identifier = i.image;
+			DeclNode temp = tabelle.find(identifier);
+			if (temp == null) {
+				errors.add(new CompilerError("Error: " + identifier + "is not defined in line: "
+						+ i.beginLine));
+				hasError = true;
+			} else if (!temp.type.variableType.hasSameTypeAs(VariableType.rangeT)) {
+				errors.add(new CompilerError("Error: " + identifier + "is not a Range in line: "
+						+ i.beginLine));
+				hasError = true;
+			}
+		}
+
+		return hasError ? VariableType.errorT : VariableType.rangeT;
 	}
 }
