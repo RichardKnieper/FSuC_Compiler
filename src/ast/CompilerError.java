@@ -1,5 +1,6 @@
+package ast;
 
-public class CompilerError extends Exception {
+public class  CompilerError extends Exception {
 	/**
 	 * 
 	 */

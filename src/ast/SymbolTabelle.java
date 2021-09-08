@@ -1,3 +1,7 @@
+package ast;
+
+import ast.node.decl.DeclNode;
+
 import java.util.HashMap;
 
 public class SymbolTabelle {

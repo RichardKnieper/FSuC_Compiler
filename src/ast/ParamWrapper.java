@@ -1,4 +1,9 @@
-class ParamWrapper{
+package ast;
+
+import ast.node.type.TypeNode;
+import jj.Token;
+
+public class ParamWrapper{
 	int index;
 	TypeNode type;
 	Token indentifier;

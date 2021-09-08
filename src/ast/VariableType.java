@@ -1,17 +1,19 @@
+package ast;
 
+@SuppressWarnings("InstantiationOfUtilityClass")
 public class VariableType {
-	static VariableType booleanT = new VariableType();
-	static VariableType stringT = new VariableType();
-	static VariableType charT = new VariableType();
-	static VariableType intT = new VariableType();
-	static VariableType rangeT = new VariableType();
-	static VariableType transitionT = new VariableType();
-	static VariableType stateT = new VariableType();
-	static VariableType faT = new VariableType();
-	static VariableType raT = new VariableType();
-	static VariableType errorT = new VariableType();
+	public static VariableType booleanT = new VariableType();
+	public static VariableType stringT = new VariableType();
+	public static VariableType charT = new VariableType();
+	public static VariableType intT = new VariableType();
+	public static VariableType rangeT = new VariableType();
+	public static VariableType transitionT = new VariableType();
+	public static VariableType stateT = new VariableType();
+	public static VariableType faT = new VariableType();
+	public static VariableType raT = new VariableType();
+	public static VariableType errorT = new VariableType();
 
-	static class ArrayVariableType extends VariableType {
+	public static class ArrayVariableType extends VariableType {
 		VariableType variableType;
 		public ArrayVariableType(VariableType variableType) {
 			super();
@@ -19,7 +21,7 @@ public class VariableType {
 		}
 	}
 	
-	static class SetVariableType extends VariableType {
+	public static class SetVariableType extends VariableType {
 		VariableType variableType;
 		public SetVariableType(VariableType variableType) {
 			super();
@@ -27,7 +29,7 @@ public class VariableType {
 		}
 	}
 	
-	static class MapVariableType extends VariableType {
+	public static class MapVariableType extends VariableType {
 		VariableType keyVariableType;
 		VariableType valueVariableType;
 		public MapVariableType(VariableType keyVariableType, VariableType valueVariableType) {
@@ -62,7 +64,8 @@ public class VariableType {
 				|| first == intT && second == charT;
 	}
 	
-	static VariableType of(String s) {
+	@SuppressWarnings("EnhancedSwitchMigration")
+	public static VariableType of(String s) {
 		switch (s) {
 			case "boolean": return VariableType.booleanT;
 			case "String": return VariableType.stringT;
@@ -78,7 +81,7 @@ public class VariableType {
 	}
 	}
 	
-	static String printType(VariableType vt) {
+	public static String printType(VariableType vt) {
 		if(vt == VariableType.booleanT)
 			return "boolean";
 		if(vt == VariableType.stringT)

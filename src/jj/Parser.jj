@@ -5,6 +5,8 @@ options {
 
 PARSER_BEGIN(Parser)
 
+package jj;
+
 public class Parser {
 
 }
@@ -73,11 +75,11 @@ MethDeclNode methDecl(TypeNode type, Token identifier): {
 	MethDeclNode node = new MethDeclNode(type, identifier);
 	TypeNode firstType, lastType;
 	Token firstIdentifier, lastIdentifier;
-	StmntNode body = null;
-	int countIndex = 0;
+	StmntNode body;
+	int countIndex = 1;
   } {
     "(" (firstType = type() firstIdentifier = <Identifier> ("," lastType = type() lastIdentifier = <Identifier>
-    { node.params.put(lastIdentifier,new ParamWrapper(countIndex++,lastType,lastIdentifier));})*
+    { node.params.put(lastIdentifier, new ParamWrapper(countIndex++,lastType,lastIdentifier));})*
     { node.params.put(firstIdentifier, new ParamWrapper(0,firstType,firstIdentifier));})? ")" body = stmnt()
     { node.body = body; return node; }
 }
@@ -95,23 +97,23 @@ ReturnStmntNode returnStmnt(): {
 	ExprNode expr;
   } {
     "return" expr = expr() ";"
-    { return new ReturnStmntNode(expr); }      
+    { return new ReturnStmntNode(expr); }
 }
 
 // ifStmnt -> "if" "(" expr ")" stmnt ("else" stmnt)?
-IfNode ifStmnt(): {
+IfStmntNode ifStmnt(): {
 	StmntNode ifExpr, ifStmnt, elseStmnt = null;
   } {
     "if" "("  ifExpr = expr() ")" ifStmnt = stmnt() (LOOKAHEAD(1)"else" elseStmnt=stmnt())?
-    { return new IfNode(ifExpr,ifStmnt,elseStmnt); }
+    { return new IfStmntNode(ifExpr,ifStmnt,elseStmnt); }
 }
 
 // whileStmnt -> "while" "(" expr ")" stmnt
-WhileNode whileStmnt(): {
+WhileStmntNode whileStmnt(): {
 	StmntNode whileExpr, whileStmnt;
   } {
     "while" "(" whileExpr=expr() ")" whileStmnt=stmnt()
-    { return new WhileNode(whileExpr,whileStmnt); } 
+    { return new WhileStmntNode(whileExpr,whileStmnt); }
 }
 
 // blockStmnt -> "{" (decl | stmnt)* "}"
