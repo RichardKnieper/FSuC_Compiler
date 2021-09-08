@@ -30,14 +30,36 @@ public class MethDeclNode extends DeclNode {
 
 	@SuppressWarnings("DuplicatedCode")
 	public VariableType semantischeAnalyse(SymbolTabelle tabelle, List<CompilerError> errors) {
+		SymbolTabelle neueTabelle = new SymbolTabelle(tabelle);
 		boolean addedError = false;
 
-		VariableType bodyType = body.semantischeAnalyse(tabelle, errors);
+		String methodName = identifier.image;
+		if (neueTabelle.findInCurrentBlock(methodName) != null) {
+			errors.add(new CompilerError("Error: " + methodName + " already exists in line: "
+					+ neueTabelle.find(methodName).identifier.beginLine));
+			addedError = true;
+		}
+
+		// should always be false
+		boolean paramTypeContainsError = params.values()
+				.stream()
+				.map(param -> param.getType().semantischeAnalyse(neueTabelle, errors))
+				.anyMatch(type -> type == VariableType.errorT);
+		if (paramTypeContainsError) {
+			errors.add(new CompilerError("Error: " + methodName + " has an error in its paramter declerations in line: "
+					+ neueTabelle.find(methodName).identifier.beginLine));
+			addedError = true;
+		}
+
+		params.values().forEach(paramWrapper ->
+				neueTabelle.add(paramWrapper.getIndentifier().image, new DeclNode(paramWrapper.getType(), paramWrapper.getIndentifier())));
+
+		VariableType bodyType = body.semantischeAnalyse(neueTabelle, errors);
 		if (bodyType == VariableType.errorT) {
 			return VariableType.errorT;
 		}
 
-		VariableType varType = type.semantischeAnalyse(tabelle, errors);
+		VariableType varType = type.semantischeAnalyse(neueTabelle, errors);
 		if (varType.isError()) {
 			return VariableType.errorT;
 		}
@@ -46,28 +68,10 @@ public class MethDeclNode extends DeclNode {
 			addedError = true;
 		}
 
-		String methodName = identifier.image;
-		if (tabelle.findInCurrentBlock(methodName) != null) {
-			errors.add(new CompilerError("Error: " + methodName + " already exists in line: "
-					+ tabelle.find(methodName).identifier.beginLine));
-			addedError = true;
-		}
-
-		// should always be false
-		boolean paramTypeContainsError = params.values()
-				.stream()
-				.map(param -> param.getType().semantischeAnalyse(tabelle, errors))
-				.anyMatch(type -> type == VariableType.errorT);
-		if (paramTypeContainsError) {
-			errors.add(new CompilerError("Error: " + methodName + " has an error in its paramter declerations in line: "
-				+ tabelle.find(methodName).identifier.beginLine));
-			addedError = true;
-		}
-
 		if (addedError) {
 			return VariableType.errorT;
 		} else {
-			tabelle.add(methodName, this);
+			neueTabelle.add(methodName, this);
 			return VariableType.noReturnType;
 		}
 	}

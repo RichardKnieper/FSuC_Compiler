@@ -188,7 +188,13 @@ AtomNode atom(): {
     | atom = array() { return atom; }
     | atom = range() { return atom; }
     | atom = fa() { return atom; }
-    | LOOKAHEAD(4) (LOOKAHEAD(2) token = <Identifier> ".")? methCall = methCall() { return new ClassMethCallNode(token, methCall); }
+    | LOOKAHEAD(4) (LOOKAHEAD(2) token = <Identifier> ".")? methCall = methCall() {
+        if (token == null) {
+            return methCall;
+        } else {
+            return new ClassMethCallNode(token, methCall);
+        }
+    }
     | LOOKAHEAD(2) token = <Identifier> "." attribute = <Identifier> { return new ReadClassAttributeNode(token, attribute); }
     | (state = state() | token = <Identifier>) (LOOKAHEAD(3) transition = transition())? {
         if (transition == null) {

@@ -28,6 +28,6 @@ public class SetLitNode extends AtomNode {
 			errors.add(new CompilerError("Error: not all values of set match."));
 		}
 
-		return type;
+		return new VariableType.SetVariableType(type);
 	}
 }

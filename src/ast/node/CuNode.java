@@ -7,6 +7,7 @@ import ast.node.stmnt.ReturnStmntNode;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class CuNode extends Node {
@@ -24,11 +25,15 @@ public class CuNode extends Node {
     }
 
     public VariableType semantischeAnalyse() {
-        return semantischeAnalyse(new SymbolTabelle(null), new LinkedList<>());
+        List<CompilerError> errors = new LinkedList<>();
+        VariableType result = semantischeAnalyse(new SymbolTabelle(null), errors);
+        errors.forEach(error -> System.out.println(error.toString()));
+        return result;
     }
 
     public VariableType semantischeAnalyse(SymbolTabelle tabelle, List<CompilerError> errors) {
         List<VariableType> types = declOrStmntList.stream()
+                .filter(Objects::nonNull)
                 .map(node -> node.semantischeAnalyse(tabelle, errors))
                 .collect(Collectors.toList());
 

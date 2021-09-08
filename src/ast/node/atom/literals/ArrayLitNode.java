@@ -28,6 +28,6 @@ public class ArrayLitNode extends AtomNode {
 			errors.add(new CompilerError("Error: not all values of array match."));
 		}
 
-		return type;
+		return new VariableType.ArrayVariableType(type);
 	}
 }
