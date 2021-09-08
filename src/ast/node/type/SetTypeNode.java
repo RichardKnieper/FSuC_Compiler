@@ -3,8 +3,8 @@ package ast.node.type;
 import ast.VariableType;
 
 public class SetTypeNode extends TypeNode {
-	public SetTypeNode(VariableType variableType) {
-		super(variableType);
+	public SetTypeNode(VariableType elementType) {
+		super(new VariableType.SetVariableType(elementType));
 	}
 
 	public String toString(String indent) {

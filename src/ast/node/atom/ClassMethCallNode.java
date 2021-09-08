@@ -29,21 +29,21 @@ public class ClassMethCallNode extends MethCallNode {
                     objectIdentifier.beginLine));
         } else {
             VariableType type = element.type.variableType;
-            String method = identifier.image;
+            String method = methCallNode.identifier.image;
             if (type.hasSameTypeAs(VariableType.stringT)) {
                 if (method.equals("length")) {
                     if (elementList.isEmpty()) {
                         return VariableType.intT;
                     } else {
                         errors.add(new CompilerError("Error: Too many parameters for method " + method
-                                + " on class String in line: " + identifier.beginLine));
+                                + " on class String in line: " + methCallNode.identifier.beginLine));
                     }
                 } else if (method.equals("charAt")) {
                     if (elementList.size() == 1) {
                         return VariableType.charT;
                     } else {
                         errors.add(new CompilerError("Error: Wrong amount of parameters for method " + method
-                                + " on class String in line: " + identifier.beginLine));
+                                + " on class String in line: " + methCallNode.identifier.beginLine));
                     }
                 }
             } else if (type.hasSameTypeAs(VariableType.rangeT)) {
@@ -52,14 +52,14 @@ public class ClassMethCallNode extends MethCallNode {
                         return VariableType.booleanT;
                     } else {
                         errors.add(new CompilerError("Error: Too many parameters for method " + method
-                                + " on class String in line: " + identifier.beginLine));
+                                + " on class String in line: " + methCallNode.identifier.beginLine));
                     }
                 } else if (method.equals("contains")) {
                     if (elementList.size() == 1) {
                         return VariableType.booleanT;
                     } else {
                         errors.add(new CompilerError("Error: Wrong amount of parameters for method " + method
-                                + " on class String in line: " + identifier.beginLine));
+                                + " on class String in line: " + methCallNode.identifier.beginLine));
                     }
                 }
             } else if (type.hasSameTypeAs(VariableType.faT)) {
@@ -68,7 +68,7 @@ public class ClassMethCallNode extends MethCallNode {
                         return new VariableType.SetVariableType(VariableType.transitionT);
                     } else {
                         errors.add(new CompilerError("Error: Wrong amount of parameters for method " + method
-                                + " on class String in line: " + identifier.beginLine));
+                                + " on class String in line: " + methCallNode.identifier.beginLine));
                     }
                 }
             } else if (type.isArrayType()) {
@@ -77,7 +77,7 @@ public class ClassMethCallNode extends MethCallNode {
                         return ((VariableType.ArrayVariableType) element.type.variableType).variableType;
                     } else {
                         errors.add(new CompilerError("Error: Wrong amount of parameters for method " + method
-                                + " on class String in line: " + identifier.beginLine));
+                                + " on class String in line: " + methCallNode.identifier.beginLine));
                     }
                 }
             } else if (type.isSetType()) {
@@ -86,14 +86,14 @@ public class ClassMethCallNode extends MethCallNode {
                         return ((VariableType.SetVariableType) element.type.variableType).variableType;
                     } else {
                         errors.add(new CompilerError("Error: Wrong amount of parameters for method " + method
-                                + " on class String in line: " + identifier.beginLine));
+                                + " on class String in line: " + methCallNode.identifier.beginLine));
                     }
                 } else if (method.equals("contains")) {
                     if (elementList.size() == 1) {
                         return VariableType.booleanT;
                     } else {
                         errors.add(new CompilerError("Error: Wrong amount of parameters for method " + method
-                                + " on class String in line: " + identifier.beginLine));
+                                + " on class String in line: " + methCallNode.identifier.beginLine));
                     }
                 }
             } else if (type.isMapType()) {
@@ -102,14 +102,14 @@ public class ClassMethCallNode extends MethCallNode {
                         return ((VariableType.MapVariableType) element.type.variableType).valueVariableType;
                     } else {
                         errors.add(new CompilerError("Error: Wrong amount of parameters for method " + method
-                                + " on class String in line: " + identifier.beginLine));
+                                + " on class String in line: " + methCallNode.identifier.beginLine));
                     }
                 } else if (method.equals("containsKey")) {
                     if (elementList.size() == 1) {
                         return VariableType.booleanT;
                     } else {
                         errors.add(new CompilerError("Error: Wrong amount of parameters for method " + method
-                                + " on class String in line: " + identifier.beginLine));
+                                + " on class String in line: " + methCallNode.identifier.beginLine));
                     }
                 }
             } else {
