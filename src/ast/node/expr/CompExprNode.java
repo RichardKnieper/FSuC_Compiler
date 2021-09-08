@@ -35,8 +35,8 @@ public class CompExprNode extends ExprNode {
 							|| (secondExprType.hasSameTypeAs(VariableType.intT))) {
 						return VariableType.booleanT;
 					} else {
-						errors.add(new CompilerError("Error: In line " + op.beginLine + ", " + op.image
-								+ " accept only Boolean or Integer."));
+						errors.add(new CompilerError("Error: Comparison in line " + op.beginLine + ", " + op.image
+								+ " accepts only Boolean or Integer."));
 						return VariableType.errorT;
 					}
 				} else {
@@ -44,12 +44,14 @@ public class CompExprNode extends ExprNode {
 						return VariableType.booleanT;
 					} else {
 						errors.add(new CompilerError(
-								"Error: In line " + op.beginLine + ", " + op.image + " accept only Integer."));
+								"Error: Comparison in line " + op.beginLine + ", " + op.image + " accepts only Integer."));
 						return VariableType.errorT;
 					}
 				}
-			} else
+			} else {
+				errors.add(new CompilerError("Error: Type mismatch for operator " + op.image + " in line " + op.beginLine));
 				return VariableType.errorT;
+			}
 		}
 		return exprType;
 	}

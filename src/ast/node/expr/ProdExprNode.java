@@ -24,15 +24,16 @@ public class ProdExprNode extends ExprNode {
 				+ ((secondExpr != null) ? secondExpr.toString(indent + "\t") : "");
 	}
 
+	@SuppressWarnings("DuplicatedCode")
 	public VariableType semantischeAnalyse(SymbolTabelle tabelle, List<CompilerError> errors) {
 		VariableType exprType = expr.semantischeAnalyse(tabelle, errors);
 		if (secondExpr != null) {
 			VariableType secondExpr = expr.semantischeAnalyse(tabelle, errors);
 			if (exprType.hasSameTypeAs(secondExpr) && exprType.hasSameTypeAs(VariableType.intT)) {
-				return exprType;
+				return VariableType.intT;
 			} else {
 				errors.add(new CompilerError(
-						"Error: By " + op.image + " in line " + op.beginLine + " accept only values of type Integer."));
+						"Error: Operation " + op.image + " in line " + op.beginLine + " only accepts values of type Integer."));
 				return VariableType.errorT;
 			}
 		}

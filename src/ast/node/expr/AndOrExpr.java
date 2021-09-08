@@ -29,14 +29,13 @@ public class AndOrExpr extends ExprNode {
 			VariableType secondExprType = secondExpr.semantischeAnalyse(tabelle, errors);
 			if (secondExprType.hasSameTypeAs(exprType)) {
 				if(secondExprType.hasSameTypeAs(VariableType.booleanT)){
-					return secondExprType;
+					return VariableType.booleanT;
 				} else {
-					errors.add(new CompilerError("Error: Type by " + op.image + " in line " + op.beginLine + " must be boolean."));
+					errors.add(new CompilerError("Error: Type for operator " + op.image + " in line " + op.beginLine + " must be boolean."));
 					return VariableType.errorT;
 				}
-			
 			} else {
-				errors.add(new CompilerError("Error: Type by " + op.image + " in line " + op.beginLine + " mismatch"));
+				errors.add(new CompilerError("Error: Type mismatch for operator " + op.image + " in line " + op.beginLine));
 				return VariableType.errorT;
 			}
 		}

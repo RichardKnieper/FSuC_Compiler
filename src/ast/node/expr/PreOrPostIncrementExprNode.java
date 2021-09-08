@@ -30,8 +30,8 @@ public class PreOrPostIncrementExprNode extends ExprNode {
 			if (atomType.hasSameTypeAs(VariableType.intT))
 				return VariableType.intT;
 			else {
-				errors.add(new CompilerError("Error: Before " + post.image + " in line " + post.beginLine
-						+ " must be values of type Integer."));
+				errors.add(new CompilerError("Error: Postoperation " + post.image + " in line " + post.beginLine
+						+ " needs to be a value of type Integer."));
 				return VariableType.errorT;
 			}
 		}
@@ -39,8 +39,8 @@ public class PreOrPostIncrementExprNode extends ExprNode {
 			if (atomType.hasSameTypeAs(VariableType.intT))
 				return VariableType.intT;
 			else {
-				errors.add(new CompilerError("Error: After " + pre.image + " in line " + pre.beginLine
-						+ " must be values of type Integer."));
+				errors.add(new CompilerError("Error: Postoperation " + pre.image + " in line " + pre.beginLine
+						+ " needs to be a value of type Integer."));
 				return VariableType.errorT;
 			}
 		}

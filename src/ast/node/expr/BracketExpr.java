@@ -18,7 +18,6 @@ public class BracketExpr extends ExprNode {
 	}
 
 	public VariableType semantischeAnalyse(SymbolTabelle tabelle, List<CompilerError> errors) {
-		VariableType exprType = expr.semantischeAnalyse(tabelle, errors);
-		return exprType;
+		return expr.semantischeAnalyse(tabelle, errors);
 	}
 }

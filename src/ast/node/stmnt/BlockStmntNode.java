@@ -7,6 +7,7 @@ import ast.node.Node;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class BlockStmntNode extends StmntNode {
 	public List<Node> declOrStmntList = new LinkedList<>();
@@ -19,11 +20,19 @@ public class BlockStmntNode extends StmntNode {
 	}
 
 	public VariableType semantischeAnalyse(SymbolTabelle tabelle, List<CompilerError> errors) {
-		
 		SymbolTabelle newSt = new SymbolTabelle(tabelle);
-		for (Node node : declOrStmntList) {
-			node.semantischeAnalyse(newSt, errors);
+		List<VariableType> types = declOrStmntList.stream()
+				.map(node -> node.semantischeAnalyse(newSt, errors))
+				.collect(Collectors.toList());
+
+		if (types.isEmpty()) {
+			return VariableType.noReturnType;
+		} else if (types.contains(VariableType.errorT)) {
+			return VariableType.errorT;
+		} else if (declOrStmntList.get(declOrStmntList.size() - 1) instanceof ReturnStmntNode) {
+			return types.get(types.size() - 1);
+		} else {
+			return VariableType.noReturnType;
 		}
-		return VariableType.noReturnType;
 	}
 }

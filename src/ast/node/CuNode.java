@@ -3,10 +3,11 @@ package ast.node;
 import ast.CompilerError;
 import ast.SymbolTabelle;
 import ast.VariableType;
+import ast.node.stmnt.ReturnStmntNode;
 
-import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class CuNode extends Node {
     public List<Node> declOrStmntList = new LinkedList<>();
@@ -23,17 +24,25 @@ public class CuNode extends Node {
     }
 
     public VariableType semantischeAnalyse() {
-        return semantischeAnalyse(new SymbolTabelle(null), Collections.emptyList());
+        return semantischeAnalyse(new SymbolTabelle(null), new LinkedList<>());
     }
 
     public VariableType semantischeAnalyse(SymbolTabelle tabelle, List<CompilerError> errors) {
-        for (Node node : declOrStmntList) {
-            node.semantischeAnalyse(tabelle, errors);
-        }
-        errors.forEach(error -> System.out.print(error.toString()));
-        if (errors.isEmpty()) {
-            return VariableType.noReturnType;
+        List<VariableType> types = declOrStmntList.stream()
+                .map(node -> node.semantischeAnalyse(tabelle, errors))
+                .collect(Collectors.toList());
+
+        if (types.contains(VariableType.errorT)) {
+            return VariableType.errorT;
+        } else if (declOrStmntList.get(declOrStmntList.size() - 1) instanceof ReturnStmntNode) {
+            if (types.get(types.size() - 1).hasSameTypeAs(VariableType.faT)) {
+                return VariableType.faT;
+            } else {
+                errors.add(new CompilerError("Error: The last statement must return an object of the FA class."));
+                return VariableType.errorT;
+            }
         } else {
+            errors.add(new CompilerError("Error: The last statement must return an object of the FA class."));
             return VariableType.errorT;
         }
     }

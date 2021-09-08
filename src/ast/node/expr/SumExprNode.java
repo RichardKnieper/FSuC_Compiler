@@ -7,7 +7,6 @@ import jj.Token;
 
 import java.util.List;
 
-@SuppressWarnings("DuplicatedCode")
 public class SumExprNode extends ExprNode {
 	public ProdExprNode expr;
 	public Token op;
@@ -25,6 +24,7 @@ public class SumExprNode extends ExprNode {
 				+ ((secondExpr != null) ? secondExpr.toString(indent + "\t") : "");
 	}
 
+	@SuppressWarnings("DuplicatedCode")
 	public VariableType semantischeAnalyse(SymbolTabelle tabelle, List<CompilerError> errors) {
 		VariableType exprType = expr.semantischeAnalyse(tabelle, errors);
 		if (secondExpr != null) {
@@ -33,7 +33,7 @@ public class SumExprNode extends ExprNode {
 				return exprType;
 			} else {
 				errors.add(new CompilerError(
-						"Error: By " + op.image + " in line " + op.beginLine + " accept only values of type Integer."));
+						"Error: Operation " + op.image + " in line " + op.beginLine + " only accepts values of type Integer."));
 				return VariableType.errorT;
 			}
 		}
