@@ -1,7 +1,7 @@
 package ast;
 
 @SuppressWarnings("InstantiationOfUtilityClass")
-public class VariableType {
+public class VariableType { // TODO find better name
 	public static VariableType booleanT = new VariableType();
 	public static VariableType stringT = new VariableType();
 	public static VariableType charT = new VariableType();
@@ -38,30 +38,49 @@ public class VariableType {
 			this.valueVariableType = valueVariableType;
 		}
 	}
-	
-	
-	static public boolean sameTypeAs(MapVariableType first, MapVariableType second) {
-		return ((first.keyVariableType == second.keyVariableType) || (first.keyVariableType == charT && second.keyVariableType == intT || first.keyVariableType == intT && second.keyVariableType == charT)) 
-				&& ((first.valueVariableType == second.valueVariableType) || (first.valueVariableType == charT && second.valueVariableType == intT || first.valueVariableType == intT && second.valueVariableType == charT)) 
-				;
-	}
-	
-	static public boolean sameTypeAs(SetVariableType first, SetVariableType second) {
-		return first.variableType == second.variableType  
-				|| first.variableType == charT && second.variableType == intT 
-				|| first.variableType == intT && second.variableType == charT;
-	}
-	
-	static public boolean sameTypeAs(ArrayVariableType first, ArrayVariableType second) {
-		return first.variableType == second.variableType  
-				|| first.variableType == charT && second.variableType == intT 
-				|| first.variableType == intT && second.variableType == charT;
-	}
 
 	static public boolean sameTypeAs(VariableType first, VariableType second) {
-		return first == second  
-				|| first == charT && second == intT 
+		if (first.isMapType()) {
+			if (second.isMapType()) {
+				return ((MapVariableType) first).keyVariableType.sameTypeAs(((MapVariableType) second).keyVariableType)
+						&& ((MapVariableType) first).valueVariableType.sameTypeAs(((MapVariableType) second).valueVariableType);
+			} else {
+				return false;
+			}
+		}
+		if (first.isSetType()) {
+			if (second.isSetType()) {
+				return ((SetVariableType) first).variableType.sameTypeAs(((SetVariableType) second).variableType);
+			} else {
+				return false;
+			}
+		}
+		if (first.isArrayType()) {
+			if (second.isArrayType()) {
+				return ((ArrayVariableType) first).variableType.sameTypeAs(((ArrayVariableType) second).variableType);
+			} else {
+				return false;
+			}
+		}
+		return first == second
+				|| first == charT && second == intT
 				|| first == intT && second == charT;
+	}
+
+	public boolean sameTypeAs(VariableType other) {
+		return VariableType.sameTypeAs(this, other);
+	}
+
+	public boolean isMapType() {
+		return this instanceof MapVariableType;
+	}
+
+	public boolean isSetType() {
+		return this instanceof SetVariableType;
+	}
+
+	public boolean isArrayType() {
+		return this instanceof ArrayVariableType;
 	}
 	
 	@SuppressWarnings("EnhancedSwitchMigration")
@@ -104,8 +123,4 @@ public class VariableType {
 			return "error";
 		return "Undefine";
 	}
-	
-
-	
-	
 }
