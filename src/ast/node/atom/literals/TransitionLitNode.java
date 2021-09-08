@@ -29,7 +29,7 @@ public class TransitionLitNode extends AtomNode {
 				+ ((endState != null) ? endState.toString(indent + "\t") : "");
 	}
 
-	public void semantischeAnalyse(SymbolTabelle tabelle, List<CompilerError> errors) {
+	public VariableType semantischeAnalyse(SymbolTabelle tabelle, List<CompilerError> errors) {
 		if (rangeIdentifier != null) {
 			if (tabelle.find(rangeIdentifier.image) == null)
 				errors.add(new CompilerError("Error: Class " + rangeIdentifier.image + " does not exist"));

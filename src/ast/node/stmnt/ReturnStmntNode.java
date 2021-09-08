@@ -2,6 +2,7 @@ package ast.node.stmnt;
 
 import ast.CompilerError;
 import ast.SymbolTabelle;
+import ast.VariableType;
 import ast.node.expr.ExprNode;
 
 import java.util.List;
@@ -20,7 +21,7 @@ public class ReturnStmntNode extends StmntNode {
 		return res;
 	}
 
-	public void semantischeAnalyse(SymbolTabelle tabelle, List<CompilerError> errors) {
+	public VariableType semantischeAnalyse(SymbolTabelle tabelle, List<CompilerError> errors) {
 		expr.semantischeAnalyse(tabelle, errors);
 	}
 }

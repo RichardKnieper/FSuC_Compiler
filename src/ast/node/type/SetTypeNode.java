@@ -2,7 +2,6 @@ package ast.node.type;
 
 import ast.VariableType;
 
-//Todo typeNode
 public class SetTypeNode extends TypeNode {
 	public SetTypeNode(VariableType variableType) {
 		super(variableType);

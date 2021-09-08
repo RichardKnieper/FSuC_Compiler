@@ -2,6 +2,7 @@ package ast.node.atom.literals;
 
 import ast.CompilerError;
 import ast.SymbolTabelle;
+import ast.VariableType;
 import ast.node.atom.AtomNode;
 import jj.Token;
 
@@ -20,7 +21,7 @@ public class StateLitNode extends AtomNode {
 		return indent + "StateLitNode: " + label.image + ((accept != null) ? accept.image : "");
 	}
 
-	public void semantischeAnalyse(SymbolTabelle tabelle, List<CompilerError> errors) {
+	public VariableType semantischeAnalyse(SymbolTabelle tabelle, List<CompilerError> errors) {
 		if (accept != null && accept.kind == 40) {
 			if (tabelle.find(accept.image) == null)
 				errors.add(new CompilerError("Error: Class " + accept.image + " does not exist"));

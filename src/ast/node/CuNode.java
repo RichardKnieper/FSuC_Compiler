@@ -2,7 +2,9 @@ package ast.node;
 
 import ast.CompilerError;
 import ast.SymbolTabelle;
+import ast.VariableType;
 
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -20,10 +22,19 @@ public class CuNode extends Node {
         semantischeAnalyse(new SymbolTabelle(null), errors);
     }
 
-    public void semantischeAnalyse(SymbolTabelle tabelle, List<CompilerError> errors) {
+    public VariableType semantischeAnalyse() {
+        return semantischeAnalyse(new SymbolTabelle(null), Collections.emptyList());
+    }
 
+    public VariableType semantischeAnalyse(SymbolTabelle tabelle, List<CompilerError> errors) {
         for (Node node : declOrStmntList) {
             node.semantischeAnalyse(tabelle, errors);
+        }
+        errors.forEach(error -> System.out.print(error.toString()));
+        if (errors.isEmpty()) {
+            return VariableType.noReturnType;
+        } else {
+            return VariableType.errorT;
         }
     }
 }

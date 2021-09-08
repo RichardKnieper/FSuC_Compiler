@@ -4,6 +4,7 @@ import ast.CompilerError;
 import ast.SymbolTabelle;
 import ast.VariableType;
 import ast.node.atom.AtomNode;
+import ast.node.decl.DeclNode;
 import jj.Token;
 
 import java.util.LinkedList;
@@ -64,7 +65,54 @@ public class FaLitNode extends AtomNode {
 		return indent + "FaLitNode";
 	}
 
-	public void semantischeAnalyse(SymbolTabelle tabelle, List<CompilerError> errors) {
-		realType = VariableType.faT;
+	public VariableType semantischeAnalyse(SymbolTabelle tabelle, List<CompilerError> errors) {
+		boolean hasError = false;
+
+		if (startState == null) {
+			DeclNode temp = tabelle.find(startStateIdentifier.image);
+			if (temp == null) {
+				errors.add(new CompilerError("Error: " + startStateIdentifier.image + "is not defined in line: "
+						+ startStateIdentifier.beginLine));
+				hasError = true;
+			} else if (temp.type.variableType.hasSameTypeAs(VariableType.stateT)) {
+				errors.add(new CompilerError("Error: " + startStateIdentifier.image + "is not a State in line: "
+						+ startStateIdentifier.beginLine));
+				hasError = true;
+			}
+		} else {
+			VariableType startStateType = startState.semantischeAnalyse(tabelle, errors);
+			if (startStateType.hasSameTypeAs(VariableType.stateT)) {
+				return VariableType.errorT;
+			}
+		}
+
+		for (Transition transition : transitions){
+			if (transition.transitionLitNode == null) {
+				DeclNode temp = tabelle.find(transition.identifier.image);
+				if (temp == null) {
+					errors.add(new CompilerError("Error: " + transition.identifier.image + "is not defined in line: "
+							+ startStateIdentifier.beginLine));
+					hasError = true;
+				} else if (temp.type.variableType.hasSameTypeAs(VariableType.transitionT)) {
+					errors.add(new CompilerError("Error: " + transition.identifier.image + "is not a Transition in line: "
+							+ transition.identifier.beginLine));
+					hasError = true;
+				}
+			} else {
+				VariableType transitionType = transition.transitionLitNode.semantischeAnalyse(tabelle, errors);
+				if (transitionType.hasSameTypeAs(VariableType.transitionT)) {
+					return VariableType.errorT;
+				}
+			}
+		}
+
+		boolean errorInAdditionalFa = additionsFa.stream()
+				.anyMatch(addition -> addition.semantischeAnalyse(tabelle, errors).isError());
+		if (errorInAdditionalFa) {
+			hasError = true;
+		}
+
+
+		return hasError ? VariableType.errorT : VariableType.faT;
 	}
 }

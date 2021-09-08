@@ -10,28 +10,47 @@ import jj.Token;
 import java.util.List;
 
 public class VarDeclNode extends DeclNode {
-	public ExprNode expr;
+    public ExprNode expr;
 
-	public VarDeclNode(TypeNode type, Token identifier, ExprNode expr) {
-		super(type, identifier);
-		this.expr = expr;
-	}
+    public VarDeclNode(TypeNode type, Token identifier, ExprNode expr) {
+        super(type, identifier);
+        this.expr = expr;
+    }
 
-	public String toString(String indent) {
-		return indent + "VarDeclNode\n" + expr.toString(indent + "\t") + "\n";
-	}
+    public String toString(String indent) {
+        return indent + "VarDeclNode\n" + expr.toString(indent + "\t") + "\n";
+    }
 
-	public void semantischeAnalyse(SymbolTabelle tabelle, List<CompilerError> errors) {
+    @SuppressWarnings("DuplicatedCode")
+    public VariableType semantischeAnalyse(SymbolTabelle tabelle, List<CompilerError> errors) {
+        boolean addedError = false;
 
-		expr.semantischeAnalyse(tabelle, errors);
-		type.semantischeAnalyse(tabelle, errors);
+        VariableType exprType = expr.semantischeAnalyse(tabelle, errors);
+        if (exprType == VariableType.errorT) {
+            return VariableType.errorT;
+        }
 
-		if (VariableType.sameTypeAs(type.variableType, expr.realType)) {
-			if (!tabelle.add(identifier.image, this))
-				errors.add(new CompilerError("Error: " + identifier.image + " already exists in line: "
-						+ tabelle.find(identifier.image).identifier.beginLine));
-		} else {
-			errors.add(new CompilerError("Error: Type mismatch in line: " + identifier.beginLine));
-		}
-	}
+        VariableType varType = type.semantischeAnalyse(tabelle, errors);
+        if (varType.isError()) {
+            return VariableType.errorT;
+        }
+        if (!varType.hasSameTypeAs(exprType)) {
+            errors.add(new CompilerError("Error: Type mismatch in line: " + identifier.beginLine));
+            addedError = true;
+        }
+
+        String varName = identifier.image;
+        if (tabelle.findInCurrentBlock(varName) != null) {
+            errors.add(new CompilerError("Error: " + identifier.image + " already exists in line: "
+                    + tabelle.find(identifier.image).identifier.beginLine));
+            addedError = true;
+        }
+
+        if (addedError) {
+            return VariableType.errorT;
+        } else {
+            tabelle.add(varName, this);
+            return VariableType.noReturnType;
+        }
+    }
 }

@@ -8,11 +8,11 @@ import ast.node.atom.AtomNode;
 import java.util.LinkedList;
 import java.util.List;
 
-public class SetLitNode extends AtomNode {
+public class ArrayLitNode extends AtomNode {
 	public List<AtomNode> elementList = new LinkedList<>();
 
 	public String toString(String indent) {
-		String res = indent + "SetLitNode";
+		String res = indent + "ArrayLitNode";
 		for (AtomNode node : elementList)
 			res += "\n" + node.toString(indent + "\t");
 		return res;
@@ -25,7 +25,7 @@ public class SetLitNode extends AtomNode {
 				.get();
 
 		if (type.isError()) {
-			errors.add(new CompilerError("Error: not all values of set match."));
+			errors.add(new CompilerError("Error: not all values of array match."));
 		}
 
 		return type;

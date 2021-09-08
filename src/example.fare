@@ -8,6 +8,7 @@ FA erzeugeAutomat(State name, State c, State d){
 }
 
 FA erzeugeAutomat(State name, State d, State e, State f, State c) {
+    int i = false;
     return <name, { name -- ['a'-'z'] --> $"B"^i } >;
     // gib einen endlichen Automaten mit dem Startzustand name und einem
     // von name zu dem Zustand B (akzeptierend 1) 

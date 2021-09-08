@@ -9,7 +9,6 @@ import jj.Token;
 import java.util.LinkedList;
 import java.util.List;
 
-//todo
 public class RangeLitNode extends AtomNode {
 	public List<Range> ranges = new LinkedList<>();
 

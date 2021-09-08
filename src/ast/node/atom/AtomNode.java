@@ -1,8 +1,6 @@
 package ast.node.atom;
 
-import ast.VariableType;
-import ast.node.Node;
+import ast.node.expr.ExprNode;
 
-abstract public class AtomNode extends Node {
-	public VariableType realType = VariableType.errorT;
+abstract public class AtomNode extends ExprNode {
 }

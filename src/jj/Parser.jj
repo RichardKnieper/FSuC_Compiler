@@ -203,30 +203,30 @@ AtomNode atom(): {
     }
 }
 
-// set -> "{" (atom ("," atom)*)? "}"
+// set -> "{" atom ("," atom)* "}"
 SetLitNode set(): {
   	SetLitNode node = new SetLitNode();
 	AtomNode first, last;
   } {
-    "{" (first = atom() ("," last = atom() { node.elementList.add(last); } )* { node.elementList.add(first); })? "}"
+    "{" first = atom() ("," last = atom() { node.elementList.add(last); } )* { node.elementList.add(first); } "}"
     { return node; }
 }
 
-// map -> "[[" (atom ":" atom ("," atom ":" atom)*)? "]]"
+// map -> "[[" atom ":" atom ("," atom ":" atom)* "]]"
 MapLitNode map(): {
 	MapLitNode node = new MapLitNode();
 	AtomNode firstKey, firstValue, lastKey, lastValue;
 } {
-    "[[" (firstKey = atom() ":" firstValue = atom() ("," lastKey = atom() ":" lastValue = atom() { node.elements.put(lastKey, lastValue);} )* { node.elements.put(firstKey, firstValue); })? "]]"
+    "[[" firstKey = atom() ":" firstValue = atom() ("," lastKey = atom() ":" lastValue = atom() { node.elements.put(lastKey, lastValue);} )* { node.elements.put(firstKey, firstValue); } "]]"
     {  return node; }
 }
 
-// array -> "[[" (atom ("," atom)*)? "]]"
+// array -> "[[" atom ("," atom)* "]]"
 ArrayLitNode array(): {
 	ArrayLitNode node = new ArrayLitNode();
 	AtomNode first, last;
 } {
-    "[[" (first=atom() ("," last = atom() { node.elementList.add(last); } )* { node.elementList.add(0, first); })? "]]"
+    "[[" first=atom() ("," last = atom() { node.elementList.add(last); } )* { node.elementList.add(0, first); } "]]"
      { return node; }
 }
 
@@ -279,6 +279,7 @@ TransitionLitNode transition(): {
     { return new TransitionLitNode(rangeIdentifier, stateIdentifier, range, state); }
 }
 
+// TODO doku
 // fa -> "<" (state | <Identifier>) ",{" (<Identifier> (transition)? ("," <Identifier (transition)?)*)? "}" ">"
 FaLitNode fa(): {
     FaLitNode node = new FaLitNode(null, null);

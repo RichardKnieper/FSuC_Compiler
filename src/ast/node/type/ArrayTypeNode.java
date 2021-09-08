@@ -2,7 +2,6 @@ package ast.node.type;
 
 import ast.VariableType;
 
-//Todo typeNode
 public class ArrayTypeNode extends TypeNode {
 	public ArrayTypeNode(VariableType variableType) {
 		super(variableType);

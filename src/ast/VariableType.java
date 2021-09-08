@@ -13,6 +13,8 @@ public class VariableType { // TODO find better name
 	public static VariableType raT = new VariableType();
 	public static VariableType errorT = new VariableType();
 
+	public static VariableType noReturnType = new VariableType();
+
 	public static class ArrayVariableType extends VariableType {
 		VariableType variableType;
 		public ArrayVariableType(VariableType variableType) {
@@ -39,25 +41,25 @@ public class VariableType { // TODO find better name
 		}
 	}
 
-	static public boolean sameTypeAs(VariableType first, VariableType second) {
+	static public boolean hasSameTypeAs(VariableType first, VariableType second) {
 		if (first.isMapType()) {
 			if (second.isMapType()) {
-				return ((MapVariableType) first).keyVariableType.sameTypeAs(((MapVariableType) second).keyVariableType)
-						&& ((MapVariableType) first).valueVariableType.sameTypeAs(((MapVariableType) second).valueVariableType);
+				return ((MapVariableType) first).keyVariableType.hasSameTypeAs(((MapVariableType) second).keyVariableType)
+						&& ((MapVariableType) first).valueVariableType.hasSameTypeAs(((MapVariableType) second).valueVariableType);
 			} else {
 				return false;
 			}
 		}
 		if (first.isSetType()) {
 			if (second.isSetType()) {
-				return ((SetVariableType) first).variableType.sameTypeAs(((SetVariableType) second).variableType);
+				return ((SetVariableType) first).variableType.hasSameTypeAs(((SetVariableType) second).variableType);
 			} else {
 				return false;
 			}
 		}
 		if (first.isArrayType()) {
 			if (second.isArrayType()) {
-				return ((ArrayVariableType) first).variableType.sameTypeAs(((ArrayVariableType) second).variableType);
+				return ((ArrayVariableType) first).variableType.hasSameTypeAs(((ArrayVariableType) second).variableType);
 			} else {
 				return false;
 			}
@@ -67,8 +69,8 @@ public class VariableType { // TODO find better name
 				|| first == intT && second == charT;
 	}
 
-	public boolean sameTypeAs(VariableType other) {
-		return VariableType.sameTypeAs(this, other);
+	public boolean hasSameTypeAs(VariableType other) {
+		return VariableType.hasSameTypeAs(this, other);
 	}
 
 	public boolean isMapType() {
@@ -81,6 +83,10 @@ public class VariableType { // TODO find better name
 
 	public boolean isArrayType() {
 		return this instanceof ArrayVariableType;
+	}
+
+	public boolean isError() {
+		return this == VariableType.errorT;
 	}
 	
 	@SuppressWarnings("EnhancedSwitchMigration")

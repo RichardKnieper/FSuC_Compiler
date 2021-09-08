@@ -2,6 +2,7 @@ package ast.node.decl;
 
 import ast.CompilerError;
 import ast.SymbolTabelle;
+import ast.VariableType;
 import ast.node.Node;
 import ast.node.type.TypeNode;
 import jj.Token;
@@ -22,12 +23,17 @@ public class DeclNode extends Node {
 		return indent + "DeclNode\n" + type.toString(indent + "\t") + "\n" + identifier.image + "\n";
 	}
 
-	public void semantischeAnalyse(SymbolTabelle tabelle, List<CompilerError> errors) {
-
+	public VariableType semantischeAnalyse(SymbolTabelle tabelle, List<CompilerError> errors) {
 		type.semantischeAnalyse(tabelle, errors);
 
-		if (!tabelle.add(identifier.image, this))
+		String varName = identifier.image;
+		if (tabelle.findInCurrentBlock(varName) != null) {
 			errors.add(new CompilerError("Error: " + identifier.image + " already exists in line: "
 					+ tabelle.find(identifier.image).identifier.beginLine));
+			return VariableType.errorT;
+		} else {
+			tabelle.add(varName, this);
+			return VariableType.noReturnType;
+		}
 	}
 }

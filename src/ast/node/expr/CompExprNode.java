@@ -29,7 +29,7 @@ public class CompExprNode extends ExprNode {
 		expr.semantischeAnalyse(tabelle, errors);
 		if (secondExpr != null) {
 			secondExpr.semantischeAnalyse(tabelle, errors);
-			if (VariableType.sameTypeAs(expr.realType, secondExpr.realType)) {
+			if (VariableType.hasSameTypeAs(expr.realType, secondExpr.realType)) {
 				realType = expr.realType;
 			} else {
 				realType = VariableType.errorT;

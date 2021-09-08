@@ -13,6 +13,10 @@ public class SymbolTabelle {
 		parent = p;
 	}
 
+	public DeclNode findInCurrentBlock(String n) {
+		return table.getOrDefault(n, null);
+	}
+
 	public DeclNode find(String n) {
 		if (table.containsKey(n))
 			return table.get(n);

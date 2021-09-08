@@ -2,7 +2,6 @@ package ast.node.type;
 
 import ast.VariableType;
 
-//Todo typeNode
 public class MapTypeNode extends TypeNode {
 	VariableType key, value;
 
