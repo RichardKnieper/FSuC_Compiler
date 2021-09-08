@@ -19,11 +19,18 @@ public class WhileStmntNode extends StmntNode {
 				+ whileStmnt.toString(indent + "\t");
 	}
 
-	public void semantischeAnalyse(SymbolTabelle tabelle, List<CompilerError> errors) {
-		whileExpr.semantischeAnalyse(tabelle, errors);
-		if (whileExpr.realType != VariableType.booleanT && whileExpr.realType != VariableType.errorT) {
-			errors.add(new CompilerError("Error: WHILE-condition must be boolean"));
+	public VariableType semantischeAnalyse(SymbolTabelle tabelle, List<CompilerError> errors) {
+		VariableType whileExprVariable = whileExpr.semantischeAnalyse(tabelle, errors);
+		if (whileExprVariable == VariableType.errorT) {
+			return VariableType.errorT;
 		}
-		whileStmnt.semantischeAnalyse(tabelle, errors);
+
+		if (whileExprVariable.hasSameTypeAs(VariableType.booleanT)) {
+			whileStmnt.semantischeAnalyse(tabelle, errors);
+			return VariableType.noReturnType;
+		} else {
+			errors.add(new CompilerError("Error: WHILE-condition must be boolean"));
+			return VariableType.errorT;
+		}
 	}
 }

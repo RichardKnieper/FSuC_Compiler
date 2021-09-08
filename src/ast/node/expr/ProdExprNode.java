@@ -24,17 +24,19 @@ public class ProdExprNode extends ExprNode {
 				+ ((secondExpr != null) ? secondExpr.toString(indent + "\t") : "");
 	}
 
-	public void semantischeAnalyse(SymbolTabelle tabelle, List<CompilerError> errors) {
-
-		expr.semantischeAnalyse(tabelle, errors);
+	public VariableType semantischeAnalyse(SymbolTabelle tabelle, List<CompilerError> errors) {
+		VariableType exprType = expr.semantischeAnalyse(tabelle, errors);
 		if (secondExpr != null) {
-			secondExpr.semantischeAnalyse(tabelle, errors);
-			if (VariableType.hasSameTypeAs(expr.realType, secondExpr.realType)) {
-				realType = expr.realType;
+			VariableType secondExpr = expr.semantischeAnalyse(tabelle, errors);
+			if (exprType.hasSameTypeAs(secondExpr) && exprType.hasSameTypeAs(VariableType.intT)) {
+				return exprType;
 			} else {
-				realType = VariableType.errorT;
-				errors.add(new CompilerError("Error: Type by " + op.image + " in line " + op.beginLine + " mismatch"));
+				errors.add(new CompilerError(
+						"Error: By " + op.image + " in line " + op.beginLine + " accept only values of type Integer."));
+				return VariableType.errorT;
 			}
 		}
+		return exprType;
+
 	}
 }
