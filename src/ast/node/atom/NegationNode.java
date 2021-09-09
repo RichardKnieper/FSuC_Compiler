@@ -1,8 +1,9 @@
 package ast.node.atom;
 
-import ast.CompilerError;
 import ast.SymbolTabelle;
 import ast.VariableType;
+import ast.exceptions.CompilerError;
+import ast.value.Value;
 
 import java.util.List;
 
@@ -25,5 +26,15 @@ public class NegationNode extends AtomNode {
 			return VariableType.errorT;
 		}
 		return VariableType.booleanT;
+	}
+
+	@Override
+	public Value run(SymbolTabelle tabelle) {
+		Value nodeValue = node.run(tabelle);
+		if (nodeValue.type.hasSameTypeAs(VariableType.booleanT)) {
+			return new Value(!nodeValue.b);
+		} else {
+			return new Value(!tabelle.find(nodeValue.identifier.image).value.b);
+		}
 	}
 }

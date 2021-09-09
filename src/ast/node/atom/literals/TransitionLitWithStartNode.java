@@ -1,10 +1,15 @@
 package ast.node.atom.literals;
 
-import ast.CompilerError;
 import ast.SymbolTabelle;
 import ast.VariableType;
+import ast.exceptions.CompilerError;
 import ast.node.atom.AtomNode;
 import ast.node.decl.DeclNode;
+import ast.value.Value;
+import domain.EpsilonTransition;
+import domain.Range;
+import domain.State;
+import domain.Transition;
 import jj.Token;
 
 import java.util.List;
@@ -54,5 +59,33 @@ public class TransitionLitWithStartNode extends AtomNode {
 		}
 
 		return hasError ? VariableType.errorT : VariableType.transitionT;
+	}
+
+	@Override
+	public Value run(SymbolTabelle tabelle) {
+		State start;
+		if (startState != null) {
+			start = startState.run(tabelle).state;
+		} else {
+			start = tabelle.find(startStateIdentifier.image).value.state;
+		}
+
+		State end;
+		if (transitionLitNode.endState != null) {
+			end = transitionLitNode.endState.run(tabelle).state;
+		} else {
+			end = tabelle.find(transitionLitNode.endStateIdentifier.image).value.state;
+		}
+
+		Range range;
+		if (transitionLitNode.range != null) {
+			range = transitionLitNode.range.run(tabelle).r;
+		} else if (transitionLitNode.rangeIdentifier != null){
+			range = tabelle.find(transitionLitNode.rangeIdentifier.image).value.r;
+		} else {
+			return new Value(new EpsilonTransition(start, end));
+		}
+
+		return new Value(new Transition(start, end, range));
 	}
 }

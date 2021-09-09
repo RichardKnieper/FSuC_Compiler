@@ -1,11 +1,14 @@
 package ast.node.atom;
 
-import ast.CompilerError;
 import ast.ParamWrapper;
 import ast.SymbolTabelle;
 import ast.VariableType;
+import ast.exceptions.CompilerError;
 import ast.node.decl.DeclNode;
 import ast.node.decl.MethDeclNode;
+import ast.node.decl.VarDeclNode;
+import ast.node.type.TypeNode;
+import ast.value.Value;
 import jj.Token;
 
 import java.util.Comparator;
@@ -70,5 +73,22 @@ public class MethCallNode extends AtomNode {
 		}
 
 		return methodDeclNode.type.variableType;
+	}
+
+	@Override
+	public Value run(SymbolTabelle tabelle) {
+		MethDeclNode methDecl = (MethDeclNode) tabelle.find(identifier.image);
+		SymbolTabelle neuTabelle = new SymbolTabelle(tabelle);
+		methDecl.params
+				.values()
+				.stream()
+				.sorted(Comparator.comparingInt(ParamWrapper::getIndex))
+				.forEach(wrapper -> {
+					Value v = elementList.get(wrapper.getIndex()).run(tabelle);
+					VarDeclNode node = new VarDeclNode(new TypeNode(v.type), wrapper.getIndentifier(), null);
+					node.value = v;
+					neuTabelle.add(wrapper.getIndentifier().image, node);
+				});
+		return methDecl.body.run(neuTabelle);
 	}
 }

@@ -1,9 +1,10 @@
 package ast.node.type;
 
-import ast.CompilerError;
 import ast.SymbolTabelle;
 import ast.VariableType;
+import ast.exceptions.CompilerError;
 import ast.node.Node;
+import ast.value.Value;
 
 import java.util.List;
 
@@ -25,5 +26,11 @@ public class TypeNode extends Node {
 	@Override
 	public VariableType semantischeAnalyse(SymbolTabelle tabelle, List<CompilerError> errors) {
 		return variableType;
+	}
+
+	// method should never be executed
+	@Override
+	public Value run(SymbolTabelle tabelle) {
+		return null;
 	}
 }

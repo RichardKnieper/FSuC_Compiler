@@ -1,9 +1,10 @@
 package ast.node.stmnt;
 
-import ast.CompilerError;
 import ast.SymbolTabelle;
 import ast.VariableType;
+import ast.exceptions.CompilerError;
 import ast.node.expr.ExprNode;
+import ast.value.Value;
 
 import java.util.List;
 
@@ -23,5 +24,10 @@ public class ReturnStmntNode extends StmntNode {
 
 	public VariableType semantischeAnalyse(SymbolTabelle tabelle, List<CompilerError> errors) {
 		return expr.semantischeAnalyse(tabelle, errors);
+	}
+
+	@Override
+	public Value run(SymbolTabelle tabelle) {
+		return expr.run(tabelle);
 	}
 }

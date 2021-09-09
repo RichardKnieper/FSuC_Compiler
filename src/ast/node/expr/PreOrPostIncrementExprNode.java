@@ -1,9 +1,10 @@
 package ast.node.expr;
 
-import ast.CompilerError;
 import ast.SymbolTabelle;
 import ast.VariableType;
+import ast.exceptions.CompilerError;
 import ast.node.atom.AtomNode;
+import ast.value.Value;
 import jj.Token;
 
 import java.util.List;
@@ -45,5 +46,35 @@ public class PreOrPostIncrementExprNode extends ExprNode {
 			}
 		}
 		return atomType;
+	}
+
+	@Override
+	public Value run(SymbolTabelle tabelle) {
+		Value atomValue = atom.run(tabelle);
+		if (pre != null) {
+			int addedValue = pre.image.equals("++") ? 1 : - 1;
+			if (atomValue.type.hasSameTypeAs(VariableType.intT)) {
+				return new Value(atomValue.i + addedValue);
+			} else if (atomValue.type.hasSameTypeAs(VariableType.identifier)) {
+				Value readValue = tabelle.find(atomValue.identifier.image).value;
+				readValue.i += addedValue;
+				return new Value(readValue.i);
+			} else {
+				throw new RuntimeException("RuntimeException: unknown value for pre increment."); // should not be reached
+			}
+		} else if (post != null) {
+			if (atomValue.type.hasSameTypeAs(VariableType.intT)) {
+				return new Value(atomValue.i);
+			} else if (atomValue.type.hasSameTypeAs(VariableType.identifier)) {
+				Value readValue = tabelle.find(atomValue.identifier.image).value;
+				Value returnValue = new Value(readValue.i);
+				readValue.i += post.image.equals("++") ? 1 : - 1;
+				return returnValue;
+			} else {
+				throw new RuntimeException("RuntimeException: unknown value for pre increment."); // should not be reached
+			}
+		} else {
+			return atomValue;
+		}
 	}
 }

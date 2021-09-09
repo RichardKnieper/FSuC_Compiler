@@ -1,9 +1,10 @@
 package ast.node.stmnt;
 
-import ast.CompilerError;
 import ast.SymbolTabelle;
 import ast.VariableType;
+import ast.exceptions.CompilerError;
 import ast.node.Node;
+import ast.value.Value;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -34,5 +35,21 @@ public class BlockStmntNode extends StmntNode {
 		} else {
 			return VariableType.noReturnType;
 		}
+	}
+
+	@Override
+	public Value run(SymbolTabelle tabelle) {
+		SymbolTabelle neueTabelle = new SymbolTabelle(tabelle);
+		List<Value> values = declOrStmntList.stream()
+				.map(node -> node.run(neueTabelle))
+				.collect(Collectors.toList());
+
+		Value returnValue = new Value();
+		if (declOrStmntList.get(declOrStmntList.size() - 1) instanceof ReturnStmntNode) {
+			returnValue.type = values.get(values.size() - 1).type;
+		} else {
+			returnValue.type = VariableType.noReturnType;
+		}
+		return returnValue;
 	}
 }

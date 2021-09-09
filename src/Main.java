@@ -1,5 +1,6 @@
 import ast.VariableType;
 import ast.node.CuNode;
+import ast.value.Value;
 import jj.ParseException;
 import jj.Parser;
 
@@ -13,7 +14,8 @@ public class Main {
         CuNode ast = parser.cu();
         VariableType returnType = ast.semantischeAnalyse();
         if (!returnType.isError())  {
-            System.out.println("Keine Fehler");
+            Value result = ast.run();
+            System.out.println(result);
         }
         int debug = 42; // TODO delete; this variable exists to stop the debugger to examine ast
     }

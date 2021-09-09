@@ -1,8 +1,9 @@
 package ast.node.stmnt;
 
-import ast.CompilerError;
 import ast.SymbolTabelle;
 import ast.VariableType;
+import ast.exceptions.CompilerError;
+import ast.value.Value;
 
 import java.util.List;
 
@@ -32,5 +33,16 @@ public class WhileStmntNode extends StmntNode {
 			errors.add(new CompilerError("Error: WHILE-condition must be boolean"));
 			return VariableType.errorT;
 		}
+	}
+
+	@SuppressWarnings("DuplicatedCode")
+	@Override
+	public Value run(SymbolTabelle tabelle) {
+		while (whileExpr.run(tabelle).b) {
+			whileStmnt.run(tabelle);
+		}
+		Value returnValue = new Value();
+		returnValue.type = VariableType.noReturnType;
+		return returnValue;
 	}
 }

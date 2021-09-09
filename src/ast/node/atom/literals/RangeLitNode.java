@@ -1,24 +1,26 @@
 package ast.node.atom.literals;
 
-import ast.CompilerError;
 import ast.SymbolTabelle;
 import ast.VariableType;
+import ast.exceptions.CompilerError;
 import ast.node.atom.AtomNode;
 import ast.node.decl.DeclNode;
+import ast.value.Value;
+import domain.Range;
 import jj.Token;
 
 import java.util.LinkedList;
 import java.util.List;
 
 public class RangeLitNode extends AtomNode {
-	public List<Range> ranges = new LinkedList<>();
+	public List<RangeWrapper> rangeWrappers = new LinkedList<>();
 
 	// for Range + Range
 	public List<RangeLitNode> additionsRange = new LinkedList<>();
 	public List<Token> additionsIdentifier = new LinkedList<>();
 
 	public void add(Token a, Token b) {
-		ranges.add(new Range(a, b));
+		rangeWrappers.add(new RangeWrapper(a, b));
 	}
 
 	public void add(Token i) {
@@ -29,10 +31,10 @@ public class RangeLitNode extends AtomNode {
 		additionsRange.add(r);
 	}
 
-	static class Range {
+	static class RangeWrapper {
 		Token a, b;
 
-		public Range(Token a, Token b) {
+		public RangeWrapper(Token a, Token b) {
 			this.a = a;
 			this.b = b;
 		}
@@ -76,5 +78,28 @@ public class RangeLitNode extends AtomNode {
 		}
 
 		return hasError ? VariableType.errorT : VariableType.rangeT;
+	}
+
+	@Override
+	public Value run(SymbolTabelle tabelle) {
+		Range range = new Range();
+		rangeWrappers.forEach(r -> {
+			if (r.b == null) {
+				// char encoded as 'c'
+				range.add(r.a.image.charAt(1));
+			} else {
+				range.add(r.a.image.charAt(1), r.b.image.charAt(1));
+			}
+		});
+
+		additionsRange.stream()
+				.map(r -> r.run(tabelle).r)
+				.forEach(r -> r.getElement().forEach(e -> range.add(e.getStart(), e.getEnd())));
+
+		additionsIdentifier.stream()
+				.map(i -> tabelle.find(i.image).value.r)
+				.forEach(r -> r.getElement().forEach(e -> range.add(e.getStart(), e.getEnd())));
+
+		return new Value(range);
 	}
 }

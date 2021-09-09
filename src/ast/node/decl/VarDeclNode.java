@@ -1,10 +1,11 @@
 package ast.node.decl;
 
-import ast.CompilerError;
 import ast.SymbolTabelle;
 import ast.VariableType;
+import ast.exceptions.CompilerError;
 import ast.node.expr.ExprNode;
 import ast.node.type.TypeNode;
+import ast.value.Value;
 import jj.Token;
 
 import java.util.List;
@@ -52,5 +53,12 @@ public class VarDeclNode extends DeclNode {
             tabelle.add(varName, this);
             return VariableType.noReturnType;
         }
+    }
+
+    @Override
+    public Value run(SymbolTabelle tabelle) {
+        this.value = expr.run(tabelle);
+        tabelle.add(identifier.image, this);
+        return null;
     }
 }

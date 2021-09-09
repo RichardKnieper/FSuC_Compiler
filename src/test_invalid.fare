@@ -25,6 +25,6 @@ if (t && f) {
 String c = b;
 
 Range range = ['b','c'] + ['w'-'z'];
-Transition transition = $"Start"^1 - - range - - > $"End"^a;
+Transition transitionWrapper = $"Start"^1 - - range - - > $"End"^a;
 
 false;

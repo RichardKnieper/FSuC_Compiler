@@ -1,9 +1,10 @@
 package ast.node.atom;
 
-import ast.CompilerError;
 import ast.SymbolTabelle;
 import ast.VariableType;
+import ast.exceptions.CompilerError;
 import ast.node.decl.DeclNode;
+import ast.value.Value;
 import jj.Token;
 
 import java.util.List;
@@ -26,5 +27,13 @@ public class IdentifierNode extends AtomNode {
 			return VariableType.errorT;
 		}
 		return temp.type.variableType;
+	}
+
+	@Override
+	public Value run(SymbolTabelle tabelle) {
+		Value returnValue = new Value();
+		returnValue.type = VariableType.identifier;
+		returnValue.identifier = identifier;
+		return returnValue;
 	}
 }

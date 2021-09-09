@@ -1,10 +1,15 @@
 package ast.node.decl;
 
-import ast.CompilerError;
 import ast.SymbolTabelle;
 import ast.VariableType;
+import ast.exceptions.CompilerError;
 import ast.node.Node;
 import ast.node.type.TypeNode;
+import ast.value.Value;
+import domain.FiniteAutomata;
+import domain.Range;
+import domain.State;
+import domain.Transition;
 import jj.Token;
 
 import java.util.List;
@@ -12,6 +17,7 @@ import java.util.List;
 public class DeclNode extends Node {
 	public TypeNode type;
 	public Token identifier;
+	public Value value = null;
 
 	public DeclNode(TypeNode type, Token identifier) {
 		super();
@@ -35,5 +41,30 @@ public class DeclNode extends Node {
 			tabelle.add(varName, this);
 			return VariableType.noReturnType;
 		}
+	}
+
+	@Override
+	public Value run(SymbolTabelle tabelle) {
+		VariableType t = this.type.variableType;
+		if (t.hasSameTypeAs(VariableType.intT)) {
+			this.value = new Value(0);
+		} else if (t.hasSameTypeAs(VariableType.stringT)) {
+			this.value = new Value("");
+		} else if (t.hasSameTypeAs(VariableType.charT)) {
+			this.value = new Value(' ');
+		} else if (t.hasSameTypeAs(VariableType.booleanT)) {
+			this.value = new Value(false);
+		} else if (t.hasSameTypeAs(VariableType.rangeT)) {
+			this.value = new Value(new Range());
+		} else if (t.hasSameTypeAs(VariableType.stateT)) {
+			this.value = new Value(new State(""));
+		} else if (t.hasSameTypeAs(VariableType.transitionT)) {
+			this.value = new Value(new Transition(new State(""), new State(""), new Range()));
+		} else if (t.hasSameTypeAs(VariableType.faT)) {
+			this.value = new Value(new FiniteAutomata(new State("")));
+		} else if (t.hasSameTypeAs(VariableType.raT)) {
+			// TODO
+		}
+		return null;
 	}
 }

@@ -14,4 +14,12 @@ public class State {
     public String toString() {
         return "(" + label + ", "+accept+")";
     }
+
+    public String getLabel() {
+        return label;
+    }
+
+    public int getAccept() {
+        return accept;
+    }
 }

@@ -13,7 +13,8 @@ public class VariableType { // TODO find better name
 	public static VariableType raT = new VariableType();
 	public static VariableType errorT = new VariableType();
 
-	public static VariableType noReturnType = new VariableType();
+	public static VariableType noReturnType = new VariableType(); // needed for semantic analyses
+	public static VariableType identifier = new VariableType(); // needed for interpreter
 
 	public static class ArrayVariableType extends VariableType {
 		public VariableType variableType;
@@ -64,9 +65,7 @@ public class VariableType { // TODO find better name
 				return false;
 			}
 		}
-		return first == second
-				|| first == charT && second == intT
-				|| first == intT && second == charT;
+		return first == second;
 	}
 
 	public boolean hasSameTypeAs(VariableType other) {

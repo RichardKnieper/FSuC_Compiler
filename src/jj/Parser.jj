@@ -28,8 +28,7 @@ TOKEN : {
     | <Arrow : "- - >" | "-- >" | "- ->" | "-->">
 }
 
-SKIP :
-{
+SKIP : {
     // White space
     " "
     | "\t"
@@ -157,7 +156,6 @@ MapTypeNode mapType(): {
 }
 
 // arrayType -> <Type> "[]"
-
 ArrayTypeNode arrayType(): {
     Token type;
   } {
@@ -286,6 +284,7 @@ TransitionLitNode transition(): {
 }
 
 // TODO doku
+// TODO + transition anstelle von + fa
 // fa -> "<" (state | <Identifier>) ",{" (<Identifier> (transition)? ("," <Identifier (transition)?)*)? "}" ">"
 FaLitNode fa(): {
     FaLitNode node = new FaLitNode(null, null);

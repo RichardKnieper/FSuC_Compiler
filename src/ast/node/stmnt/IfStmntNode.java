@@ -1,8 +1,9 @@
 package ast.node.stmnt;
 
-import ast.CompilerError;
 import ast.SymbolTabelle;
 import ast.VariableType;
+import ast.exceptions.CompilerError;
+import ast.value.Value;
 
 import java.util.List;
 
@@ -36,5 +37,19 @@ public class IfStmntNode extends StmntNode {
 			errors.add(new CompilerError("Error: IF-condition must be boolean"));
 			return VariableType.errorT;
 		}	
+	}
+
+	@SuppressWarnings("DuplicatedCode")
+	@Override
+	public Value run(SymbolTabelle tabelle) {
+		Value ifExprValue = ifExpr.run(tabelle);
+		if (ifExprValue.b) {
+			ifStmnt.run(tabelle);
+		} else {
+			elseStmnt.run(tabelle);
+		}
+		Value returnValue = new Value();
+		returnValue.type = VariableType.noReturnType;
+		return returnValue;
 	}
 }

@@ -1,8 +1,9 @@
 package ast.node.expr;
 
-import ast.CompilerError;
 import ast.SymbolTabelle;
 import ast.VariableType;
+import ast.exceptions.CompilerError;
+import ast.value.Value;
 import jj.Token;
 
 import java.util.List;
@@ -40,5 +41,31 @@ public class AndOrExpr extends ExprNode {
 			}
 		}
 		return exprType;
+	}
+
+	@SuppressWarnings("DuplicatedCode")
+	@Override
+	public Value run(SymbolTabelle tabelle) {
+		if (op == null) {
+			return expr.run(tabelle);
+		} else {
+			Value firstValue = expr.run(tabelle);
+			Value secondValue = secondExpr.run(tabelle);
+
+			if (firstValue.type.hasSameTypeAs(VariableType.identifier)) {
+				firstValue = tabelle.find(firstValue.identifier.image).value;
+			}
+			if (secondValue.type.hasSameTypeAs(VariableType.identifier)) {
+				secondValue = tabelle.find(secondValue.identifier.image).value;
+			}
+
+			boolean returnValue;
+			if (op.image.equals("&&")) {
+				returnValue = firstValue.b && secondValue.b;
+			} else { // op = "||"
+				returnValue = firstValue.b || secondValue.b;
+			}
+			return new Value(returnValue);
+		}
 	}
 }

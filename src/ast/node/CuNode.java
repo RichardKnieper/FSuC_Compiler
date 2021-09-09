@@ -1,9 +1,10 @@
 package ast.node;
 
-import ast.CompilerError;
 import ast.SymbolTabelle;
 import ast.VariableType;
+import ast.exceptions.CompilerError;
 import ast.node.stmnt.ReturnStmntNode;
+import ast.value.Value;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -47,5 +48,17 @@ public class CuNode extends Node {
         }
 
         return types.contains(VariableType.errorT) ? VariableType.errorT : VariableType.faT;
+    }
+
+    public Value run() {
+        return run(new SymbolTabelle(null));
+    }
+
+    @Override
+    public Value run(SymbolTabelle tabelle) {
+        return declOrStmntList.stream()
+                .map(node -> node.run(tabelle))
+                .collect(Collectors.toList())
+                .get(declOrStmntList.size() - 1);
     }
 }

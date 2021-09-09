@@ -1,9 +1,13 @@
 package ast.node.atom;
 
-import ast.CompilerError;
 import ast.SymbolTabelle;
 import ast.VariableType;
+import ast.exceptions.CompilerError;
 import ast.node.decl.DeclNode;
+import ast.value.SetValue;
+import ast.value.Value;
+import domain.EpsilonTransition;
+import domain.Transition;
 import jj.Token;
 
 import java.util.List;
@@ -20,6 +24,7 @@ public class ReadClassAttributeNode extends AtomNode {
 		return indent + "ReadClassAttributeNode: " + classIdentifier + "." + attributeIdentifier + "\n";
 	}
 
+	@SuppressWarnings("DuplicatedCode")
 	public VariableType semantischeAnalyse(SymbolTabelle tabelle, List<CompilerError> errors) {
 		DeclNode element = tabelle.find(classIdentifier.image);
 		if (element == null) {
@@ -37,7 +42,6 @@ public class ReadClassAttributeNode extends AtomNode {
 					errors.add(new CompilerError("Error: FA does not have attribute: " + attribute));
 				}
 			} else if (type.hasSameTypeAs(VariableType.transitionT)) {
-
 				if (attribute.equals("source") || attribute.equals("target")) {
 					return VariableType.stateT;
 				} else if (attribute.equals("range")) {
@@ -47,7 +51,7 @@ public class ReadClassAttributeNode extends AtomNode {
 				}
 			} else if (type.hasSameTypeAs(VariableType.stateT)) {
 				if (attribute.equals("label")) {
-					return VariableType.stateT;
+					return VariableType.stringT;
 				} else if (attribute.equals("accept")) {
 					return VariableType.intT;
 				} else {
@@ -59,5 +63,39 @@ public class ReadClassAttributeNode extends AtomNode {
 		}
 
 		return VariableType.errorT;
+	}
+
+	@SuppressWarnings("DuplicatedCode")
+	@Override
+	public Value run(SymbolTabelle tabelle) {
+		Value element = tabelle.find(classIdentifier.image).value;
+
+		VariableType type = element.type;
+		String attribute = attributeIdentifier.image;
+		if (type.hasSameTypeAs(VariableType.faT)) {
+			if (attribute.equals("start")) {
+				return new Value(element.fa.getStartState());
+			} else { // states
+				return new SetValue<>(element.fa.getStates(), VariableType.stateT);
+			}
+		} else if (type.hasSameTypeAs(VariableType.transitionT)) {
+			if (attribute.equals("source")) {
+				return new Value(element.transition.getStart());
+			} else if (attribute.equals("target")) {
+				return new Value(element.transition.getEnd());
+			} else { // range
+				if (element.transition instanceof EpsilonTransition) {
+					throw new RuntimeException("There exists no range for this transition.");
+				} else {
+					return new Value(((Transition) element.transition).getRange());
+				}
+			}
+		} else { // state
+			if (attribute.equals("label")) {
+				return new Value(element.state.getLabel());
+			} else { // accept
+				return new Value(element.state.getAccept());
+			}
+		}
 	}
 }

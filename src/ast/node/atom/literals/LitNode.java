@@ -1,9 +1,10 @@
 package ast.node.atom.literals;
 
-import ast.CompilerError;
 import ast.SymbolTabelle;
 import ast.VariableType;
+import ast.exceptions.CompilerError;
 import ast.node.atom.AtomNode;
+import ast.value.Value;
 import jj.ParserConstants;
 import jj.Token;
 
@@ -29,6 +30,17 @@ public class LitNode extends AtomNode {
             case ParserConstants.StringLiteral: return VariableType.stringT;
             case ParserConstants.IntegerLiteral: return VariableType.intT;
             default: return VariableType.errorT;
+        }
+    }
+
+    @Override
+    public Value run(SymbolTabelle tabelle) {
+        switch (token.kind) {
+            case ParserConstants.BoolLiteral: return new Value(Boolean.parseBoolean(token.image));
+            case ParserConstants.CharLiteral: return new Value(token.image.charAt(1));
+            case ParserConstants.StringLiteral: return new Value(token.image.substring(1, token.image.length() - 2));
+            case ParserConstants.IntegerLiteral: return new Value(Integer.parseInt(token.image));
+            default: Value returnValue = new Value(); returnValue.type = VariableType.errorT; return returnValue;
         }
     }
 }

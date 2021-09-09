@@ -1,8 +1,9 @@
 package ast.node.expr;
 
-import ast.CompilerError;
 import ast.SymbolTabelle;
 import ast.VariableType;
+import ast.exceptions.CompilerError;
+import ast.value.Value;
 
 import java.util.List;
 
@@ -37,5 +38,14 @@ public class IntersectionExprNode extends ExprNode {
             }
         }
         return aType;
+    }
+
+    @Override
+    public Value run(SymbolTabelle tabelle) {
+        if (b == null) {
+            return a.run(tabelle);
+        } else {
+            return a.run(tabelle); // TODO intersection
+        }
     }
 }

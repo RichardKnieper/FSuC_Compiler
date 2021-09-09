@@ -1,17 +1,16 @@
 package ast.node.atom.literals;
 
-import ast.CompilerError;
 import ast.SymbolTabelle;
 import ast.VariableType;
+import ast.exceptions.CompilerError;
 import ast.node.atom.AtomNode;
 import ast.node.decl.DeclNode;
+import ast.value.Value;
 import jj.Token;
 
 import java.util.List;
 
-/**
- * Only exists when encapsulated by {@link TransitionLitWithStartNode}.
- */
+// Only exists when encapsulated by TransitionLitWithStartNode
 public class TransitionLitNode extends AtomNode {
 	public Token rangeIdentifier, endStateIdentifier;
 	public RangeLitNode range;
@@ -72,5 +71,11 @@ public class TransitionLitNode extends AtomNode {
 		}
 
 		return hasError ? VariableType.errorT : VariableType.transitionT;
+	}
+
+	// should never be called cause it is only used in TransitionLitWithStartNode
+	@Override
+	public Value run(SymbolTabelle tabelle) {
+		throw new RuntimeException("Should never be called");
 	}
 }

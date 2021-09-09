@@ -1,11 +1,12 @@
 package ast.node.decl;
 
-import ast.CompilerError;
 import ast.ParamWrapper;
 import ast.SymbolTabelle;
 import ast.VariableType;
+import ast.exceptions.CompilerError;
 import ast.node.stmnt.StmntNode;
 import ast.node.type.TypeNode;
+import ast.value.Value;
 import jj.Token;
 
 import java.util.HashMap;
@@ -85,5 +86,11 @@ public class MethDeclNode extends DeclNode {
 			tabelle.add(methodName, this);
 			return VariableType.noReturnType;
 		}
+	}
+
+	@Override
+	public Value run(SymbolTabelle tabelle) {
+		tabelle.add(identifier.image, this);
+		return null;
 	}
 }
