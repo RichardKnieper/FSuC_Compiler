@@ -9,7 +9,7 @@ import java.io.FileReader;
 public class Main {
 
     public static void main(String[] args) throws ParseException, FileNotFoundException {
-        Parser parser = new Parser(new FileReader("src/test_invalid.fare"));
+        Parser parser = new Parser(new FileReader("src/test_valid.fare"));
         CuNode ast = parser.cu();
         VariableType returnType = ast.semantischeAnalyse();
         if (!returnType.isError())  {
