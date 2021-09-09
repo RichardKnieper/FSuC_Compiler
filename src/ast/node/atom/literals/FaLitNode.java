@@ -91,7 +91,7 @@ public class FaLitNode extends AtomNode {
 				DeclNode temp = tabelle.find(transition.identifier.image);
 				if (temp == null) {
 					errors.add(new CompilerError("Error: " + transition.identifier.image + " is not defined in line: "
-							+ startStateIdentifier.beginLine));
+							+ transition.identifier.beginLine));
 					hasError = true;
 				} else if (!temp.type.variableType.hasSameTypeAs(VariableType.transitionT)) {
 					errors.add(new CompilerError("Error: " + transition.identifier.image + " is not a Transition in line: "

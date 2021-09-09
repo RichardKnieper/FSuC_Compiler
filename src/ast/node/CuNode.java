@@ -37,18 +37,15 @@ public class CuNode extends Node {
                 .map(node -> node.semantischeAnalyse(tabelle, errors))
                 .collect(Collectors.toList());
 
-        if (types.contains(VariableType.errorT)) {
-            return VariableType.errorT;
-        } else if (declOrStmntList.get(declOrStmntList.size() - 1) instanceof ReturnStmntNode) {
-            if (types.get(types.size() - 1).hasSameTypeAs(VariableType.faT)) {
-                return VariableType.faT;
-            } else {
-                errors.add(new CompilerError("Error: The last statement must return an object of the FA class."));
-                return VariableType.errorT;
-            }
-        } else {
-            errors.add(new CompilerError("Error: The last statement must return an object of the FA class."));
-            return VariableType.errorT;
+        if (!(declOrStmntList.get(declOrStmntList.size() - 1) instanceof ReturnStmntNode)) {
+            errors.add(new CompilerError("Error: The last statement be a return statement."));
+            types.add(VariableType.errorT);
         }
+        if (!types.get(types.size() - 1).hasSameTypeAs(VariableType.faT)) {
+            errors.add(new CompilerError("Error: The last statement must return an object of the FA class."));
+            types.add(VariableType.errorT);
+        }
+
+        return types.contains(VariableType.errorT) ? VariableType.errorT : VariableType.faT;
     }
 }

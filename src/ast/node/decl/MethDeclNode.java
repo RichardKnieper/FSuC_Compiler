@@ -51,6 +51,17 @@ public class MethDeclNode extends DeclNode {
 			addedError = true;
 		}
 
+		boolean duplicateParamNames = params.values()
+				.stream()
+				.map(param -> param.getIndentifier().image)
+				.distinct()
+				.count() < params.size();
+		if (duplicateParamNames) {
+			errors.add(new CompilerError("Error: Parameter identifiers must be unique in line: "
+					+ params.values().iterator().next().getIndentifier().beginLine));
+			addedError = true;
+		}
+
 		params.values().forEach(paramWrapper ->
 				neueTabelle.add(paramWrapper.getIndentifier().image, new DeclNode(paramWrapper.getType(), paramWrapper.getIndentifier())));
 
@@ -71,7 +82,7 @@ public class MethDeclNode extends DeclNode {
 		if (addedError) {
 			return VariableType.errorT;
 		} else {
-			neueTabelle.add(methodName, this);
+			tabelle.add(methodName, this);
 			return VariableType.noReturnType;
 		}
 	}
