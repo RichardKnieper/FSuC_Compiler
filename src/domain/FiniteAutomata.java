@@ -40,4 +40,8 @@ public class FiniteAutomata {
         }
         return erg + "\n";
     }
+
+    public Set<AbstractTransition> getTransitions() {
+        return transitions;
+    }
 }

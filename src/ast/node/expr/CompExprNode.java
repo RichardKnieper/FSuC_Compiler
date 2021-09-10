@@ -26,8 +26,6 @@ public class CompExprNode extends ExprNode {
                 + ((secondExpr != null) ? secondExpr.toString(indent + "\t") : "");
     }
 
-    // TODO überarbeiten wegen dem entfernen von int == char
-    // TODO add String
     public VariableType semantischeAnalyse(SymbolTabelle tabelle, List<CompilerError> errors) {
         VariableType exprType = expr.semantischeAnalyse(tabelle, errors);
         if (secondExpr != null) {
@@ -35,19 +33,21 @@ public class CompExprNode extends ExprNode {
             if (secondExprType.hasSameTypeAs(exprType)) {
                 if (op.image.equals("!=") || op.image.equals("==")) {
                     if ((secondExprType.hasSameTypeAs(VariableType.booleanT))
-                            || (secondExprType.hasSameTypeAs(VariableType.intT))) {
+                            || (secondExprType.hasSameTypeAs(VariableType.intT))
+                            || (secondExprType.hasSameTypeAs(VariableType.charT))
+                            || (secondExprType.hasSameTypeAs(VariableType.stringT))) {
                         return VariableType.booleanT;
                     } else {
                         errors.add(new CompilerError("Error: Comparison in line " + op.beginLine + ", " + op.image
-                                + " accepts only Boolean or Integer."));
+                                + " accepts only Boolean, Character or Integer."));
                         return VariableType.errorT;
                     }
                 } else {
-                    if (secondExprType.hasSameTypeAs(VariableType.intT)) {
+                    if (secondExprType.hasSameTypeAs(VariableType.intT) || secondExprType.hasSameTypeAs(VariableType.charT)) {
                         return VariableType.booleanT;
                     } else {
                         errors.add(new CompilerError(
-                                "Error: Comparison in line " + op.beginLine + ", " + op.image + " accepts only Integer."));
+                                "Error: Comparison in line " + op.beginLine + ", " + op.image + " accepts only Integer or Character."));
                         return VariableType.errorT;
                     }
                 }
@@ -96,13 +96,29 @@ public class CompExprNode extends ExprNode {
                         return new Value(!firstValue.string.equals(secondValue.string));
                     }
                 case "<=":
-                    return new Value(firstValue.i <= secondValue.i);
+                    if (firstValue.type.hasSameTypeAs(VariableType.intT)) {
+                        return new Value(firstValue.i <= secondValue.i);
+                    } else { // char
+                        return new Value(firstValue.c <= secondValue.c);
+                    }
                 case ">=":
-                    return new Value(firstValue.i >= secondValue.i);
+                    if (firstValue.type.hasSameTypeAs(VariableType.intT)) {
+                        return new Value(firstValue.i >= secondValue.i);
+                    } else { // char
+                        return new Value(firstValue.c >= secondValue.c);
+                    }
                 case "<":
-                    return new Value(firstValue.i < secondValue.i);
+                    if (firstValue.type.hasSameTypeAs(VariableType.intT)) {
+                        return new Value(firstValue.i < secondValue.i);
+                    } else { // char
+                        return new Value(firstValue.c < secondValue.c);
+                    }
                 default:  // op = ">"
-                    return new Value(firstValue.i > secondValue.i);
+                    if (firstValue.type.hasSameTypeAs(VariableType.intT)) {
+                        return new Value(firstValue.i > secondValue.i);
+                    } else { // char
+                        return new Value(firstValue.c > secondValue.c);
+                    }
             }
         }
     }

@@ -1,23 +1,28 @@
-int myFunction(String a, String b) {
-    return 3 - 1;
+int myFunction(int a, int b) {
+    return a - b;
 }
 
-int a = myFunction("a", "b");
+int a = myFunction(5, 2);
 
 boolean t = true || false;
 boolean f = 1 >= 2;
 
-if (t && f) {
-    int a = 12;
-} else {
-    String b = "test";
-}
+Map<int, int> map = [[1: 100, 2: 200]];
 
+int b;
+if (t && f) {
+    b = map.get(1);
+} else {
+    b = map.get(2);
+}
 
 Range testRange = ['t'];
 Range range = ['b','c'] + ['w'-'z'] + testRange;
 Range d = range + testRange;
 State state = $"Erster";
 Transition transition = state - - range - - > $"End"^a;
+FA fa = <$"Start"^1, { transition }>;
 
-return <$"Start"^1, { transition }>;
+Transition transition2 = state - - range - - > $"End"^b;
+
+return fa + transition2;

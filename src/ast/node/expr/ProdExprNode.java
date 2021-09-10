@@ -60,8 +60,10 @@ public class ProdExprNode extends ExprNode {
 			int returnValue;
 			if (op.image.equals("*")) {
 				returnValue = firstValue.i * secondValue.i;
-			} else { // op = "/"
+			} else if (op.image.equals("/")) {
 				returnValue = firstValue.i / secondValue.i;
+			} else { // %
+				returnValue = firstValue.i % secondValue.i;
 			}
 			return new Value(returnValue);
 		}

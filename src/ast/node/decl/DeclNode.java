@@ -65,6 +65,10 @@ public class DeclNode extends Node {
 		} else if (t.hasSameTypeAs(VariableType.raT)) {
 			// TODO
 		}
-		return null;
+		tabelle.add(identifier.image, this);
+
+		Value returnValue = new Value();
+		returnValue.type = VariableType.noReturnType;
+		return returnValue;
 	}
 }

@@ -87,8 +87,18 @@ MethDeclNode methDecl(TypeNode type, Token identifier): {
 StmntNode stmnt(): {
 	StmntNode node = null;
   } {
-    (node = returnStmnt() | node = ifStmnt() | node = whileStmnt() | LOOKAHEAD(3) node = blockStmnt() | node = expr() | ";")
+    (node = returnStmnt() | node = ifStmnt() | node = whileStmnt() | LOOKAHEAD(3) node = blockStmnt()
+    | LOOKAHEAD(2) node = assignStmnt() | node = expr() | ";")
 	{ return node; }
+}
+
+// assignStmnt -> <Identifer> = expr ";"
+AssignStmntNode assignStmnt(): {
+    Token identifier;
+    ExprNode expr;
+} {
+    identifier = <Identifier> "=" expr = expr() ";"
+    { return new AssignStmntNode(identifier, expr); }
 }
 
 // returnStmnt -> "return" expr ";"
@@ -181,7 +191,7 @@ AtomNode atom(): {
     | token = <StringLiteral> { return new LitNode(token); }
     | token = <IntegerLiteral> { return new LitNode(token); }
     | token = <BoolLiteral> { return new LitNode(token); }
-    | atom = set() { return atom; }
+    | LOOKAHEAD(3) atom = set() { return atom; }
     | LOOKAHEAD(3) atom = map() { return atom; }
     | atom = array() { return atom; }
     | atom = range() { return atom; }
@@ -283,15 +293,12 @@ TransitionLitNode transition(): {
     { return new TransitionLitNode(rangeIdentifier, stateIdentifier, range, state); }
 }
 
-// TODO doku
-// TODO + transition anstelle von + fa
 // fa -> "<" (state | <Identifier>) ",{" (<Identifier> (transition)? ("," <Identifier (transition)?)*)? "}" ">"
 FaLitNode fa(): {
     FaLitNode node = new FaLitNode(null, null);
     StateLitNode state = null;
     TransitionLitNode transition = null;
     Token identifier = null;
-    FaLitNode additionalFa = null;
  } {
     "<" (state = state() | identifier = <Identifier>) {
         if(state == null)
@@ -301,14 +308,6 @@ FaLitNode fa(): {
             }
      "," "{" (identifier = <Identifier>(transition = transition())? { node.add(identifier, transition); transition = null; }
      ("," identifier = <Identifier>(transition = transition())? { node.add(identifier, transition); transition = null; } )*)? "}" ">"
-    (LOOKAHEAD(2) "+" (additionalFa = fa() | identifier = <Identifier>) {
-        if(additionalFa == null)
-            node.add(identifier);
-        else
-            node.add(additionalFa);
-        additionalFa = null;
-        identifier = null;
-         })*
     { return node; }
 }
 
@@ -349,7 +348,7 @@ ProdExprNode prodExpr(): {
     IntersectionExprNode b = null;
     Token op = null;
  } {
-    a = intersectionExpr() ((op="*" | op="/") b = intersectionExpr())?
+    a = intersectionExpr() ((op="*" | op="/" | op="%") b = intersectionExpr())?
     { return new ProdExprNode(a, op, b); }
 }
 

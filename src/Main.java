@@ -15,8 +15,7 @@ public class Main {
         VariableType returnType = ast.semantischeAnalyse();
         if (!returnType.isError())  {
             Value result = ast.run();
-            System.out.println(result);
+            System.out.println(result.fa.toString());
         }
-        int debug = 42; // TODO delete; this variable exists to stop the debugger to examine ast
     }
 }

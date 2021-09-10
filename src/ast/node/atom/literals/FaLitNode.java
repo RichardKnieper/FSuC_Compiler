@@ -18,18 +18,6 @@ public class FaLitNode extends AtomNode {
 	public Token startStateIdentifier;
 	public List<TransitionWrapper> transitionWrappers = new LinkedList<>();
 
-	// for FA + FA
-	public List<Token> additionsIdentifier = new LinkedList<>();
-	public List<FaLitNode> additionsFa = new LinkedList<>();
-
-	public void add(Token i) {
-		additionsIdentifier.add(i);
-	}
-
-	public void add(FaLitNode fa) {
-		additionsFa.add(fa);
-	}
-
 	public void add(Token i, TransitionLitNode t) {
 		transitionWrappers.add(new TransitionWrapper(i, t));
 	}
@@ -68,7 +56,7 @@ public class FaLitNode extends AtomNode {
 		return indent + "FaLitNode";
 	}
 
-	// TODO + transition anstelle von + fa
+	@SuppressWarnings("DuplicatedCode")
 	public VariableType semantischeAnalyse(SymbolTabelle tabelle, List<CompilerError> errors) {
 		boolean hasError = false;
 
@@ -110,30 +98,9 @@ public class FaLitNode extends AtomNode {
 			}
 		}
 
-		boolean errorInAdditionalFa = additionsFa.stream()
-				.anyMatch(addition -> addition.semantischeAnalyse(tabelle, errors).isError());
-		if (errorInAdditionalFa) {
-			hasError = true;
-		}
-
-		for (Token i : additionsIdentifier) {
-			String identifier = i.image;
-			DeclNode temp = tabelle.find(identifier);
-			if (temp == null) {
-				errors.add(new CompilerError("Error: " + identifier + " is not defined in line: "
-						+ i.beginLine));
-				hasError = true;
-			} else if (!temp.type.variableType.hasSameTypeAs(VariableType.faT)) {
-				errors.add(new CompilerError("Error: " + identifier + " is not a FA in line: "
-						+ i.beginLine));
-				hasError = true;
-			}
-		}
-
 		return hasError ? VariableType.errorT : VariableType.faT;
 	}
 
-	// TODO + transition anstelle von + fa
 	@Override
 	public Value run(SymbolTabelle tabelle) {
 		State start;
@@ -153,8 +120,6 @@ public class FaLitNode extends AtomNode {
 					}
 				})
 				.forEach(fa::addTransitions);
-
-		// TODO + transition
 
 		return new Value(fa);
 	}
