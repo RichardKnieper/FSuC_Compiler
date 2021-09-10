@@ -7,7 +7,7 @@ public class BasicRange { // Abschnitte von Buchstaben ohne Lücken
         end = b;
     }
     public int compare(char a, char b) { // -2 means b<start-1, -1 means b==start-1, 0 means [a,b] and [start,end] have common elements,
-                                         // 1 means a==end+1, 2 means a>end+1
+        // 1 means a==end+1, 2 means a>end+1
         if (a==end+1) return 1;
         else if (a>end+1) return 2;
         else if (b==start-1) return -1;

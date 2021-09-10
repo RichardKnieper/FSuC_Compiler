@@ -1,8 +1,8 @@
 package ast.node;
 
+import ast.CompilerError;
 import ast.SymbolTabelle;
 import ast.VariableType;
-import ast.exceptions.CompilerError;
 import ast.node.stmnt.ReturnStmntNode;
 import ast.value.Value;
 

@@ -1,9 +1,9 @@
 package ast.node.atom;
 
+import ast.CompilerError;
 import ast.ParamWrapper;
 import ast.SymbolTabelle;
 import ast.VariableType;
-import ast.exceptions.CompilerError;
 import ast.node.decl.DeclNode;
 import ast.node.decl.MethDeclNode;
 import ast.node.decl.VarDeclNode;

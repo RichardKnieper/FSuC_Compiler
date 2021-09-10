@@ -1,8 +1,8 @@
 package ast.node.stmnt;
 
+import ast.CompilerError;
 import ast.SymbolTabelle;
 import ast.VariableType;
-import ast.exceptions.CompilerError;
 import ast.node.Node;
 import ast.value.Value;
 
@@ -44,12 +44,12 @@ public class BlockStmntNode extends StmntNode {
 				.map(node -> node.run(neueTabelle))
 				.collect(Collectors.toList());
 
-		Value returnValue = new Value();
 		if (declOrStmntList.get(declOrStmntList.size() - 1) instanceof ReturnStmntNode) {
-			returnValue.type = values.get(values.size() - 1).type;
+			return values.get(values.size() - 1);
 		} else {
+			Value returnValue = new Value();
 			returnValue.type = VariableType.noReturnType;
+			return returnValue;
 		}
-		return returnValue;
 	}
 }

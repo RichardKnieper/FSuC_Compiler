@@ -1,8 +1,8 @@
 package ast.node.expr;
 
+import ast.CompilerError;
 import ast.SymbolTabelle;
 import ast.VariableType;
-import ast.exceptions.CompilerError;
 import ast.value.Value;
 
 import java.util.List;

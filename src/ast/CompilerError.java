@@ -1,4 +1,4 @@
-package ast.exceptions;
+package ast;
 
 public class  CompilerError extends Exception {
 	/**

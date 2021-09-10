@@ -13,7 +13,10 @@ if (t && f) {
     String b = "test";
 }
 
-Range range = ['b','c'] + ['w'-'z'];
+
+Range testRange = ['t'];
+Range range = ['b','c'] + ['w'-'z'] + testRange;
+Range d = range + testRange;
 State state = $"Erster";
 Transition transition = state - - range - - > $"End"^a;
 

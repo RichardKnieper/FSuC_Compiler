@@ -1,8 +1,8 @@
 package ast.node.atom.literals;
 
+import ast.CompilerError;
 import ast.SymbolTabelle;
 import ast.VariableType;
-import ast.exceptions.CompilerError;
 import ast.node.atom.AtomNode;
 import ast.node.decl.DeclNode;
 import ast.value.Value;

@@ -1,11 +1,12 @@
 package ast.node.atom.literals;
 
+import ast.CompilerError;
 import ast.SymbolTabelle;
 import ast.VariableType;
-import ast.exceptions.CompilerError;
 import ast.node.atom.AtomNode;
 import ast.node.decl.DeclNode;
 import ast.value.Value;
+import domain.BasicRange;
 import domain.Range;
 import jj.Token;
 
@@ -82,23 +83,45 @@ public class RangeLitNode extends AtomNode {
 
 	@Override
 	public Value run(SymbolTabelle tabelle) {
-		Range range = new Range();
-		rangeWrappers.forEach(r -> {
+		Range range = null; // can not be initialized here because otherwise the add(...) method does not work
+		for (RangeWrapper r : rangeWrappers) {
 			if (r.b == null) {
 				// char encoded as 'c'
-				range.add(r.a.image.charAt(1));
+				if (range == null) {
+					range = new Range(r.a.image.charAt(1));
+				} else {
+					range.add(r.a.image.charAt(1));
+				}
 			} else {
-				range.add(r.a.image.charAt(1), r.b.image.charAt(1));
+				if (range == null) {
+					range = new Range(r.a.image.charAt(1), r.b.image.charAt(1));
+				} else {
+					range.add(r.a.image.charAt(1), r.b.image.charAt(1));
+				}
 			}
-		});
+		}
 
-		additionsRange.stream()
-				.map(r -> r.run(tabelle).r)
-				.forEach(r -> r.getElement().forEach(e -> range.add(e.getStart(), e.getEnd())));
+		for (RangeLitNode rln : additionsRange) {
+			Range r = rln.run(tabelle).r;
+			for (BasicRange br : r.getElement()) {
+				if (range == null) {
+					range = new Range(br.getStart(), br.getEnd());
+				} else {
+					range.add(br.getStart(), br.getEnd());
+				}
+			}
+		}
 
-		additionsIdentifier.stream()
-				.map(i -> tabelle.find(i.image).value.r)
-				.forEach(r -> r.getElement().forEach(e -> range.add(e.getStart(), e.getEnd())));
+		for (Token identifier : additionsIdentifier) {
+			Range r = tabelle.find(identifier.image).value.r;
+			for (BasicRange br : r.getElement()) {
+				if (range == null) {
+					range = new Range(br.getStart(), br.getEnd());
+				} else {
+					range.add(br.getStart(), br.getEnd());
+				}
+			}
+		}
 
 		return new Value(range);
 	}
