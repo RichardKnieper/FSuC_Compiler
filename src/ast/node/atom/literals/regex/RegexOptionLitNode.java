@@ -10,26 +10,27 @@ import jj.Token;
 import java.util.List;
 
 public class RegexOptionLitNode extends AtomNode {
-    RegexAtomLitNode regex;
-    Token op;
+	RegexAtomLitNode regex;
+	Token op;
 
-    public RegexOptionLitNode(RegexAtomLitNode regex, Token op) {
-        this.regex = regex;
-        this.op = op;
-    }
+	public RegexOptionLitNode(RegexAtomLitNode regex, Token op) {
+		this.regex = regex;
+		this.op = op;
+	}
 
-    @Override
-    public String toString(String indent) {
-        return null;
-    }
+	@Override
+	public String toString(String indent) {
+		return null;
+	}
 
-    @Override
-    public VariableType semantischeAnalyse(SymbolTabelle tabelle, List<CompilerError> errors) {
-        return null;
-    }
+	@Override
+	public VariableType semantischeAnalyse(SymbolTabelle tabelle, List<CompilerError> errors) {
+		VariableType RegexOptionLitNodeType = regex.semantischeAnalyse(tabelle, errors);
+		return RegexOptionLitNodeType;
+	}
 
-    @Override
-    public Value run(SymbolTabelle tabelle) {
-        return null;
-    }
+	@Override
+	public Value run(SymbolTabelle tabelle) {
+		return null;
+	}
 }

@@ -22,7 +22,8 @@ public class RegexLitNode extends AtomNode {
 
     @Override
     public VariableType semantischeAnalyse(SymbolTabelle tabelle, List<CompilerError> errors) {
-        return null;
+        VariableType regexType = regex.semantischeAnalyse(tabelle, errors);
+    	return regexType;
     }
 
     @Override

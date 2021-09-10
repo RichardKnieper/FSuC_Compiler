@@ -28,7 +28,14 @@ public class RegexAtomLitNode extends AtomNode {
 
     @Override
     public VariableType semantischeAnalyse(SymbolTabelle tabelle, List<CompilerError> errors) {
-        return null;
+        if(range!=null) {
+        	return VariableType.rangeT;
+        }else if(bracketed!=null) {
+        	VariableType bracketedType = bracketed.semantischeAnalyse(tabelle, errors);
+        	return bracketedType;
+        } else { //token s
+        	return VariableType.raT;
+        }   
     }
 
     @Override

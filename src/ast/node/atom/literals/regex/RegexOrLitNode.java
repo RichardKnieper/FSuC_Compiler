@@ -19,7 +19,16 @@ public class RegexOrLitNode extends AtomNode {
 
     @Override
     public VariableType semantischeAnalyse(SymbolTabelle tabelle, List<CompilerError> errors) {
-        return null;
+    	for(RegexConcatLitNode rcl : regexList ) {
+    		VariableType RegexConcatLitNodeType = rcl.semantischeAnalyse(tabelle, errors);
+    		if(!RegexConcatLitNodeType.hasSameTypeAs(VariableType.raT) 
+    				|| !RegexConcatLitNodeType.hasSameTypeAs(VariableType.rangeT)
+    				|| RegexConcatLitNodeType.hasSameTypeAs(VariableType.errorT)) {
+    			errors.add(new CompilerError("Error: Concat accepts only Range or regular express Type."));
+    			return VariableType.errorT;
+    		}
+    	}
+    	return VariableType.raT;
     }
 
     @Override
