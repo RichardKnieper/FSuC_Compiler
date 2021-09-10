@@ -42,7 +42,7 @@ SKIP : {
 
 // Parser
 
-// CU -> (decl | stmnt)*
+// cu -> (decl | stmnt)*
 CuNode cu(): {
 	CuNode node = new CuNode();
 	Node declOrStmnt;
@@ -51,7 +51,7 @@ CuNode cu(): {
     { return node; }
 }
 
-// decl -> type() <Identifier> (varDecl | methDecl | ";")
+// decl -> type <Identifier> (varDecl | methDecl | ";")
 DeclNode decl(): {
 	Token identifier;
 	TypeNode type;
@@ -83,7 +83,7 @@ MethDeclNode methDecl(TypeNode type, Token identifier): {
     { node.body = body; return node; }
 }
 
-// stmnt -> returnStmnt | ifStmnt | whileStmnt | blockStmnt | expr | ";"
+// stmnt -> returnStmnt | ifStmnt | whileStmnt | blockStmnt | assignStmnt | expr | ";"
 StmntNode stmnt(): {
 	StmntNode node = null;
   } {
@@ -92,7 +92,7 @@ StmntNode stmnt(): {
 	{ return node; }
 }
 
-// assignStmnt -> <Identifer> = expr ";"
+// assignStmnt -> <Identifier> "=" expr ";"
 AssignStmntNode assignStmnt(): {
     Token identifier;
     ExprNode expr;
@@ -173,11 +173,12 @@ ArrayTypeNode arrayType(): {
     { return new ArrayTypeNode(VariableType.of(type.image));}
 }
 
-// atom -> "!" atom | <Character> | <String> | <Integer> | <Boolean>
+// atom -> "!" atom | <CharLiteral> | <StringLiteral> | <IntegerLiteral> | <BoolLiteral>
 //         | set | map | array
 //         | range | fa
 //         | (<Identifier> ".")? methCall
-//         | (state | <Identifier> ("." <Identifier>)*) (transition)?
+//		   | <Identifier> "." <Identifier>
+//         | (state | <Identifier>) (transition)?
 AtomNode atom(): {
 	Token token = null;
 	Token attribute;
@@ -254,7 +255,7 @@ MethCallNode methCall(): {
     { node.identifier = identifier; return node; }
 }
 
-// range -> "[" <Char> ("-" <Char)? ("," <Char> ("-" <Char)?)* "]" ("+" (range | <Identifier>))*
+// range -> "[" <Char> ("-" <Char)? ("," <Char> ("-" <Char)?)* "]"
 RangeLitNode range(): {
     RangeLitNode node = new RangeLitNode();
     RangeLitNode additionRange = null;
@@ -274,7 +275,7 @@ RangeLitNode range(): {
     { return node; }
 }
 
-// state -> "$" <String> ("^" (<Integer> | <Identifier>))?
+// state -> "$" <StringLiteral> ("^" (<IntegerLiteral> | <Identifier>))?
 StateLitNode state(): {
 	Token label, accept = null;
   } {
@@ -342,7 +343,7 @@ SumExprNode sumExpr(): {
     { return new SumExprNode(a, op, b); }
 }
 
-// prodExpr -> intersectionExpr (("*" | "/") intersectionExpr)?
+// prodExpr -> intersectionExpr (("*" | "/" | "%") intersectionExpr)?
 ProdExprNode prodExpr(): {
     IntersectionExprNode a;
     IntersectionExprNode b = null;
