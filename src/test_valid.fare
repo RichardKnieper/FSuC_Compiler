@@ -40,4 +40,7 @@ Set<Transition> s2 = fa.transitions($"Erster");
 
 Transition transition2 = state - - k - - > $"End"^b;
 
+int durch = 10 / 2;
+RA regex = §a*b(13)?['b','c']§;
+
 return fa + transition2;

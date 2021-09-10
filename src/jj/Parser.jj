@@ -1,6 +1,7 @@
 options {
     STATIC = false;
     DEBUG_PARSER = true;
+    UNICODE_INPUT = true;
 }
 
 PARSER_BEGIN(Parser)
@@ -23,9 +24,9 @@ TOKEN : {
     | <CharLiteral : "'" ["A"-"Z", "a"-"z", "?", "!"] "'">
     | <StringLiteral : "\"" ["A"-"Z", "a"-"z", "_"](["A"-"Z", "a"-"z", "_", "0"-"9"])* "\"">
     | <IntegerLiteral : "0" | (["1"-"9"] (["0"-"9"])*)>
-    | <RegexLiteral : "/" (["A"-"Z"] | ["a"-"z"] | ["0"-"9"] | "(" | ")" | "[" | "]" | "+" | "*" | "|" | "?" | "-")+ "/">
     | <Identifier : ["A"-"Z", "a"-"z", "_"](["A"-"Z", "a"-"z", "_", "0" - "9"])*>
     | <Arrow : "- - >" | "-- >" | "- ->" | "-->">
+    | <RegexBracket : "§">
 }
 
 SKIP : {
@@ -196,6 +197,7 @@ AtomNode atom(): {
     | atom = array() { return atom; }
     | atom = range() { return atom; }
     | atom = fa() { return atom; }
+    | atom = regex() { return atom; }
     | LOOKAHEAD(4) (LOOKAHEAD(2) token = <Identifier> ".")? methCall = methCall() {
         if (token == null) {
             return methCall;
@@ -215,6 +217,46 @@ AtomNode atom(): {
             return new TransitionLitWithStartNode(token, state, transition);
         }
     }
+}
+
+RegexLitNode regex(): {
+    RegexOrLitNode regex;
+} {
+    <RegexBracket> regex = regexOr() <RegexBracket>
+    { return new RegexLitNode(regex); }
+}
+
+RegexOrLitNode regexOr(): {
+    RegexOrLitNode node = new RegexOrLitNode();
+    RegexConcatLitNode temp;
+} {
+    temp = regexConcat() { node.regexList.add(temp); } ("|" temp = regexConcat() {  node.regexList.add(temp); })*
+    { return node; }
+}
+
+RegexConcatLitNode regexConcat(): {
+    RegexConcatLitNode node = new RegexConcatLitNode();
+    RegexOptionLitNode temp;
+} {
+    temp = regexOption() { node.regexList.add(temp); } (temp = regexOption() { node.regexList.add(temp); } )*
+    { return node; }
+}
+
+RegexOptionLitNode regexOption(): {
+    RegexAtomLitNode regex;
+    Token op = null;
+} {
+    regex = regexAtom() (op="*" | op="?" | op="+")?
+    { return new RegexOptionLitNode(regex, op); }
+}
+
+RegexAtomLitNode regexAtom(): {
+    RangeLitNode range = null;
+    RegexOrLitNode bracketed = null;
+    Token s = null;
+} {
+    "(" bracketed = regexOr() ")" | range = range() | "\"" s = <Identifier> "\""
+    { return new RegexAtomLitNode(range, bracketed, s); }
 }
 
 // set -> "{" atom ("," atom)* "}"
