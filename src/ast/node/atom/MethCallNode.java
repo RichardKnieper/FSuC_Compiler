@@ -16,6 +16,10 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * Represents a method call. identifier is the name of the method and elementList contains the parameters of the
+ * method call.
+ */
 public class MethCallNode extends AtomNode {
 	public Token identifier;
 	public List<AtomNode> elementList = new LinkedList<>();
@@ -85,9 +89,9 @@ public class MethCallNode extends AtomNode {
 				.sorted(Comparator.comparingInt(ParamWrapper::getIndex))
 				.forEach(wrapper -> {
 					Value v = elementList.get(wrapper.getIndex()).run(tabelle);
-					VarDeclNode node = new VarDeclNode(new TypeNode(v.type), wrapper.getIndentifier(), null);
+					VarDeclNode node = new VarDeclNode(new TypeNode(v.type), wrapper.getIdentifier(), null);
 					node.value = v;
-					neuTabelle.add(wrapper.getIndentifier().image, node);
+					neuTabelle.add(wrapper.getIdentifier().image, node);
 				});
 		return methDecl.body.run(neuTabelle);
 	}

@@ -4,6 +4,11 @@ import ast.VariableType;
 
 import java.util.Map;
 
+/**
+ * Represents the return value of a statement/expression when a map is returned. Used when interpreting the AST.
+ * @param <K> Type of the keys .
+ * @param <V> Type of the values.
+ */
 public class MapValue<K, V> extends Value {
     Map<K, V> map;
 

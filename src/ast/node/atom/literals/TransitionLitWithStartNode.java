@@ -14,7 +14,11 @@ import jj.Token;
 
 import java.util.List;
 
+/**
+ * Uses TransitionLitNode and a start State to represent a Transition.
+ */
 public class TransitionLitWithStartNode extends AtomNode {
+	// either identifier or not is set; the other is null
 	public Token startStateIdentifier;
 	public StateLitNode startState;
 	public TransitionLitNode transitionLitNode;

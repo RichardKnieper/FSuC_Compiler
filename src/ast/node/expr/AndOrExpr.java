@@ -8,6 +8,9 @@ import jj.Token;
 
 import java.util.List;
 
+/**
+ * Represents 'and' (&&) and 'or' (||) expressions for boolean logic.
+ */
 public class AndOrExpr extends ExprNode {
 	public CompExprNode expr;
 	public Token op;

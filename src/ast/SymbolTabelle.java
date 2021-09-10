@@ -4,8 +4,11 @@ import ast.node.decl.DeclNode;
 
 import java.util.HashMap;
 
+/**
+ * Saves variables and method definitions.
+ * Parent is null for global scope. Bracket statement nodes or method calls create a new SymbolTabelle and set the parent.
+ */
 public class SymbolTabelle {
-
 	SymbolTabelle parent;
 	HashMap<String, DeclNode> table = new HashMap<>();
 

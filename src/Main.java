@@ -9,7 +9,7 @@ import java.io.FileReader;
 
 public class Main {
 
-    public static void main(String[] args) throws ParseException, FileNotFoundException {
+    public static void main(String[] args) {
         if (args.length <= 0) {
             System.out.println("You need to specify a file.");
             return;

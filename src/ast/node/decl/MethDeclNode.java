@@ -13,6 +13,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Represents a method declaration.
+ */
 public class MethDeclNode extends DeclNode {
 	public Map<Token, ParamWrapper> params = new HashMap<>();
 	public StmntNode body = null;
@@ -47,24 +50,24 @@ public class MethDeclNode extends DeclNode {
 				.map(param -> param.getType().semantischeAnalyse(neueTabelle, errors))
 				.anyMatch(type -> type == VariableType.errorT);
 		if (paramTypeContainsError) {
-			errors.add(new CompilerError("Error: " + methodName + " has an error in its paramter declerations in line: "
+			errors.add(new CompilerError("Error: " + methodName + " has an error in its parameter declarations in line: "
 					+ neueTabelle.find(methodName).identifier.beginLine));
 			addedError = true;
 		}
 
 		boolean duplicateParamNames = params.values()
 				.stream()
-				.map(param -> param.getIndentifier().image)
+				.map(param -> param.getIdentifier().image)
 				.distinct()
 				.count() < params.size();
 		if (duplicateParamNames) {
 			errors.add(new CompilerError("Error: Parameter identifiers must be unique in line: "
-					+ params.values().iterator().next().getIndentifier().beginLine));
+					+ params.values().iterator().next().getIdentifier().beginLine));
 			addedError = true;
 		}
 
 		params.values().forEach(paramWrapper ->
-				neueTabelle.add(paramWrapper.getIndentifier().image, new DeclNode(paramWrapper.getType(), paramWrapper.getIndentifier())));
+				neueTabelle.add(paramWrapper.getIdentifier().image, new DeclNode(paramWrapper.getType(), paramWrapper.getIdentifier())));
 
 		VariableType bodyType = body.semantischeAnalyse(neueTabelle, errors);
 		if (bodyType == VariableType.errorT) {

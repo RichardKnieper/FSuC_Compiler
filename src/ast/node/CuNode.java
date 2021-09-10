@@ -11,6 +11,11 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+/**
+ * Contains a list of all declarations and statements of the script
+ * Starts syntax check and interpreter methods.
+ * Checks if last statement is a return statement and if it returns a {@link domain.FiniteAutomata}.
+ */
 public class CuNode extends Node {
     public List<Node> declOrStmntList = new LinkedList<>();
 

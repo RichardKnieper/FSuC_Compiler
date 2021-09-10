@@ -8,6 +8,9 @@ import ast.value.Value;
 
 import java.util.List;
 
+/**
+ * Represents a return statement.
+ */
 public class ReturnStmntNode extends StmntNode {
 	public ExprNode expr;
 

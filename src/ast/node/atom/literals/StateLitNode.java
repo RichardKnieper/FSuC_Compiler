@@ -12,6 +12,9 @@ import jj.Token;
 
 import java.util.List;
 
+/**
+ * Represents the creation of a {@link State}.
+ */
 public class StateLitNode extends AtomNode {
     public Token label, accept;
 

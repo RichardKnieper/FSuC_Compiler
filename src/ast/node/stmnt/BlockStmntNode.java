@@ -10,6 +10,12 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * Represents a block statement inside of curly brackets ('{' and '}').
+ * The statement creates a new {@link SymbolTabelle} for the statements that it includes. This allows variables to
+ * scope only to this block. It also allows the definition of a variable with an identifier that already exists without
+ * overwriting the global variable or variable of a parent block statement.
+ */
 public class BlockStmntNode extends StmntNode {
 	public List<Node> declOrStmntList = new LinkedList<>();
 

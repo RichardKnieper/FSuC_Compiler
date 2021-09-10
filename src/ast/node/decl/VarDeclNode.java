@@ -10,6 +10,9 @@ import jj.Token;
 
 import java.util.List;
 
+/**
+ * Represents declaration and initialization of variable.
+ */
 public class VarDeclNode extends DeclNode {
     public ExprNode expr;
 

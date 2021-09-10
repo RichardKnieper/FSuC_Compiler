@@ -9,6 +9,9 @@ import jj.Token;
 
 import java.util.List;
 
+/**
+ * Represents the substraction or addition via the pre or post expressions '++' and '--'.
+ */
 public class PreOrPostIncrementExprNode extends ExprNode {
 	public AtomNode atom;
 	public Token pre;

@@ -7,6 +7,9 @@ import ast.value.Value;
 
 import java.util.List;
 
+/**
+ * Represents expression in brackets.
+ */
 public class BracketExpr extends ExprNode {
 	public ExprNode expr;
 

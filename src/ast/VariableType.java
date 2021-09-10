@@ -1,7 +1,11 @@
 package ast;
 
+/**
+ * Represents the Type a variable can have.
+ */
 @SuppressWarnings("InstantiationOfUtilityClass")
-public class VariableType { // TODO find better name
+public class VariableType {
+	// possible types a variable can have or return types a method can have
 	public static VariableType booleanT = new VariableType();
 	public static VariableType stringT = new VariableType();
 	public static VariableType charT = new VariableType();
@@ -11,11 +15,14 @@ public class VariableType { // TODO find better name
 	public static VariableType stateT = new VariableType();
 	public static VariableType faT = new VariableType();
 	public static VariableType raT = new VariableType();
-	public static VariableType errorT = new VariableType();
 
+	public static VariableType errorT = new VariableType(); // needed for semantic analysis
 	public static VariableType noReturnType = new VariableType(); // needed for semantic analyses
 	public static VariableType identifier = new VariableType(); // needed for interpreter
 
+	/**
+	 * Represents the type of an array that contains values of a given {@link VariableType}.
+	 */
 	public static class ArrayVariableType extends VariableType {
 		public VariableType variableType;
 		public ArrayVariableType(VariableType variableType) {
@@ -23,7 +30,10 @@ public class VariableType { // TODO find better name
 			this.variableType = variableType;
 		}
 	}
-	
+
+	/**
+	 * Represents the type of a set that contains values of a given {@linke VariableType}.
+	 */
 	public static class SetVariableType extends VariableType {
 		public VariableType variableType;
 		public SetVariableType(VariableType variableType) {
@@ -31,7 +41,10 @@ public class VariableType { // TODO find better name
 			this.variableType = variableType;
 		}
 	}
-	
+
+	/**
+	 * Represents the type of a map that maps keys of a given {@linke VariableType} to values of a given {@linke VariableType}.
+	 */
 	public static class MapVariableType extends VariableType {
 		public VariableType keyVariableType;
 		public VariableType valueVariableType;

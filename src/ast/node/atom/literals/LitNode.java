@@ -10,6 +10,9 @@ import jj.Token;
 
 import java.util.List;
 
+/**
+ * Literal node for primitive data types and String.
+ */
 public class LitNode extends AtomNode {
     public Token token;
 

@@ -7,6 +7,11 @@ import ast.value.Value;
 
 import java.util.List;
 
+/**
+ * Represents an if statement.
+ * Semantic analysis checks for errors in all statements.
+ * Interpreter only executes if or else statement depending on the value of the condition.
+ */
 public class IfStmntNode extends StmntNode {
 	public StmntNode ifExpr, ifStmnt, elseStmnt;
 
@@ -23,20 +28,22 @@ public class IfStmntNode extends StmntNode {
 
 	public VariableType semantischeAnalyse(SymbolTabelle tabelle, List<CompilerError> errors) {
 		VariableType ifExprVariable = ifExpr.semantischeAnalyse(tabelle, errors);
-		if (ifExprVariable == VariableType.errorT) {
-            return VariableType.errorT;
-        }
-		
-		if(ifExprVariable.hasSameTypeAs(VariableType.booleanT)) {
-			ifStmnt.semantischeAnalyse(tabelle, errors);
-			if (elseStmnt != null)
-				elseStmnt.semantischeAnalyse(tabelle, errors);
-			return VariableType.noReturnType;
-		}
-		else {
+		VariableType ifStmntType = ifStmnt.semantischeAnalyse(tabelle, errors);
+
+		if (!ifExprVariable.isError() && !ifExprVariable.hasSameTypeAs(VariableType.booleanT)) {
 			errors.add(new CompilerError("Error: IF-condition must be boolean"));
 			return VariableType.errorT;
-		}	
+		}
+		VariableType elseStmtType = null;
+		if (elseStmnt != null) {
+			elseStmtType = elseStmnt.semantischeAnalyse(tabelle, errors);
+		}
+
+		if (ifExprVariable.isError() || ifStmntType.isError() || (elseStmtType != null && elseStmtType.isError())) {
+			return VariableType.errorT;
+		} else {
+			return VariableType.noReturnType;
+		}
 	}
 
 	@SuppressWarnings("DuplicatedCode")

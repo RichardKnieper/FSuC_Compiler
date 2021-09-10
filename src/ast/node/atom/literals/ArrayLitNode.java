@@ -11,6 +11,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * Represents the creation of an array.
+ */
 public class ArrayLitNode extends AtomNode {
 	public List<AtomNode> elementList = new LinkedList<>();
 

@@ -14,9 +14,14 @@ import jj.Token;
 
 import java.util.List;
 
+/**
+ * Represents the declaration or a variable without initialization.
+ */
 public class DeclNode extends Node {
 	public TypeNode type;
 	public Token identifier;
+
+	// stored value for interpreter
 	public Value value = null;
 
 	public DeclNode(TypeNode type, Token identifier) {
@@ -43,6 +48,9 @@ public class DeclNode extends Node {
 		}
 	}
 
+	/**
+	 * Initializes the variable with a default value.
+	 */
 	@Override
 	public Value run(SymbolTabelle tabelle) {
 		VariableType t = this.type.variableType;

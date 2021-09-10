@@ -7,6 +7,9 @@ import ast.value.Value;
 
 import java.util.List;
 
+/**
+ * Generic node of the AST.
+ */
 abstract public class Node {
     public abstract String toString(String indent);
 

@@ -3,10 +3,13 @@ package ast;
 import ast.node.type.TypeNode;
 import jj.Token;
 
+/**
+ * Wraps the parameters of a method definition to store the name and type of a parameter at a given index.
+ */
 public class ParamWrapper{
 	int index;
 	TypeNode type;
-	Token indentifier;
+	Token identifier;
 	
 	public int getIndex() {
 		return index;
@@ -16,19 +19,20 @@ public class ParamWrapper{
 		return type;
 	}
 	
-	public Token getIndentifier() {
-		return indentifier;
+	public Token getIdentifier() {
+		return identifier;
 	}
-	public ParamWrapper(int index, TypeNode type, Token indentifier) {
+
+	public ParamWrapper(int index, TypeNode type, Token identifier) {
 		super();
 		this.index = index;
 		this.type = type;
-		this.indentifier = indentifier;
+		this.identifier = identifier;
 	}
 	
 	@Override
 	public String toString() {
-		return index + indentifier.image;
+		return index + identifier.image;
 		
 	}
 	

@@ -10,6 +10,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Represents the creation of a map.
+ */
 public class MapLitNode extends AtomNode {
     public Map<AtomNode, AtomNode> elements = new HashMap<>();
     public VariableType keyType, valueType;

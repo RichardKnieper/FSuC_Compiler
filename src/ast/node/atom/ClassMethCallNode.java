@@ -17,6 +17,11 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+/**
+ * Represents the method call of an object.
+ * objectIdentifier represents the name of the object. methCallNode contains the name of the method and a list of parameters.
+ * If the object has no method by that name error messages are added.
+ */
 public class ClassMethCallNode extends AtomNode {
     public Token objectIdentifier;
     public MethCallNode methCallNode;
@@ -127,10 +132,9 @@ public class ClassMethCallNode extends AtomNode {
                         return VariableType.booleanT;
                     }
                 }
-            } else {
-                errors.add(new CompilerError("Error: can not call method " + method + " on class " + type
-                        + " in line " + objectIdentifier.beginLine));
             }
+            errors.add(new CompilerError("Error: can not call method " + method + " on class " + type
+                    + " in line " + objectIdentifier.beginLine));
         }
 
         return VariableType.errorT;
@@ -158,7 +162,7 @@ public class ClassMethCallNode extends AtomNode {
         } else if (type.hasSameTypeAs(VariableType.rangeT)) {
             if (method.contains("isEmpty")) {
                 return new Value(element.r.isEmpty());
-            } else if (method.equals("contains")) { // contains(car)
+            } else if (method.equals("contains")) { // contains(char)
                 char c = methCallNode.elementList.get(0).run(tabelle).c;
                 boolean contains = element.r
                         .getElement()
@@ -180,7 +184,7 @@ public class ClassMethCallNode extends AtomNode {
                 return new SetValue<>(transitions, VariableType.transitionT);
             }
         } else if (type.isArrayType()) {
-            if (method.equals("get")) {
+            if (method.equals("get")) { // only for primitive data types and String
                 int i = methCallNode.elementList.get(0).run(tabelle).i;
                 try {
                     Object arrayValue = ((ArrayValue) element).get(i);
@@ -216,7 +220,7 @@ public class ClassMethCallNode extends AtomNode {
                 return new Value(((SetValue) element).contains(p.string));
             }
         } else if (type.isMapType()) {
-            if (method.equals("get")) {
+            if (method.equals("get")) { // only for primitive data types and String
                 Value p = methCallNode.elementList.get(0).run(tabelle);
                 if (((VariableType.MapVariableType) type).keyVariableType.hasSameTypeAs(VariableType.booleanT)) {
                     if (((VariableType.MapVariableType) type).valueVariableType.hasSameTypeAs(VariableType.booleanT)) {
@@ -259,7 +263,7 @@ public class ClassMethCallNode extends AtomNode {
                         return new Value((String) ((MapValue) element).get(p.string));
                     }
                 }
-            } else if (method.equals("containsKey")) {
+            } else if (method.equals("containsKey")) { // only for primitive data types and String
                 Value p = methCallNode.elementList.get(0).run(tabelle);
                 if (((VariableType.MapVariableType) type).keyVariableType.hasSameTypeAs(VariableType.booleanT)) {
                     return new Value(((MapValue) element).containsKey(p.b));

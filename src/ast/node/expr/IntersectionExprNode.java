@@ -9,6 +9,9 @@ import domain.Range;
 
 import java.util.List;
 
+/**
+ * Represents the intersection of two ranges.
+ */
 public class IntersectionExprNode extends ExprNode {
     public PreOrPostIncrementExprNode a;
     public PreOrPostIncrementExprNode b;

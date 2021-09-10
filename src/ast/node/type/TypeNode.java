@@ -8,6 +8,9 @@ import ast.value.Value;
 
 import java.util.List;
 
+/**
+ * Represents the type definition of a variable.
+ */
 public class TypeNode extends Node {
 	public VariableType variableType;
 

@@ -8,6 +8,9 @@ import jj.Token;
 
 import java.util.List;
 
+/**
+ * Represents comparison of values with '!=', '==', '>', '<', '>=' and '<=' operators.
+ */
 @SuppressWarnings("DuplicatedCode")
 public class CompExprNode extends ExprNode {
     public SumExprNode expr;

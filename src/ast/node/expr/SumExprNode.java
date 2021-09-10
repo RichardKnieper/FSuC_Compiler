@@ -11,6 +11,9 @@ import jj.Token;
 
 import java.util.List;
 
+/**
+ * Represents addition and subtraction of integers, union or two ranges and addition of a transition to a finite automata.
+ */
 public class SumExprNode extends ExprNode {
 	public ProdExprNode expr;
 	public Token op;

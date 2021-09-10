@@ -12,6 +12,10 @@ import jj.Token;
 
 import java.util.List;
 
+/**
+ * Represents the reading of a class attribute. classIdentifier is the name of the object and attributeIdentifier the
+ * name of the attribute. If the class of the object has no attributes by that name error messages are added.
+ */
 public class ReadClassAttributeNode extends AtomNode {
 	Token classIdentifier, attributeIdentifier;
 

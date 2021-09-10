@@ -8,6 +8,9 @@ import jj.Token;
 
 import java.util.List;
 
+/**
+ * Represents multiplication, division and modulo calculation of two integers.
+ */
 public class ProdExprNode extends ExprNode {
 	public IntersectionExprNode expr;
 	public Token op;

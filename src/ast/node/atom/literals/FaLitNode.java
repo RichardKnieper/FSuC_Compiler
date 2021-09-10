@@ -13,6 +13,9 @@ import jj.Token;
 import java.util.LinkedList;
 import java.util.List;
 
+/**
+ * Represents the creation of a {@link FiniteAutomata}.
+ */
 public class FaLitNode extends AtomNode {
 	public StateLitNode startState;
 	public Token startStateIdentifier;

@@ -10,8 +10,12 @@ import jj.Token;
 
 import java.util.List;
 
-// Only exists when encapsulated by TransitionLitWithStartNode
+/**
+ * This class only exists in the AST if encapsulated by TransitionLitWithStartNode.
+ * It represents the range and end state of a Transition.
+ */
 public class TransitionLitNode extends AtomNode {
+	// if rangeIdentifier and range are null the Transition is an EpsilonTransition
 	public Token rangeIdentifier, endStateIdentifier;
 	public RangeLitNode range;
 	public StateLitNode endState;

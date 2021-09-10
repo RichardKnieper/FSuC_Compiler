@@ -11,6 +11,9 @@ import jj.Token;
 
 import java.util.List;
 
+/**
+ * Represents the (re-)assignment of a variable.
+ */
 public class AssignStmntNode extends StmntNode {
     Token identifier;
     ExprNode expr;

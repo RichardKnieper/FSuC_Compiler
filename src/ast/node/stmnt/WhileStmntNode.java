@@ -7,6 +7,9 @@ import ast.value.Value;
 
 import java.util.List;
 
+/**
+ * Represents a while statement.
+ */
 public class WhileStmntNode extends StmntNode {
 	public StmntNode whileExpr, whileStmnt;
 

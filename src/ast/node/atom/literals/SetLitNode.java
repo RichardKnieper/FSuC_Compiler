@@ -12,6 +12,9 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+/**
+ * Represents the creation of a set.
+ */
 public class SetLitNode extends AtomNode {
 	public List<AtomNode> elementList = new LinkedList<>();
 

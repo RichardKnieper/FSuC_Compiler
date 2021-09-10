@@ -13,6 +13,10 @@ import jj.Token;
 import java.util.LinkedList;
 import java.util.List;
 
+/**
+ * Represents the creation of a {@link Range}.
+ * Also represents the addition of other ranges in the same expression.
+ */
 public class RangeLitNode extends AtomNode {
 	public List<RangeWrapper> rangeWrappers = new LinkedList<>();
 

@@ -4,6 +4,10 @@ import ast.VariableType;
 import domain.*;
 import jj.Token;
 
+/**
+ * Represents the return value of a statement/expression. Used when interpreting the AST.
+ * VariableType defines the type and therefore what attribute contains the value. All other attributes are set to null.
+ */
 public class Value {
     public VariableType type;
     public boolean b;
