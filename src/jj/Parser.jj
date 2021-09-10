@@ -26,7 +26,8 @@ TOKEN : {
     | <IntegerLiteral : "0" | (["1"-"9"] (["0"-"9"])*)>
     | <Identifier : ["A"-"Z", "a"-"z", "_"](["A"-"Z", "a"-"z", "_", "0" - "9"])*>
     | <Arrow : "- - >" | "-- >" | "- ->" | "-->">
-    | <RegexBracket : "ยง">
+    | <RegexBracket : "ง">
+    
 }
 
 SKIP : {
@@ -219,6 +220,7 @@ AtomNode atom(): {
     }
 }
 
+// regex -> "ง" regexOr "ง"
 RegexLitNode regex(): {
     RegexOrLitNode regex;
 } {
@@ -226,6 +228,7 @@ RegexLitNode regex(): {
     { return new RegexLitNode(regex); }
 }
 
+// regexOr -> regexConcat (|regexConcat)*
 RegexOrLitNode regexOr(): {
     RegexOrLitNode node = new RegexOrLitNode();
     RegexConcatLitNode temp;
@@ -234,6 +237,8 @@ RegexOrLitNode regexOr(): {
     { return node; }
 }
 
+
+// regexConcat -> regexOption (regexOption)*
 RegexConcatLitNode regexConcat(): {
     RegexConcatLitNode node = new RegexConcatLitNode();
     RegexOptionLitNode temp;
@@ -242,6 +247,7 @@ RegexConcatLitNode regexConcat(): {
     { return node; }
 }
 
+// regexOption -> regexAtom ("*"|"?"|"+")*
 RegexOptionLitNode regexOption(): {
     RegexAtomLitNode regex;
     Token op = null;
@@ -250,12 +256,13 @@ RegexOptionLitNode regexOption(): {
     { return new RegexOptionLitNode(regex, op); }
 }
 
+// regexAtom -> "(" regexOr ")" | range |  String
 RegexAtomLitNode regexAtom(): {
     RangeLitNode range = null;
     RegexOrLitNode bracketed = null;
     Token s = null;
 } {
-    "(" bracketed = regexOr() ")" | range = range() | "\"" s = <Identifier> "\""
+    (      "(" bracketed = regexOr() ")" | range = range() | <StringLiteral> )
     { return new RegexAtomLitNode(range, bracketed, s); }
 }
 
@@ -359,10 +366,15 @@ ExprNode expr(): {
     CompExprNode a;
     CompExprNode b = null;
     Token op = null;
+     RegexOrLitNode regex;
 } {
     "(" node = expr() ")" { return new BracketExpr(node); }
+    |  LOOKAHEAD(2) <RegexBracket> regex = regexOr() <RegexBracket> { return new RegexLitNode(regex); }
     | a = compExpr() ((op = "&&" | op = "||") b = compExpr())? { return new AndOrExpr(a, op, b); }
 }
+
+
+
 
 // compExpr -> sumExpr (("=="|"!="|"<="|">="|"<"|">") sumExpr)?
 CompExprNode compExpr(): {
