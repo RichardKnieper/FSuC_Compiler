@@ -10,12 +10,33 @@ import java.io.FileReader;
 public class Main {
 
     public static void main(String[] args) throws ParseException, FileNotFoundException {
-        Parser parser = new Parser(new FileReader("src/test_valid.fare"));
-        CuNode ast = parser.cu();
-        VariableType returnType = ast.semantischeAnalyse();
-        if (!returnType.isError())  {
-            Value result = ast.run();
-            System.out.println(result.fa.toString());
+        if (args.length <= 0) {
+            System.out.println("You need to specify a file.");
+            return;
+        }
+        FileReader fr;
+        try {
+            fr = new FileReader(args[0]);
+        } catch (FileNotFoundException fnf) {
+            System.out.println("File not found.");
+            return;
+        }
+
+        Parser parser = new Parser(fr);
+        try {
+            CuNode ast = parser.cu();
+            VariableType returnType = ast.semantischeAnalyse();
+            if (!returnType.isError()) {
+                try {
+                    Value result = ast.run();
+                    System.out.println(result.fa.toString());
+                } catch (RuntimeException exception) {
+                    System.out.println(exception.getMessage());
+                }
+            }
+        } catch (ParseException exception) {
+            System.out.println("The syntax has errors.");
+            exception.printStackTrace();
         }
     }
 }

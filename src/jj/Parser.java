@@ -23,363 +23,181 @@ public class Parser implements ParserConstants {
 // Parser
 
 // CU -> (decl | stmnt)*
-  final public CuNode cu() throws ParseException {
-    trace_call("cu");
-    try {
-CuNode node = new CuNode();
+  final public CuNode cu() throws ParseException {CuNode node = new CuNode();
         Node declOrStmnt;
-      label_1:
-      while (true) {
-        switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
-        case 6:
-        case 7:
-        case 11:
-        case 16:
-        case 19:
-        case 21:
-        case 23:
-        case 25:
-        case 27:
-        case 28:
-        case 30:
-        case 32:
-        case 33:
-        case Type:
-        case 35:
-        case 36:
-        case BoolLiteral:
-        case CharLiteral:
-        case StringLiteral:
-        case IntegerLiteral:
-        case Identifier:{
-          ;
-          break;
-          }
-        default:
-          jj_la1[0] = jj_gen;
-          break label_1;
-        }
-        switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
-        case Type:
-        case 35:
-        case 36:{
-          declOrStmnt = decl();
-          break;
-          }
-        case 6:
-        case 7:
-        case 11:
-        case 16:
-        case 19:
-        case 21:
-        case 23:
-        case 25:
-        case 27:
-        case 28:
-        case 30:
-        case 32:
-        case 33:
-        case BoolLiteral:
-        case CharLiteral:
-        case StringLiteral:
-        case IntegerLiteral:
-        case Identifier:{
-          declOrStmnt = stmnt();
-          break;
-          }
-        default:
-          jj_la1[1] = jj_gen;
-          jj_consume_token(-1);
-          throw new ParseException();
-        }
-node.declOrStmntList.add(declOrStmnt);
-      }
-{if ("" != null) return node;}
-    throw new Error("Missing return statement in function");
-    } finally {
-      trace_return("cu");
-    }
-}
-
-// decl -> type() <Identifier> (varDecl | methDecl | ";")
-  final public DeclNode decl() throws ParseException {
-    trace_call("decl");
-    try {
-Token identifier;
-        TypeNode type;
-        DeclNode node = null;
-      type = type();
-      identifier = jj_consume_token(Identifier);
+    label_1:
+    while (true) {
       switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
-      case 13:{
-        node = varDecl(type, identifier);
-        break;
-        }
-      case 21:{
-        node = methDecl(type, identifier);
-        break;
-        }
-      case 27:{
-        jj_consume_token(27);
+      case 6:
+      case 7:
+      case 11:
+      case 16:
+      case 19:
+      case 21:
+      case 23:
+      case 25:
+      case 27:
+      case 28:
+      case 30:
+      case 32:
+      case 33:
+      case Type:
+      case 35:
+      case 36:
+      case BoolLiteral:
+      case CharLiteral:
+      case StringLiteral:
+      case IntegerLiteral:
+      case Identifier:{
+        ;
         break;
         }
       default:
-        jj_la1[2] = jj_gen;
-        jj_consume_token(-1);
-        throw new ParseException();
+        jj_la1[0] = jj_gen;
+        break label_1;
       }
-{if ("" != null) return node == null ? new DeclNode(type, identifier) : node;}
-    throw new Error("Missing return statement in function");
-    } finally {
-      trace_return("decl");
-    }
-}
-
-// varDecl -> "=" expr ";"
-  final public VarDeclNode varDecl(TypeNode type, Token identifier) throws ParseException {
-    trace_call("varDecl");
-    try {
-ExprNode expr;
-      jj_consume_token(13);
-      expr = expr();
-      jj_consume_token(27);
-{if ("" != null) return new VarDeclNode(type, identifier, expr);}
-    throw new Error("Missing return statement in function");
-    } finally {
-      trace_return("varDecl");
-    }
-}
-
-// methDecl -> "(" (type <Identifier> ("," type <Identifier>)*)? ")" stmnt
-  final public MethDeclNode methDecl(TypeNode type, Token identifier) throws ParseException {
-    trace_call("methDecl");
-    try {
-MethDeclNode node = new MethDeclNode(type, identifier);
-        TypeNode firstType, lastType;
-        Token firstIdentifier, lastIdentifier;
-        StmntNode body;
-        int countIndex = 1;
-      jj_consume_token(21);
       switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
       case Type:
       case 35:
       case 36:{
-        firstType = type();
-        firstIdentifier = jj_consume_token(Identifier);
-        label_2:
-        while (true) {
-          switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
-          case 14:{
-            ;
-            break;
-            }
-          default:
-            jj_la1[3] = jj_gen;
-            break label_2;
-          }
-          jj_consume_token(14);
-          lastType = type();
-          lastIdentifier = jj_consume_token(Identifier);
-node.params.put(lastIdentifier, new ParamWrapper(countIndex++,lastType,lastIdentifier));
+        declOrStmnt = decl();
+        break;
         }
-node.params.put(firstIdentifier, new ParamWrapper(0,firstType,firstIdentifier));
+      case 6:
+      case 7:
+      case 11:
+      case 16:
+      case 19:
+      case 21:
+      case 23:
+      case 25:
+      case 27:
+      case 28:
+      case 30:
+      case 32:
+      case 33:
+      case BoolLiteral:
+      case CharLiteral:
+      case StringLiteral:
+      case IntegerLiteral:
+      case Identifier:{
+        declOrStmnt = stmnt();
         break;
         }
       default:
-        jj_la1[4] = jj_gen;
-        ;
+        jj_la1[1] = jj_gen;
+        jj_consume_token(-1);
+        throw new ParseException();
       }
-      jj_consume_token(22);
-      body = stmnt();
-node.body = body; {if ("" != null) return node;}
-    throw new Error("Missing return statement in function");
-    } finally {
-      trace_return("methDecl");
+node.declOrStmntList.add(declOrStmnt);
     }
-}
-
-// stmnt -> returnStmnt | ifStmnt | whileStmnt | blockStmnt | expr | ";"
-  final public StmntNode stmnt() throws ParseException {
-    trace_call("stmnt");
-    try {
-StmntNode node = null;
-      switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
-      case 33:{
-        node = returnStmnt();
-        break;
-        }
-      case 30:{
-        node = ifStmnt();
-        break;
-        }
-      case 32:{
-        node = whileStmnt();
-        break;
-        }
-      default:
-        jj_la1[5] = jj_gen;
-        if (jj_2_1(3)) {
-          node = blockStmnt();
-        } else if (jj_2_2(2)) {
-          node = assignStmnt();
-        } else {
-          switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
-          case 6:
-          case 7:
-          case 11:
-          case 16:
-          case 19:
-          case 21:
-          case 23:
-          case 25:
-          case 28:
-          case BoolLiteral:
-          case CharLiteral:
-          case StringLiteral:
-          case IntegerLiteral:
-          case Identifier:{
-            node = expr();
-            break;
-            }
-          case 27:{
-            jj_consume_token(27);
-            break;
-            }
-          default:
-            jj_la1[6] = jj_gen;
-            jj_consume_token(-1);
-            throw new ParseException();
-          }
-        }
-      }
 {if ("" != null) return node;}
     throw new Error("Missing return statement in function");
-    } finally {
-      trace_return("stmnt");
-    }
 }
 
-// assignStmnt -> <Identifer> = expr ";"
-  final public AssignStmntNode assignStmnt() throws ParseException {
-    trace_call("assignStmnt");
-    try {
-Token identifier;
-    ExprNode expr;
-      identifier = jj_consume_token(Identifier);
-      jj_consume_token(13);
-      expr = expr();
-      jj_consume_token(27);
-{if ("" != null) return new AssignStmntNode(identifier, expr);}
-    throw new Error("Missing return statement in function");
-    } finally {
-      trace_return("assignStmnt");
-    }
-}
-
-// returnStmnt -> "return" expr ";"
-  final public ReturnStmntNode returnStmnt() throws ParseException {
-    trace_call("returnStmnt");
-    try {
-ExprNode expr;
-      jj_consume_token(33);
-      expr = expr();
-      jj_consume_token(27);
-{if ("" != null) return new ReturnStmntNode(expr);}
-    throw new Error("Missing return statement in function");
-    } finally {
-      trace_return("returnStmnt");
-    }
-}
-
-// ifStmnt -> "if" "(" expr ")" stmnt ("else" stmnt)?
-  final public IfStmntNode ifStmnt() throws ParseException {
-    trace_call("ifStmnt");
-    try {
-StmntNode ifExpr, ifStmnt, elseStmnt = null;
-      jj_consume_token(30);
-      jj_consume_token(21);
-      ifExpr = expr();
-      jj_consume_token(22);
-      ifStmnt = stmnt();
-      switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
-      case 31:{
-        jj_consume_token(31);
-        elseStmnt = stmnt();
-        break;
-        }
-      default:
-        jj_la1[7] = jj_gen;
-        ;
+// decl -> type() <Identifier> (varDecl | methDecl | ";")
+  final public DeclNode decl() throws ParseException {Token identifier;
+        TypeNode type;
+        DeclNode node = null;
+    type = type();
+    identifier = jj_consume_token(Identifier);
+    switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
+    case 13:{
+      node = varDecl(type, identifier);
+      break;
       }
-{if ("" != null) return new IfStmntNode(ifExpr,ifStmnt,elseStmnt);}
-    throw new Error("Missing return statement in function");
-    } finally {
-      trace_return("ifStmnt");
+    case 21:{
+      node = methDecl(type, identifier);
+      break;
+      }
+    case 27:{
+      jj_consume_token(27);
+      break;
+      }
+    default:
+      jj_la1[2] = jj_gen;
+      jj_consume_token(-1);
+      throw new ParseException();
     }
+{if ("" != null) return node == null ? new DeclNode(type, identifier) : node;}
+    throw new Error("Missing return statement in function");
 }
 
-// whileStmnt -> "while" "(" expr ")" stmnt
-  final public WhileStmntNode whileStmnt() throws ParseException {
-    trace_call("whileStmnt");
-    try {
-StmntNode whileExpr, whileStmnt;
-      jj_consume_token(32);
-      jj_consume_token(21);
-      whileExpr = expr();
-      jj_consume_token(22);
-      whileStmnt = stmnt();
-{if ("" != null) return new WhileStmntNode(whileExpr,whileStmnt);}
+// varDecl -> "=" expr ";"
+  final public VarDeclNode varDecl(TypeNode type, Token identifier) throws ParseException {
+    ExprNode expr;
+    jj_consume_token(13);
+    expr = expr();
+    jj_consume_token(27);
+{if ("" != null) return new VarDeclNode(type, identifier, expr);}
     throw new Error("Missing return statement in function");
-    } finally {
-      trace_return("whileStmnt");
-    }
 }
 
-// blockStmnt -> "{" (decl | stmnt)* "}"
-  final public BlockStmntNode blockStmnt() throws ParseException {
-    trace_call("blockStmnt");
-    try {
-BlockStmntNode node = new BlockStmntNode();
-        Node declOrStmnt;
-      jj_consume_token(25);
-      label_3:
+// methDecl -> "(" (type <Identifier> ("," type <Identifier>)*)? ")" stmnt
+  final public MethDeclNode methDecl(TypeNode type, Token identifier) throws ParseException {MethDeclNode node = new MethDeclNode(type, identifier);
+        TypeNode firstType, lastType;
+        Token firstIdentifier, lastIdentifier;
+        StmntNode body;
+        int countIndex = 1;
+    jj_consume_token(21);
+    switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
+    case Type:
+    case 35:
+    case 36:{
+      firstType = type();
+      firstIdentifier = jj_consume_token(Identifier);
+      label_2:
       while (true) {
         switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
-        case 6:
-        case 7:
-        case 11:
-        case 16:
-        case 19:
-        case 21:
-        case 23:
-        case 25:
-        case 27:
-        case 28:
-        case 30:
-        case 32:
-        case 33:
-        case Type:
-        case 35:
-        case 36:
-        case BoolLiteral:
-        case CharLiteral:
-        case StringLiteral:
-        case IntegerLiteral:
-        case Identifier:{
+        case 14:{
           ;
           break;
           }
         default:
-          jj_la1[8] = jj_gen;
-          break label_3;
+          jj_la1[3] = jj_gen;
+          break label_2;
         }
+        jj_consume_token(14);
+        lastType = type();
+        lastIdentifier = jj_consume_token(Identifier);
+node.params.put(lastIdentifier, new ParamWrapper(countIndex++,lastType,lastIdentifier));
+      }
+node.params.put(firstIdentifier, new ParamWrapper(0,firstType,firstIdentifier));
+      break;
+      }
+    default:
+      jj_la1[4] = jj_gen;
+      ;
+    }
+    jj_consume_token(22);
+    body = stmnt();
+node.body = body; {if ("" != null) return node;}
+    throw new Error("Missing return statement in function");
+}
+
+// stmnt -> returnStmnt | ifStmnt | whileStmnt | blockStmnt | expr | ";"
+  final public StmntNode stmnt() throws ParseException {StmntNode node = null;
+    switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
+    case 33:{
+      node = returnStmnt();
+      break;
+      }
+    case 30:{
+      node = ifStmnt();
+      break;
+      }
+    case 32:{
+      node = whileStmnt();
+      break;
+      }
+    default:
+      jj_la1[5] = jj_gen;
+      if (jj_2_1(3)) {
+        node = blockStmnt();
+      } else if (jj_2_2(2)) {
+        node = assignStmnt();
+      } else {
         switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
-        case Type:
-        case 35:
-        case 36:{
-          declOrStmnt = decl();
-          break;
-          }
         case 6:
         case 7:
         case 11:
@@ -388,119 +206,218 @@ BlockStmntNode node = new BlockStmntNode();
         case 21:
         case 23:
         case 25:
-        case 27:
         case 28:
-        case 30:
-        case 32:
-        case 33:
         case BoolLiteral:
         case CharLiteral:
         case StringLiteral:
         case IntegerLiteral:
         case Identifier:{
-          declOrStmnt = stmnt();
+          node = expr();
+          break;
+          }
+        case 27:{
+          jj_consume_token(27);
           break;
           }
         default:
-          jj_la1[9] = jj_gen;
+          jj_la1[6] = jj_gen;
           jj_consume_token(-1);
           throw new ParseException();
         }
-node.declOrStmntList.add(declOrStmnt);
       }
-      jj_consume_token(26);
+    }
 {if ("" != null) return node;}
     throw new Error("Missing return statement in function");
-    } finally {
-      trace_return("blockStmnt");
+}
+
+// assignStmnt -> <Identifer> = expr ";"
+  final public AssignStmntNode assignStmnt() throws ParseException {Token identifier;
+    ExprNode expr;
+    identifier = jj_consume_token(Identifier);
+    jj_consume_token(13);
+    expr = expr();
+    jj_consume_token(27);
+{if ("" != null) return new AssignStmntNode(identifier, expr);}
+    throw new Error("Missing return statement in function");
+}
+
+// returnStmnt -> "return" expr ";"
+  final public ReturnStmntNode returnStmnt() throws ParseException {ExprNode expr;
+    jj_consume_token(33);
+    expr = expr();
+    jj_consume_token(27);
+{if ("" != null) return new ReturnStmntNode(expr);}
+    throw new Error("Missing return statement in function");
+}
+
+// ifStmnt -> "if" "(" expr ")" stmnt ("else" stmnt)?
+  final public IfStmntNode ifStmnt() throws ParseException {StmntNode ifExpr, ifStmnt, elseStmnt = null;
+    jj_consume_token(30);
+    jj_consume_token(21);
+    ifExpr = expr();
+    jj_consume_token(22);
+    ifStmnt = stmnt();
+    switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
+    case 31:{
+      jj_consume_token(31);
+      elseStmnt = stmnt();
+      break;
+      }
+    default:
+      jj_la1[7] = jj_gen;
+      ;
     }
+{if ("" != null) return new IfStmntNode(ifExpr,ifStmnt,elseStmnt);}
+    throw new Error("Missing return statement in function");
+}
+
+// whileStmnt -> "while" "(" expr ")" stmnt
+  final public WhileStmntNode whileStmnt() throws ParseException {StmntNode whileExpr, whileStmnt;
+    jj_consume_token(32);
+    jj_consume_token(21);
+    whileExpr = expr();
+    jj_consume_token(22);
+    whileStmnt = stmnt();
+{if ("" != null) return new WhileStmntNode(whileExpr,whileStmnt);}
+    throw new Error("Missing return statement in function");
+}
+
+// blockStmnt -> "{" (decl | stmnt)* "}"
+  final public BlockStmntNode blockStmnt() throws ParseException {BlockStmntNode node = new BlockStmntNode();
+        Node declOrStmnt;
+    jj_consume_token(25);
+    label_3:
+    while (true) {
+      switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
+      case 6:
+      case 7:
+      case 11:
+      case 16:
+      case 19:
+      case 21:
+      case 23:
+      case 25:
+      case 27:
+      case 28:
+      case 30:
+      case 32:
+      case 33:
+      case Type:
+      case 35:
+      case 36:
+      case BoolLiteral:
+      case CharLiteral:
+      case StringLiteral:
+      case IntegerLiteral:
+      case Identifier:{
+        ;
+        break;
+        }
+      default:
+        jj_la1[8] = jj_gen;
+        break label_3;
+      }
+      switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
+      case Type:
+      case 35:
+      case 36:{
+        declOrStmnt = decl();
+        break;
+        }
+      case 6:
+      case 7:
+      case 11:
+      case 16:
+      case 19:
+      case 21:
+      case 23:
+      case 25:
+      case 27:
+      case 28:
+      case 30:
+      case 32:
+      case 33:
+      case BoolLiteral:
+      case CharLiteral:
+      case StringLiteral:
+      case IntegerLiteral:
+      case Identifier:{
+        declOrStmnt = stmnt();
+        break;
+        }
+      default:
+        jj_la1[9] = jj_gen;
+        jj_consume_token(-1);
+        throw new ParseException();
+      }
+node.declOrStmntList.add(declOrStmnt);
+    }
+    jj_consume_token(26);
+{if ("" != null) return node;}
+    throw new Error("Missing return statement in function");
 }
 
 // type -> arrayType | <Type> | setType | mapType
-  final public TypeNode type() throws ParseException {
-    trace_call("type");
-    try {
-TypeNode node = null;
+  final public TypeNode type() throws ParseException {TypeNode node = null;
         Token type = null;
-      if (jj_2_3(2)) {
-        node = arrayType();
-      } else {
-        switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
-        case Type:{
-          type = jj_consume_token(Type);
-          break;
-          }
-        case 35:{
-          node = setType();
-          break;
-          }
-        case 36:{
-          node = mapType();
-          break;
-          }
-        default:
-          jj_la1[10] = jj_gen;
-          jj_consume_token(-1);
-          throw new ParseException();
+    if (jj_2_3(2)) {
+      node = arrayType();
+    } else {
+      switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
+      case Type:{
+        type = jj_consume_token(Type);
+        break;
         }
+      case 35:{
+        node = setType();
+        break;
+        }
+      case 36:{
+        node = mapType();
+        break;
+        }
+      default:
+        jj_la1[10] = jj_gen;
+        jj_consume_token(-1);
+        throw new ParseException();
       }
+    }
 if(type == null) {
             {if ("" != null) return node;}
         } else {
             {if ("" != null) return new TypeNode(VariableType.of(type.image));}
         }
     throw new Error("Missing return statement in function");
-    } finally {
-      trace_return("type");
-    }
 }
 
 // setType -> "Set" "<" <Type> ">"
-  final public SetTypeNode setType() throws ParseException {
-    trace_call("setType");
-    try {
-Token type;
-      jj_consume_token(35);
-      jj_consume_token(23);
-      type = jj_consume_token(Type);
-      jj_consume_token(24);
+  final public SetTypeNode setType() throws ParseException {Token type;
+    jj_consume_token(35);
+    jj_consume_token(23);
+    type = jj_consume_token(Type);
+    jj_consume_token(24);
 {if ("" != null) return new SetTypeNode(VariableType.of(type.image));}
     throw new Error("Missing return statement in function");
-    } finally {
-      trace_return("setType");
-    }
 }
 
 // mapType -> "Map" "<" <Type> , <Type> ">"
-  final public MapTypeNode mapType() throws ParseException {
-    trace_call("mapType");
-    try {
-Token key,value;
-      jj_consume_token(36);
-      jj_consume_token(23);
-      key = jj_consume_token(Type);
-      jj_consume_token(14);
-      value = jj_consume_token(Type);
-      jj_consume_token(24);
+  final public MapTypeNode mapType() throws ParseException {Token key,value;
+    jj_consume_token(36);
+    jj_consume_token(23);
+    key = jj_consume_token(Type);
+    jj_consume_token(14);
+    value = jj_consume_token(Type);
+    jj_consume_token(24);
 {if ("" != null) return new MapTypeNode(VariableType.of(key.image),VariableType.of(value.image));}
     throw new Error("Missing return statement in function");
-    } finally {
-      trace_return("mapType");
-    }
 }
 
 // arrayType -> <Type> "[]"
-  final public ArrayTypeNode arrayType() throws ParseException {
-    trace_call("arrayType");
-    try {
-Token type;
-      type = jj_consume_token(Type);
-      jj_consume_token(18);
+  final public ArrayTypeNode arrayType() throws ParseException {Token type;
+    type = jj_consume_token(Type);
+    jj_consume_token(18);
 {if ("" != null) return new ArrayTypeNode(VariableType.of(type.image));}
     throw new Error("Missing return statement in function");
-    } finally {
-      trace_return("arrayType");
-    }
 }
 
 // atom -> "!" atom | <Character> | <String> | <Integer> | <Boolean>
@@ -508,110 +425,107 @@ Token type;
 //         | range | fa
 //         | (<Identifier> ".")? methCall
 //         | (state | <Identifier> ("." <Identifier>)*) (transition)?
-  final public AtomNode atom() throws ParseException {
-    trace_call("atom");
-    try {
-Token token = null;
+  final public AtomNode atom() throws ParseException {Token token = null;
         Token attribute;
         AtomNode atom;
         MethCallNode methCall;
         StateLitNode state = null;
         TransitionLitNode transition = null;
-      switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
-      case 11:{
-        jj_consume_token(11);
-        atom = atom();
+    switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
+    case 11:{
+      jj_consume_token(11);
+      atom = atom();
 {if ("" != null) return new NegationNode(atom);}
-        break;
-        }
-      case CharLiteral:{
-        token = jj_consume_token(CharLiteral);
+      break;
+      }
+    case CharLiteral:{
+      token = jj_consume_token(CharLiteral);
 {if ("" != null) return new LitNode(token);}
-        break;
-        }
-      case StringLiteral:{
-        token = jj_consume_token(StringLiteral);
+      break;
+      }
+    case StringLiteral:{
+      token = jj_consume_token(StringLiteral);
 {if ("" != null) return new LitNode(token);}
-        break;
-        }
-      case IntegerLiteral:{
-        token = jj_consume_token(IntegerLiteral);
+      break;
+      }
+    case IntegerLiteral:{
+      token = jj_consume_token(IntegerLiteral);
 {if ("" != null) return new LitNode(token);}
-        break;
-        }
-      case BoolLiteral:{
-        token = jj_consume_token(BoolLiteral);
+      break;
+      }
+    case BoolLiteral:{
+      token = jj_consume_token(BoolLiteral);
 {if ("" != null) return new LitNode(token);}
-        break;
-        }
-      default:
-        jj_la1[12] = jj_gen;
-        if (jj_2_6(3)) {
-          atom = set();
+      break;
+      }
+    default:
+      jj_la1[12] = jj_gen;
+      if (jj_2_6(3)) {
+        atom = set();
 {if ("" != null) return atom;}
-        } else if (jj_2_7(3)) {
-          atom = map();
+      } else if (jj_2_7(3)) {
+        atom = map();
 {if ("" != null) return atom;}
-        } else {
-          switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
-          case 19:{
-            atom = array();
+      } else {
+        switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
+        case 19:{
+          atom = array();
 {if ("" != null) return atom;}
-            break;
+          break;
+          }
+        case 16:{
+          atom = range();
+{if ("" != null) return atom;}
+          break;
+          }
+        case 23:{
+          atom = fa();
+{if ("" != null) return atom;}
+          break;
+          }
+        default:
+          jj_la1[13] = jj_gen;
+          if (jj_2_8(4)) {
+            if (jj_2_4(2)) {
+              token = jj_consume_token(Identifier);
+              jj_consume_token(15);
+            } else {
+              ;
             }
-          case 16:{
-            atom = range();
-{if ("" != null) return atom;}
-            break;
-            }
-          case 23:{
-            atom = fa();
-{if ("" != null) return atom;}
-            break;
-            }
-          default:
-            jj_la1[13] = jj_gen;
-            if (jj_2_8(4)) {
-              if (jj_2_4(2)) {
-                token = jj_consume_token(Identifier);
-                jj_consume_token(15);
-              } else {
-                ;
-              }
-              methCall = methCall();
+            methCall = methCall();
 if (token == null) {
             {if ("" != null) return methCall;}
         } else {
             {if ("" != null) return new ClassMethCallNode(token, methCall);}
         }
-            } else if (jj_2_9(2)) {
-              token = jj_consume_token(Identifier);
-              jj_consume_token(15);
-              attribute = jj_consume_token(Identifier);
+          } else if (jj_2_9(2)) {
+            token = jj_consume_token(Identifier);
+            jj_consume_token(15);
+            attribute = jj_consume_token(Identifier);
 {if ("" != null) return new ReadClassAttributeNode(token, attribute);}
-            } else {
+          } else {
+            switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
+            case 28:
+            case Identifier:{
               switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
-              case 28:
+              case 28:{
+                state = state();
+                break;
+                }
               case Identifier:{
-                switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
-                case 28:{
-                  state = state();
-                  break;
-                  }
-                case Identifier:{
-                  token = jj_consume_token(Identifier);
-                  break;
-                  }
-                default:
-                  jj_la1[11] = jj_gen;
-                  jj_consume_token(-1);
-                  throw new ParseException();
+                token = jj_consume_token(Identifier);
+                break;
                 }
-                if (jj_2_5(3)) {
-                  transition = transition();
-                } else {
-                  ;
-                }
+              default:
+                jj_la1[11] = jj_gen;
+                jj_consume_token(-1);
+                throw new ParseException();
+              }
+              if (jj_2_5(3)) {
+                transition = transition();
+              } else {
+                ;
+              }
 if (transition == null) {
             if (token == null) {
                 {if ("" != null) return state;}
@@ -621,185 +535,179 @@ if (transition == null) {
         } else {
             {if ("" != null) return new TransitionLitWithStartNode(token, state, transition);}
         }
-                break;
-                }
-              default:
-                jj_la1[14] = jj_gen;
-                jj_consume_token(-1);
-                throw new ParseException();
+              break;
               }
+            default:
+              jj_la1[14] = jj_gen;
+              jj_consume_token(-1);
+              throw new ParseException();
             }
           }
         }
       }
-    throw new Error("Missing return statement in function");
-    } finally {
-      trace_return("atom");
     }
+    throw new Error("Missing return statement in function");
 }
 
 // set -> "{" atom ("," atom)* "}"
-  final public SetLitNode set() throws ParseException {
-    trace_call("set");
-    try {
-SetLitNode node = new SetLitNode();
+  final public SetLitNode set() throws ParseException {SetLitNode node = new SetLitNode();
         AtomNode first, last;
-      jj_consume_token(25);
-      first = atom();
-      label_4:
-      while (true) {
-        switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
-        case 14:{
-          ;
-          break;
-          }
-        default:
-          jj_la1[15] = jj_gen;
-          break label_4;
-        }
-        jj_consume_token(14);
-        last = atom();
-node.elementList.add(last);
-      }
-node.elementList.add(first);
-      jj_consume_token(26);
-{if ("" != null) return node;}
-    throw new Error("Missing return statement in function");
-    } finally {
-      trace_return("set");
-    }
-}
-
-// map -> "[[" atom ":" atom ("," atom ":" atom)* "]]"
-  final public MapLitNode map() throws ParseException {
-    trace_call("map");
-    try {
-MapLitNode node = new MapLitNode();
-        AtomNode firstKey, firstValue, lastKey, lastValue;
-      jj_consume_token(19);
-      firstKey = atom();
-      jj_consume_token(29);
-      firstValue = atom();
-      label_5:
-      while (true) {
-        switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
-        case 14:{
-          ;
-          break;
-          }
-        default:
-          jj_la1[16] = jj_gen;
-          break label_5;
-        }
-        jj_consume_token(14);
-        lastKey = atom();
-        jj_consume_token(29);
-        lastValue = atom();
-node.elements.put(lastKey, lastValue);
-      }
-node.elements.put(firstKey, firstValue);
-      jj_consume_token(20);
-{if ("" != null) return node;}
-    throw new Error("Missing return statement in function");
-    } finally {
-      trace_return("map");
-    }
-}
-
-// array -> "[[" atom ("," atom)* "]]"
-  final public ArrayLitNode array() throws ParseException {
-    trace_call("array");
-    try {
-ArrayLitNode node = new ArrayLitNode();
-        AtomNode first, last;
-      jj_consume_token(19);
-      first = atom();
-      label_6:
-      while (true) {
-        switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
-        case 14:{
-          ;
-          break;
-          }
-        default:
-          jj_la1[17] = jj_gen;
-          break label_6;
-        }
-        jj_consume_token(14);
-        last = atom();
-node.elementList.add(last);
-      }
-node.elementList.add(0, first);
-      jj_consume_token(20);
-{if ("" != null) return node;}
-    throw new Error("Missing return statement in function");
-    } finally {
-      trace_return("array");
-    }
-}
-
-// methCall -> <Identifier> "(" (atom ("," atom)*)? ")"
-  final public MethCallNode methCall() throws ParseException {
-    trace_call("methCall");
-    try {
-MethCallNode node = new MethCallNode();
-        Token identifier;
-        AtomNode first, last;
-      identifier = jj_consume_token(Identifier);
-      jj_consume_token(21);
+    jj_consume_token(25);
+    first = atom();
+    label_4:
+    while (true) {
       switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
-      case 11:
-      case 16:
-      case 19:
-      case 23:
-      case 25:
-      case 28:
-      case BoolLiteral:
-      case CharLiteral:
-      case StringLiteral:
-      case IntegerLiteral:
-      case Identifier:{
-        first = atom();
-        label_7:
-        while (true) {
-          switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
-          case 14:{
-            ;
-            break;
-            }
-          default:
-            jj_la1[18] = jj_gen;
-            break label_7;
-          }
-          jj_consume_token(14);
-          last = atom();
-node.elementList.add(last);
-        }
-node.elementList.add(0, first);
+      case 14:{
+        ;
         break;
         }
       default:
-        jj_la1[19] = jj_gen;
-        ;
+        jj_la1[15] = jj_gen;
+        break label_4;
       }
-      jj_consume_token(22);
+      jj_consume_token(14);
+      last = atom();
+node.elementList.add(last);
+    }
+node.elementList.add(first);
+    jj_consume_token(26);
+{if ("" != null) return node;}
+    throw new Error("Missing return statement in function");
+}
+
+// map -> "[[" atom ":" atom ("," atom ":" atom)* "]]"
+  final public MapLitNode map() throws ParseException {MapLitNode node = new MapLitNode();
+        AtomNode firstKey, firstValue, lastKey, lastValue;
+    jj_consume_token(19);
+    firstKey = atom();
+    jj_consume_token(29);
+    firstValue = atom();
+    label_5:
+    while (true) {
+      switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
+      case 14:{
+        ;
+        break;
+        }
+      default:
+        jj_la1[16] = jj_gen;
+        break label_5;
+      }
+      jj_consume_token(14);
+      lastKey = atom();
+      jj_consume_token(29);
+      lastValue = atom();
+node.elements.put(lastKey, lastValue);
+    }
+node.elements.put(firstKey, firstValue);
+    jj_consume_token(20);
+{if ("" != null) return node;}
+    throw new Error("Missing return statement in function");
+}
+
+// array -> "[[" atom ("," atom)* "]]"
+  final public ArrayLitNode array() throws ParseException {ArrayLitNode node = new ArrayLitNode();
+        AtomNode first, last;
+    jj_consume_token(19);
+    first = atom();
+    label_6:
+    while (true) {
+      switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
+      case 14:{
+        ;
+        break;
+        }
+      default:
+        jj_la1[17] = jj_gen;
+        break label_6;
+      }
+      jj_consume_token(14);
+      last = atom();
+node.elementList.add(last);
+    }
+node.elementList.add(0, first);
+    jj_consume_token(20);
+{if ("" != null) return node;}
+    throw new Error("Missing return statement in function");
+}
+
+// methCall -> <Identifier> "(" (atom ("," atom)*)? ")"
+  final public MethCallNode methCall() throws ParseException {MethCallNode node = new MethCallNode();
+        Token identifier;
+        AtomNode first, last;
+    identifier = jj_consume_token(Identifier);
+    jj_consume_token(21);
+    switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
+    case 11:
+    case 16:
+    case 19:
+    case 23:
+    case 25:
+    case 28:
+    case BoolLiteral:
+    case CharLiteral:
+    case StringLiteral:
+    case IntegerLiteral:
+    case Identifier:{
+      first = atom();
+      label_7:
+      while (true) {
+        switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
+        case 14:{
+          ;
+          break;
+          }
+        default:
+          jj_la1[18] = jj_gen;
+          break label_7;
+        }
+        jj_consume_token(14);
+        last = atom();
+node.elementList.add(last);
+      }
+node.elementList.add(0, first);
+      break;
+      }
+    default:
+      jj_la1[19] = jj_gen;
+      ;
+    }
+    jj_consume_token(22);
 node.identifier = identifier; {if ("" != null) return node;}
     throw new Error("Missing return statement in function");
-    } finally {
-      trace_return("methCall");
-    }
 }
 
 // range -> "[" <Char> ("-" <Char)? ("," <Char> ("-" <Char)?)* "]" ("+" (range | <Identifier>))*
-  final public RangeLitNode range() throws ParseException {
-    trace_call("range");
-    try {
-RangeLitNode node = new RangeLitNode();
+  final public RangeLitNode range() throws ParseException {RangeLitNode node = new RangeLitNode();
     RangeLitNode additionRange = null;
     Token additionIdentifier = null;
     Token a;
     Token b = null;
-      jj_consume_token(16);
+    jj_consume_token(16);
+    a = jj_consume_token(CharLiteral);
+    switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
+    case 2:{
+      jj_consume_token(2);
+      b = jj_consume_token(CharLiteral);
+      break;
+      }
+    default:
+      jj_la1[20] = jj_gen;
+      ;
+    }
+node.add(a, b); b=null;
+    label_8:
+    while (true) {
+      switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
+      case 14:{
+        ;
+        break;
+        }
+      default:
+        jj_la1[21] = jj_gen;
+        break label_8;
+      }
+      jj_consume_token(14);
       a = jj_consume_token(CharLiteral);
       switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
       case 2:{
@@ -808,11 +716,179 @@ RangeLitNode node = new RangeLitNode();
         break;
         }
       default:
-        jj_la1[20] = jj_gen;
+        jj_la1[22] = jj_gen;
         ;
       }
 node.add(a, b); b=null;
-      label_8:
+    }
+    jj_consume_token(17);
+    label_9:
+    while (true) {
+      if (jj_2_10(2)) {
+        ;
+      } else {
+        break label_9;
+      }
+      jj_consume_token(1);
+      switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
+      case 16:{
+        additionRange = range();
+        break;
+        }
+      case Identifier:{
+        additionIdentifier = jj_consume_token(Identifier);
+        break;
+        }
+      default:
+        jj_la1[23] = jj_gen;
+        jj_consume_token(-1);
+        throw new ParseException();
+      }
+if(additionRange == null)
+            node.add(additionIdentifier);
+        else
+            node.add(additionRange);
+        additionRange = null;
+        additionIdentifier = null;
+    }
+{if ("" != null) return node;}
+    throw new Error("Missing return statement in function");
+}
+
+// state -> "$" <String> ("^" (<Integer> | <Identifier>))?
+  final public StateLitNode state() throws ParseException {Token label, accept = null;
+    jj_consume_token(28);
+    label = jj_consume_token(StringLiteral);
+    if (jj_2_11(2)) {
+      jj_consume_token(12);
+      switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
+      case IntegerLiteral:{
+        accept = jj_consume_token(IntegerLiteral);
+        break;
+        }
+      case Identifier:{
+        accept = jj_consume_token(Identifier);
+        break;
+        }
+      default:
+        jj_la1[24] = jj_gen;
+        jj_consume_token(-1);
+        throw new ParseException();
+      }
+    } else {
+      ;
+    }
+{if ("" != null) return new StateLitNode(label,accept);}
+    throw new Error("Missing return statement in function");
+}
+
+// transition -> (("-" "-" | "--") (range | <Identifier>) | "-") <Arrow> (state | <Identifier>)
+  final public TransitionLitNode transition() throws ParseException {Token rangeIdentifier = null;
+        Token stateIdentifier = null;
+        RangeLitNode range = null;
+        StateLitNode state = null;
+    if (jj_2_12(2)) {
+      switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
+      case 2:{
+        jj_consume_token(2);
+        jj_consume_token(2);
+        break;
+        }
+      case 7:{
+        jj_consume_token(7);
+        break;
+        }
+      default:
+        jj_la1[25] = jj_gen;
+        jj_consume_token(-1);
+        throw new ParseException();
+      }
+      switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
+      case 16:{
+        range = range();
+        break;
+        }
+      case Identifier:{
+        rangeIdentifier = jj_consume_token(Identifier);
+        break;
+        }
+      default:
+        jj_la1[26] = jj_gen;
+        jj_consume_token(-1);
+        throw new ParseException();
+      }
+    } else {
+      switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
+      case 2:{
+        jj_consume_token(2);
+        break;
+        }
+      default:
+        jj_la1[27] = jj_gen;
+        jj_consume_token(-1);
+        throw new ParseException();
+      }
+    }
+    jj_consume_token(Arrow);
+    switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
+    case 28:{
+      state = state();
+      break;
+      }
+    case Identifier:{
+      stateIdentifier = jj_consume_token(Identifier);
+      break;
+      }
+    default:
+      jj_la1[28] = jj_gen;
+      jj_consume_token(-1);
+      throw new ParseException();
+    }
+{if ("" != null) return new TransitionLitNode(rangeIdentifier, stateIdentifier, range, state);}
+    throw new Error("Missing return statement in function");
+}
+
+// fa -> "<" (state | <Identifier>) ",{" (<Identifier> (transition)? ("," <Identifier (transition)?)*)? "}" ">"
+  final public FaLitNode fa() throws ParseException {FaLitNode node = new FaLitNode(null, null);
+    StateLitNode state = null;
+    TransitionLitNode transition = null;
+    Token identifier = null;
+    jj_consume_token(23);
+    switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
+    case 28:{
+      state = state();
+      break;
+      }
+    case Identifier:{
+      identifier = jj_consume_token(Identifier);
+      break;
+      }
+    default:
+      jj_la1[29] = jj_gen;
+      jj_consume_token(-1);
+      throw new ParseException();
+    }
+if(state == null)
+            node.startStateIdentifier = identifier;
+        else
+            node.startState = state;
+    jj_consume_token(14);
+    jj_consume_token(25);
+    switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
+    case Identifier:{
+      identifier = jj_consume_token(Identifier);
+      switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
+      case 2:
+      case 7:{
+        transition = transition();
+        break;
+        }
+      default:
+        jj_la1[30] = jj_gen;
+        ;
+      }
+node.add(identifier, transition); transition = null;
+      label_10:
       while (true) {
         switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
         case 14:{
@@ -820,196 +896,10 @@ node.add(a, b); b=null;
           break;
           }
         default:
-          jj_la1[21] = jj_gen;
-          break label_8;
+          jj_la1[31] = jj_gen;
+          break label_10;
         }
         jj_consume_token(14);
-        a = jj_consume_token(CharLiteral);
-        switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
-        case 2:{
-          jj_consume_token(2);
-          b = jj_consume_token(CharLiteral);
-          break;
-          }
-        default:
-          jj_la1[22] = jj_gen;
-          ;
-        }
-node.add(a, b); b=null;
-      }
-      jj_consume_token(17);
-      label_9:
-      while (true) {
-        if (jj_2_10(2)) {
-          ;
-        } else {
-          break label_9;
-        }
-        jj_consume_token(1);
-        switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
-        case 16:{
-          additionRange = range();
-          break;
-          }
-        case Identifier:{
-          additionIdentifier = jj_consume_token(Identifier);
-          break;
-          }
-        default:
-          jj_la1[23] = jj_gen;
-          jj_consume_token(-1);
-          throw new ParseException();
-        }
-if(additionRange == null)
-            node.add(additionIdentifier);
-        else
-            node.add(additionRange);
-        additionRange = null;
-        additionIdentifier = null;
-      }
-{if ("" != null) return node;}
-    throw new Error("Missing return statement in function");
-    } finally {
-      trace_return("range");
-    }
-}
-
-// state -> "$" <String> ("^" (<Integer> | <Identifier>))?
-  final public StateLitNode state() throws ParseException {
-    trace_call("state");
-    try {
-Token label, accept = null;
-      jj_consume_token(28);
-      label = jj_consume_token(StringLiteral);
-      if (jj_2_11(2)) {
-        jj_consume_token(12);
-        switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
-        case IntegerLiteral:{
-          accept = jj_consume_token(IntegerLiteral);
-          break;
-          }
-        case Identifier:{
-          accept = jj_consume_token(Identifier);
-          break;
-          }
-        default:
-          jj_la1[24] = jj_gen;
-          jj_consume_token(-1);
-          throw new ParseException();
-        }
-      } else {
-        ;
-      }
-{if ("" != null) return new StateLitNode(label,accept);}
-    throw new Error("Missing return statement in function");
-    } finally {
-      trace_return("state");
-    }
-}
-
-// transition -> (("-" "-" | "--") (range | <Identifier>) | "-") <Arrow> (state | <Identifier>)
-  final public TransitionLitNode transition() throws ParseException {
-    trace_call("transition");
-    try {
-Token rangeIdentifier = null;
-        Token stateIdentifier = null;
-        RangeLitNode range = null;
-        StateLitNode state = null;
-      if (jj_2_12(2)) {
-        switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
-        case 2:{
-          jj_consume_token(2);
-          jj_consume_token(2);
-          break;
-          }
-        case 7:{
-          jj_consume_token(7);
-          break;
-          }
-        default:
-          jj_la1[25] = jj_gen;
-          jj_consume_token(-1);
-          throw new ParseException();
-        }
-        switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
-        case 16:{
-          range = range();
-          break;
-          }
-        case Identifier:{
-          rangeIdentifier = jj_consume_token(Identifier);
-          break;
-          }
-        default:
-          jj_la1[26] = jj_gen;
-          jj_consume_token(-1);
-          throw new ParseException();
-        }
-      } else {
-        switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
-        case 2:{
-          jj_consume_token(2);
-          break;
-          }
-        default:
-          jj_la1[27] = jj_gen;
-          jj_consume_token(-1);
-          throw new ParseException();
-        }
-      }
-      jj_consume_token(Arrow);
-      switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
-      case 28:{
-        state = state();
-        break;
-        }
-      case Identifier:{
-        stateIdentifier = jj_consume_token(Identifier);
-        break;
-        }
-      default:
-        jj_la1[28] = jj_gen;
-        jj_consume_token(-1);
-        throw new ParseException();
-      }
-{if ("" != null) return new TransitionLitNode(rangeIdentifier, stateIdentifier, range, state);}
-    throw new Error("Missing return statement in function");
-    } finally {
-      trace_return("transition");
-    }
-}
-
-// fa -> "<" (state | <Identifier>) ",{" (<Identifier> (transition)? ("," <Identifier (transition)?)*)? "}" ">"
-  final public FaLitNode fa() throws ParseException {
-    trace_call("fa");
-    try {
-FaLitNode node = new FaLitNode(null, null);
-    StateLitNode state = null;
-    TransitionLitNode transition = null;
-    Token identifier = null;
-      jj_consume_token(23);
-      switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
-      case 28:{
-        state = state();
-        break;
-        }
-      case Identifier:{
-        identifier = jj_consume_token(Identifier);
-        break;
-        }
-      default:
-        jj_la1[29] = jj_gen;
-        jj_consume_token(-1);
-        throw new ParseException();
-      }
-if(state == null)
-            node.startStateIdentifier = identifier;
-        else
-            node.startState = state;
-      jj_consume_token(14);
-      jj_consume_token(25);
-      switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
-      case Identifier:{
         identifier = jj_consume_token(Identifier);
         switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
         case 2:
@@ -1018,282 +908,244 @@ if(state == null)
           break;
           }
         default:
-          jj_la1[30] = jj_gen;
+          jj_la1[32] = jj_gen;
           ;
         }
 node.add(identifier, transition); transition = null;
-        label_10:
-        while (true) {
-          switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
-          case 14:{
-            ;
-            break;
-            }
-          default:
-            jj_la1[31] = jj_gen;
-            break label_10;
-          }
-          jj_consume_token(14);
-          identifier = jj_consume_token(Identifier);
-          switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
-          case 2:
-          case 7:{
-            transition = transition();
-            break;
-            }
-          default:
-            jj_la1[32] = jj_gen;
-            ;
-          }
-node.add(identifier, transition); transition = null;
-        }
-        break;
-        }
-      default:
-        jj_la1[33] = jj_gen;
-        ;
       }
-      jj_consume_token(26);
-      jj_consume_token(24);
+      break;
+      }
+    default:
+      jj_la1[33] = jj_gen;
+      ;
+    }
+    jj_consume_token(26);
+    jj_consume_token(24);
 {if ("" != null) return node;}
     throw new Error("Missing return statement in function");
-    } finally {
-      trace_return("fa");
-    }
 }
 
 // expr -> "(" expr ")" | compExpr (("&&" | "||") compExpr)?
-  final public ExprNode expr() throws ParseException {
-    trace_call("expr");
-    try {
-ExprNode node;
+  final public ExprNode expr() throws ParseException {ExprNode node;
     CompExprNode a;
     CompExprNode b = null;
     Token op = null;
-      switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
-      case 21:{
-        jj_consume_token(21);
-        node = expr();
-        jj_consume_token(22);
+    switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
+    case 21:{
+      jj_consume_token(21);
+      node = expr();
+      jj_consume_token(22);
 {if ("" != null) return new BracketExpr(node);}
-        break;
-        }
-      case 6:
-      case 7:
-      case 11:
-      case 16:
-      case 19:
-      case 23:
-      case 25:
-      case 28:
-      case BoolLiteral:
-      case CharLiteral:
-      case StringLiteral:
-      case IntegerLiteral:
-      case Identifier:{
-        a = compExpr();
+      break;
+      }
+    case 6:
+    case 7:
+    case 11:
+    case 16:
+    case 19:
+    case 23:
+    case 25:
+    case 28:
+    case BoolLiteral:
+    case CharLiteral:
+    case StringLiteral:
+    case IntegerLiteral:
+    case Identifier:{
+      a = compExpr();
+      switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
+      case 8:
+      case 9:{
         switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
-        case 8:
-        case 9:{
-          switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
-          case 8:{
-            op = jj_consume_token(8);
-            break;
-            }
-          case 9:{
-            op = jj_consume_token(9);
-            break;
-            }
-          default:
-            jj_la1[34] = jj_gen;
-            jj_consume_token(-1);
-            throw new ParseException();
+        case 8:{
+          op = jj_consume_token(8);
+          break;
           }
-          b = compExpr();
+        case 9:{
+          op = jj_consume_token(9);
           break;
           }
         default:
-          jj_la1[35] = jj_gen;
-          ;
+          jj_la1[34] = jj_gen;
+          jj_consume_token(-1);
+          throw new ParseException();
         }
-{if ("" != null) return new AndOrExpr(a, op, b);}
+        b = compExpr();
         break;
         }
       default:
-        jj_la1[36] = jj_gen;
-        jj_consume_token(-1);
-        throw new ParseException();
+        jj_la1[35] = jj_gen;
+        ;
       }
-    throw new Error("Missing return statement in function");
-    } finally {
-      trace_return("expr");
+{if ("" != null) return new AndOrExpr(a, op, b);}
+      break;
+      }
+    default:
+      jj_la1[36] = jj_gen;
+      jj_consume_token(-1);
+      throw new ParseException();
     }
+    throw new Error("Missing return statement in function");
 }
 
 // compExpr -> sumExpr (("=="|"!="|"<="|">="|"<"|">") sumExpr)?
   final public CompExprNode compExpr() throws ParseException {
-    trace_call("compExpr");
-    try {
-SumExprNode a;
+    SumExprNode a;
     SumExprNode b = null;
     Token op = null;
-      a = sumExpr();
-      if (jj_2_13(2)) {
-        switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
-        case 50:{
-          op = jj_consume_token(50);
-          break;
-          }
-        case 51:{
-          op = jj_consume_token(51);
-          break;
-          }
-        case 52:{
-          op = jj_consume_token(52);
-          break;
-          }
-        case 53:{
-          op = jj_consume_token(53);
-          break;
-          }
-        case 23:{
-          op = jj_consume_token(23);
-          break;
-          }
-        case 24:{
-          op = jj_consume_token(24);
-          break;
-          }
-        default:
-          jj_la1[37] = jj_gen;
-          jj_consume_token(-1);
-          throw new ParseException();
+    a = sumExpr();
+    if (jj_2_13(2)) {
+      switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
+      case 50:{
+        op = jj_consume_token(50);
+        break;
         }
-        b = sumExpr();
-      } else {
-        ;
+      case 51:{
+        op = jj_consume_token(51);
+        break;
+        }
+      case 52:{
+        op = jj_consume_token(52);
+        break;
+        }
+      case 53:{
+        op = jj_consume_token(53);
+        break;
+        }
+      case 23:{
+        op = jj_consume_token(23);
+        break;
+        }
+      case 24:{
+        op = jj_consume_token(24);
+        break;
+        }
+      default:
+        jj_la1[37] = jj_gen;
+        jj_consume_token(-1);
+        throw new ParseException();
       }
+      b = sumExpr();
+    } else {
+      ;
+    }
 {if ("" != null) return new CompExprNode(a, op, b);}
     throw new Error("Missing return statement in function");
-    } finally {
-      trace_return("compExpr");
-    }
 }
 
 // sumExpr -> prodExpr (("+" | "-") prodExpr)?
-  final public SumExprNode sumExpr() throws ParseException {
-    trace_call("sumExpr");
-    try {
-ProdExprNode a;
+  final public SumExprNode sumExpr() throws ParseException {ProdExprNode a;
     ProdExprNode b = null;
     Token op = null;
-      a = prodExpr();
+    a = prodExpr();
+    switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
+    case 1:
+    case 2:{
       switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
-      case 1:
-      case 2:{
-        switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
-        case 1:{
-          op = jj_consume_token(1);
-          break;
-          }
-        case 2:{
-          op = jj_consume_token(2);
-          break;
-          }
-        default:
-          jj_la1[38] = jj_gen;
-          jj_consume_token(-1);
-          throw new ParseException();
+      case 1:{
+        op = jj_consume_token(1);
+        break;
         }
-        b = prodExpr();
+      case 2:{
+        op = jj_consume_token(2);
         break;
         }
       default:
-        jj_la1[39] = jj_gen;
-        ;
+        jj_la1[38] = jj_gen;
+        jj_consume_token(-1);
+        throw new ParseException();
       }
+      b = prodExpr();
+      break;
+      }
+    default:
+      jj_la1[39] = jj_gen;
+      ;
+    }
 {if ("" != null) return new SumExprNode(a, op, b);}
     throw new Error("Missing return statement in function");
-    } finally {
-      trace_return("sumExpr");
-    }
 }
 
 // prodExpr -> intersectionExpr (("*" | "/") intersectionExpr)?
-  final public ProdExprNode prodExpr() throws ParseException {
-    trace_call("prodExpr");
-    try {
-IntersectionExprNode a;
+  final public ProdExprNode prodExpr() throws ParseException {IntersectionExprNode a;
     IntersectionExprNode b = null;
     Token op = null;
-      a = intersectionExpr();
+    a = intersectionExpr();
+    switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
+    case 3:
+    case 4:
+    case 5:{
       switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
-      case 3:
-      case 4:
-      case 5:{
-        switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
-        case 3:{
-          op = jj_consume_token(3);
-          break;
-          }
-        case 4:{
-          op = jj_consume_token(4);
-          break;
-          }
-        case 5:{
-          op = jj_consume_token(5);
-          break;
-          }
-        default:
-          jj_la1[40] = jj_gen;
-          jj_consume_token(-1);
-          throw new ParseException();
+      case 3:{
+        op = jj_consume_token(3);
+        break;
         }
-        b = intersectionExpr();
+      case 4:{
+        op = jj_consume_token(4);
+        break;
+        }
+      case 5:{
+        op = jj_consume_token(5);
         break;
         }
       default:
-        jj_la1[41] = jj_gen;
-        ;
+        jj_la1[40] = jj_gen;
+        jj_consume_token(-1);
+        throw new ParseException();
       }
+      b = intersectionExpr();
+      break;
+      }
+    default:
+      jj_la1[41] = jj_gen;
+      ;
+    }
 {if ("" != null) return new ProdExprNode(a, op, b);}
     throw new Error("Missing return statement in function");
-    } finally {
-      trace_return("prodExpr");
-    }
 }
 
 // intersectionExpr -> preOrPostIncrementExpr ("^" preOrPostIncrementExpr)?
-  final public IntersectionExprNode intersectionExpr() throws ParseException {
-    trace_call("intersectionExpr");
-    try {
-PreOrPostIncrementExprNode a;
+  final public IntersectionExprNode intersectionExpr() throws ParseException {PreOrPostIncrementExprNode a;
     PreOrPostIncrementExprNode b = null;
-      a = preOrPostIncrementExpr();
-      switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
-      case 12:{
-        jj_consume_token(12);
-        b = preOrPostIncrementExpr();
-        break;
-        }
-      default:
-        jj_la1[42] = jj_gen;
-        ;
+    a = preOrPostIncrementExpr();
+    switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
+    case 12:{
+      jj_consume_token(12);
+      b = preOrPostIncrementExpr();
+      break;
       }
+    default:
+      jj_la1[42] = jj_gen;
+      ;
+    }
 {if ("" != null) return new IntersectionExprNode(a, b);}
     throw new Error("Missing return statement in function");
-    } finally {
-      trace_return("intersectionExpr");
-    }
 }
 
 // preOrPostIncrementExpr -> ("++" | "--") atom | atom ("++" | "--")?
-  final public PreOrPostIncrementExprNode preOrPostIncrementExpr() throws ParseException {
-    trace_call("preOrPostIncrementExpr");
-    try {
-AtomNode atom;
+  final public PreOrPostIncrementExprNode preOrPostIncrementExpr() throws ParseException {AtomNode atom;
     Token op = null;
-      if (jj_2_14(2)) {
+    if (jj_2_14(2)) {
+      switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
+      case 6:{
+        op = jj_consume_token(6);
+        break;
+        }
+      case 7:{
+        op = jj_consume_token(7);
+        break;
+        }
+      default:
+        jj_la1[43] = jj_gen;
+        jj_consume_token(-1);
+        throw new ParseException();
+      }
+      atom = atom();
+{if ("" != null) return new PreOrPostIncrementExprNode(atom, op, null);}
+    } else if (jj_2_15(2)) {
+      atom = atom();
+      switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
+      case 6:
+      case 7:{
         switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
         case 6:{
           op = jj_consume_token(6);
@@ -1304,46 +1156,22 @@ AtomNode atom;
           break;
           }
         default:
-          jj_la1[43] = jj_gen;
+          jj_la1[44] = jj_gen;
           jj_consume_token(-1);
           throw new ParseException();
         }
-        atom = atom();
-{if ("" != null) return new PreOrPostIncrementExprNode(atom, op, null);}
-      } else if (jj_2_15(2)) {
-        atom = atom();
-        switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
-        case 6:
-        case 7:{
-          switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
-          case 6:{
-            op = jj_consume_token(6);
-            break;
-            }
-          case 7:{
-            op = jj_consume_token(7);
-            break;
-            }
-          default:
-            jj_la1[44] = jj_gen;
-            jj_consume_token(-1);
-            throw new ParseException();
-          }
-          break;
-          }
-        default:
-          jj_la1[45] = jj_gen;
-          ;
+        break;
         }
-{if ("" != null) return new PreOrPostIncrementExprNode(atom, null, op);}
-      } else {
-        jj_consume_token(-1);
-        throw new ParseException();
+      default:
+        jj_la1[45] = jj_gen;
+        ;
       }
-    throw new Error("Missing return statement in function");
-    } finally {
-      trace_return("preOrPostIncrementExpr");
+{if ("" != null) return new PreOrPostIncrementExprNode(atom, null, op);}
+    } else {
+      jj_consume_token(-1);
+      throw new ParseException();
     }
+    throw new Error("Missing return statement in function");
 }
 
   private boolean jj_2_1(int xla)
@@ -2183,9 +2011,6 @@ AtomNode atom;
   private boolean jj_rescan = false;
   private int jj_gc = 0;
 
-  {
-      enable_tracing();
-  }
   /** Constructor with InputStream. */
   public Parser(java.io.InputStream stream) {
 	  this(stream, null);
@@ -2283,7 +2108,6 @@ AtomNode atom;
 		   }
 		 }
 	   }
-	   trace_token(token, "");
 	   return token;
 	 }
 	 token = oldToken;
@@ -2327,7 +2151,6 @@ AtomNode atom;
 	 else token = token.next = token_source.getNextToken();
 	 jj_ntk = -1;
 	 jj_gen++;
-	   trace_token(token, " (in getNextToken)");
 	 return token;
   }
 
@@ -2436,53 +2259,12 @@ AtomNode atom;
 	 return trace_enabled;
   }
 
-  private int trace_indent = 0;
-/** Enable tracing. */
+  /** Enable tracing. */
   final public void enable_tracing() {
-	 trace_enabled = true;
   }
 
-/** Disable tracing. */
+  /** Disable tracing. */
   final public void disable_tracing() {
-	 trace_enabled = false;
-  }
-
-  protected void trace_call(String s) {
-	 if (trace_enabled) {
-	   for (int i = 0; i < trace_indent; i++) { System.out.print(" "); }
-	   System.out.println("Call:	" + s);
-	 }
-	 trace_indent = trace_indent + 2;
-  }
-
-  protected void trace_return(String s) {
-	 trace_indent = trace_indent - 2;
-	 if (trace_enabled) {
-	   for (int i = 0; i < trace_indent; i++) { System.out.print(" "); }
-	   System.out.println("Return: " + s);
-	 }
-  }
-
-  protected void trace_token(Token t, String where) {
-	 if (trace_enabled) {
-	   for (int i = 0; i < trace_indent; i++) { System.out.print(" "); }
-	   System.out.print("Consumed token: <" + tokenImage[t.kind]);
-	   if (t.kind != 0 && !tokenImage[t.kind].equals("\"" + t.image + "\"")) {
-		 System.out.print(": \"" + TokenMgrError.addEscapes(t.image) + "\"");
-	   }
-	   System.out.println(" at line " + t.beginLine + " column " + t.beginColumn + ">" + where);
-	 }
-  }
-
-  protected void trace_scan(Token t1, int t2) {
-	 if (trace_enabled) {
-	   for (int i = 0; i < trace_indent; i++) { System.out.print(" "); }
-	   System.out.print("Visited token: <" + tokenImage[t1.kind]);
-	   if (t1.kind != 0 && !tokenImage[t1.kind].equals("\"" + t1.image + "\"")) {
-		 System.out.print(": \"" + TokenMgrError.addEscapes(t1.image) + "\"");
-	   }
-	   System.out.println(" at line " + t1.beginLine + " column " + t1.beginColumn + ">; Expected token: <" + tokenImage[t2] + ">");
-	 }
   }
 
   private void jj_rescan_token() {
