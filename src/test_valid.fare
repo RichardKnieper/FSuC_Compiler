@@ -27,6 +27,17 @@ Range i = ['a'-'c', 'f', 'x'-'z'];
 Range j = ['b'-'c', 'e'-'g'];
 Range k = i^j;
 
+String s = "abcdefgahc";
+int x = s.length();
+char charAt = s.charAt(2);
+boolean contains = map.containsKey(2);
+boolean doesNotContain = map.containsKey(3);
+boolean rangeContains = i.contains('f');
+boolean rangeContains2 = i.contains('b');
+boolean rangeNotContains = i.contains('d');
+
+Set<Transition> s2 = fa.transitions($"Erster");
+
 Transition transition2 = state - - k - - > $"End"^b;
 
 return fa + transition2;

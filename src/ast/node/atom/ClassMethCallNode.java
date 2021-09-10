@@ -8,9 +8,14 @@ import ast.value.ArrayValue;
 import ast.value.MapValue;
 import ast.value.SetValue;
 import ast.value.Value;
+import domain.AbstractTransition;
+import domain.State;
+import domain.Transition;
 import jj.Token;
 
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 public class ClassMethCallNode extends AtomNode {
     public Token objectIdentifier;
@@ -26,6 +31,7 @@ public class ClassMethCallNode extends AtomNode {
                 + methCallNode.toString(indent + "\t") + "\n";
     }
 
+    @SuppressWarnings("DuplicatedCode")
     public VariableType semantischeAnalyse(SymbolTabelle tabelle, List<CompilerError> errors) {
         DeclNode element = tabelle.find(objectIdentifier.image);
         if (element == null) {
@@ -43,11 +49,13 @@ public class ClassMethCallNode extends AtomNode {
                                 + " on class String in line: " + methCallNode.identifier.beginLine));
                     }
                 } else if (method.equals("charAt")) {
-                    if (methCallNode.elementList.size() == 1) {
-                        return VariableType.charT;
-                    } else {
+                    if (methCallNode.elementList.size() != 1) {
                         errors.add(new CompilerError("Error: Wrong amount of parameters for method " + method
                                 + " on class String in line: " + methCallNode.identifier.beginLine));
+                    } else if (!methCallNode.elementList.get(0).semantischeAnalyse(tabelle, errors).hasSameTypeAs(VariableType.intT)) {
+                        errors.add(new CompilerError("Error: Wrong parameter type. Must be int in line: " + methCallNode.identifier.beginLine));
+                    } else {
+                        return VariableType.charT;
                     }
                 }
             } else if (type.hasSameTypeAs(VariableType.rangeT)) {
@@ -59,20 +67,24 @@ public class ClassMethCallNode extends AtomNode {
                                 + " on class String in line: " + methCallNode.identifier.beginLine));
                     }
                 } else if (method.equals("contains")) {
-                    if (methCallNode.elementList.size() == 1) {
-                        return VariableType.booleanT;
-                    } else {
+                    if (methCallNode.elementList.size() != 1) {
                         errors.add(new CompilerError("Error: Wrong amount of parameters for method " + method
                                 + " on class String in line: " + methCallNode.identifier.beginLine));
+                    } else if (!methCallNode.elementList.get(0).semantischeAnalyse(tabelle, errors).hasSameTypeAs(VariableType.charT)) {
+                        errors.add(new CompilerError("Error: Wrong parameter type. Must be char in line: " + methCallNode.identifier.beginLine));
+                    } else {
+                        return VariableType.booleanT;
                     }
                 }
             } else if (type.hasSameTypeAs(VariableType.faT)) {
                 if (method.contains("transitions")) {
-                    if (methCallNode.elementList.size() == 1) {
-                        return new VariableType.SetVariableType(VariableType.transitionT);
-                    } else {
+                    if (methCallNode.elementList.size() != 1) {
                         errors.add(new CompilerError("Error: Wrong amount of parameters for method " + method
                                 + " on class String in line: " + methCallNode.identifier.beginLine));
+                    } else if (!methCallNode.elementList.get(0).semantischeAnalyse(tabelle, errors).hasSameTypeAs(VariableType.stateT)) {
+                        errors.add(new CompilerError("Error: Wrong parameter type. Must be State in line: " + methCallNode.identifier.beginLine));
+                    } else {
+                        return new VariableType.SetVariableType(VariableType.transitionT);
                     }
                 }
             } else if (type.isArrayType()) {
@@ -85,30 +97,34 @@ public class ClassMethCallNode extends AtomNode {
                     }
                 }
             } else if (type.isSetType()) {
-                // TODO contains check type
                 if (method.equals("contains")) {
-                    if (methCallNode.elementList.size() == 1) {
-                        return VariableType.booleanT;
-                    } else {
+                    if (methCallNode.elementList.size() != 1) {
                         errors.add(new CompilerError("Error: Wrong amount of parameters for method " + method
                                 + " on class String in line: " + methCallNode.identifier.beginLine));
+                    } else if (!(((VariableType.SetVariableType) type).variableType.hasSameTypeAs(methCallNode.elementList.get(0).semantischeAnalyse(tabelle, errors)))) {
+                        errors.add(new CompilerError("Error: Wrong parameter type. Must be same type as type of Set in line: " + methCallNode.identifier.beginLine));
+                    } else {
+                        return VariableType.booleanT;
                     }
                 }
             } else if (type.isMapType()) {
-                // TODO check key type
                 if (method.equals("get")) {
-                    if (methCallNode.elementList.size() == 1) {
-                        return ((VariableType.MapVariableType) element.type.variableType).valueVariableType;
-                    } else {
+                    if (methCallNode.elementList.size() != 1) {
                         errors.add(new CompilerError("Error: Wrong amount of parameters for method " + method
                                 + " on class String in line: " + methCallNode.identifier.beginLine));
+                    } else if (!((VariableType.MapVariableType) type).keyVariableType.hasSameTypeAs(methCallNode.elementList.get(0).semantischeAnalyse(tabelle, errors))) {
+                        errors.add(new CompilerError("Error: Wrong parameter type. Must be same type as type of Map key in line: " + methCallNode.identifier.beginLine));
+                    } else {
+                        return ((VariableType.MapVariableType) element.type.variableType).valueVariableType;
                     }
                 } else if (method.equals("containsKey")) {
-                    if (methCallNode.elementList.size() == 1) {
-                        return VariableType.booleanT;
-                    } else {
+                    if (methCallNode.elementList.size() != 1) {
                         errors.add(new CompilerError("Error: Wrong amount of parameters for method " + method
                                 + " on class String in line: " + methCallNode.identifier.beginLine));
+                    } else if (!((VariableType.MapVariableType) type).keyVariableType.hasSameTypeAs(methCallNode.elementList.get(0).semantischeAnalyse(tabelle, errors))) {
+                        errors.add(new CompilerError("Error: Wrong parameter type. Must be same type as type of Map key in line: " + methCallNode.identifier.beginLine));
+                    } else {
+                        return VariableType.booleanT;
                     }
                 }
             } else {
@@ -142,14 +158,26 @@ public class ClassMethCallNode extends AtomNode {
         } else if (type.hasSameTypeAs(VariableType.rangeT)) {
             if (method.contains("isEmpty")) {
                 return new Value(element.r.isEmpty());
-            } else if (method.equals("contains")) {
-                // TODO implement
-                throw new RuntimeException("Methode nicht implementiert");
+            } else if (method.equals("contains")) { // contains(car)
+                char c = methCallNode.elementList.get(0).run(tabelle).c;
+                boolean contains = element.r
+                        .getElement()
+                        .stream()
+                        .anyMatch(basicRange -> basicRange.getStart() <= c && basicRange.getEnd() >= c);
+                return new Value(contains);
             }
         } else if (type.hasSameTypeAs(VariableType.faT)) {
             if (method.contains("transitions")) {
-                // TODO implement
-                throw new RuntimeException("Methode nicht implementiert");
+                State state = methCallNode.elementList.get(0).run(tabelle).state;
+                Set<AbstractTransition> transitions = element.fa
+                        .getTransitions()
+                        .stream()
+                        .filter(transition -> transition instanceof Transition)
+                        .map(transition -> (Transition) transition)
+                        .filter(transition -> transition.getStart().getLabel().equals(state.getLabel())
+                                || transition.getEnd().getLabel().equals(state.getLabel()))
+                        .collect(Collectors.toSet());
+                return new SetValue<>(transitions, VariableType.transitionT);
             }
         } else if (type.isArrayType()) {
             if (method.equals("get")) {
@@ -178,6 +206,12 @@ public class ClassMethCallNode extends AtomNode {
                 return new Value(((SetValue) element).contains(p.i));
             } else if (((VariableType.SetVariableType) type).variableType.hasSameTypeAs(VariableType.charT)) {
                 return new Value(((SetValue) element).contains(p.c));
+            } else if (((VariableType.SetVariableType) type).variableType.hasSameTypeAs(VariableType.rangeT)) {
+                return new Value(((SetValue) element).contains(p.r));
+            } else if (((VariableType.SetVariableType) type).variableType.hasSameTypeAs(VariableType.transitionT)) {
+                return new Value(((SetValue) element).contains(p.transition));
+            } else if (((VariableType.SetVariableType) type).variableType.hasSameTypeAs(VariableType.faT)) {
+                return new Value(((SetValue) element).contains(p.fa));
             } else { // String
                 return new Value(((SetValue) element).contains(p.string));
             }

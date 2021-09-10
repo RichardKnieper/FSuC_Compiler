@@ -38,7 +38,7 @@ public class LitNode extends AtomNode {
         switch (token.kind) {
             case ParserConstants.BoolLiteral: return new Value(Boolean.parseBoolean(token.image));
             case ParserConstants.CharLiteral: return new Value(token.image.charAt(1));
-            case ParserConstants.StringLiteral: return new Value(token.image.substring(1, token.image.length() - 2));
+            case ParserConstants.StringLiteral: return new Value(token.image.substring(1, token.image.length() - 1));
             case ParserConstants.IntegerLiteral: return new Value(Integer.parseInt(token.image));
             default: Value returnValue = new Value(); returnValue.type = VariableType.errorT; return returnValue;
         }

@@ -17,7 +17,7 @@ TOKEN : {
     "+" | "-" | "*" | "/" | "%" | "++" | "--" | "&&" | "||" | "|" | "!" | "^"| "=" | "," | "."
     | "[" | "]" | "[]" | "[[" | "]]" | "(" | ")" | "<" | ">" | "{" | "}" | ";" | "$" | ":"
     | "if" | "else" | "while" | "return"
-    | <Type : "String" | "Range" | "State" | "Transition" | "FA" | "RA" |"int" | "double" | "char" | "boolean">
+    | <Type : "String" | "Range" | "State" | "Transition" | "FA" | "RA" |"int" | "char" | "boolean">
     | "Set" | "Map"
     | <BoolLiteral : "true" | "false">
     | <CharLiteral : "'" ["A"-"Z", "a"-"z", "?", "!"] "'">

@@ -35,7 +35,7 @@ public class DeclNode extends Node {
 		String varName = identifier.image;
 		if (tabelle.findInCurrentBlock(varName) != null) {
 			errors.add(new CompilerError("Error: " + identifier.image + " already exists in line: "
-					+ tabelle.find(identifier.image).identifier.beginLine));
+					+ tabelle.find(identifier.image).identifier.beginLine + " and " + identifier.beginLine));
 			return VariableType.errorT;
 		} else {
 			tabelle.add(varName, this);

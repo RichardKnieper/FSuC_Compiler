@@ -37,7 +37,7 @@ public class MethDeclNode extends DeclNode {
 		String methodName = identifier.image;
 		if (neueTabelle.findInCurrentBlock(methodName) != null) {
 			errors.add(new CompilerError("Error: " + methodName + " already exists in line: "
-					+ neueTabelle.find(methodName).identifier.beginLine));
+					+ neueTabelle.find(methodName).identifier.beginLine + " and " + identifier.beginLine));
 			addedError = true;
 		}
 
