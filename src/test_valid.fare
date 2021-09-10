@@ -23,6 +23,10 @@ State state = $"Erster";
 Transition transition = state - - range - - > $"End"^a;
 FA fa = <$"Start"^1, { transition }>;
 
-Transition transition2 = state - - range - - > $"End"^b;
+Range i = ['a'-'c', 'f', 'x'-'z'];
+Range j = ['b'-'c', 'e'-'g'];
+Range k = i^j;
+
+Transition transition2 = state - - k - - > $"End"^b;
 
 return fa + transition2;

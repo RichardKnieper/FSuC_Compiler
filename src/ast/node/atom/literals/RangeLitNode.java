@@ -43,6 +43,13 @@ public class RangeLitNode extends AtomNode {
 		public String toString(String indent) {
 			return indent + "Range " + "\n" + a.image + "\n" + b.image;
 		}
+
+		public boolean valid() {
+			if (b == null) {
+				return true;
+			}
+			return a.image.charAt(1) <= b.image.charAt(1);
+		}
 	}
 
 	public String toString(String indent) {
@@ -57,6 +64,14 @@ public class RangeLitNode extends AtomNode {
 
 	public VariableType semantischeAnalyse(SymbolTabelle tabelle, List<CompilerError> errors) {
 		boolean hasError = false;
+
+		for (RangeWrapper r : rangeWrappers) {
+			if (!r.valid()) {
+				errors.add(new CompilerError("Error: First element of Range must be less or equal to second "
+					+ "element in line " + r.a.beginLine));
+				hasError = true;
+			}
+		}
 
 		boolean errorInAdditionalRange = additionsRange.stream()
 				.anyMatch(addition -> addition.semantischeAnalyse(tabelle, errors).isError());

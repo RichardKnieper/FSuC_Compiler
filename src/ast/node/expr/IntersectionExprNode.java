@@ -4,6 +4,8 @@ import ast.CompilerError;
 import ast.SymbolTabelle;
 import ast.VariableType;
 import ast.value.Value;
+import domain.BasicRange;
+import domain.Range;
 
 import java.util.List;
 
@@ -45,7 +47,35 @@ public class IntersectionExprNode extends ExprNode {
         if (b == null) {
             return a.run(tabelle);
         } else {
-            return a.run(tabelle); // TODO intersection
+            Value firstValue = a.run(tabelle);
+            Value secondValue = b.run(tabelle);
+            Range first = firstValue.type.hasSameTypeAs(VariableType.rangeT) ? firstValue.r : tabelle.find(firstValue.identifier.image).value.r;
+            Range second = secondValue.type.hasSameTypeAs(VariableType.rangeT) ? secondValue.r : tabelle.find(secondValue.identifier.image).value.r;
+
+            Range range = null; // can not be initialized here because otherwise the add(...) method does not work
+
+            for (BasicRange firstBR : first.getElement()) {
+                for (BasicRange secondBR : second.getElement()) {
+                    if (firstBR.isSingle()) {
+                        if (firstBR.getStart() >= secondBR.getStart() && firstBR.getStart() <= secondBR.getEnd()) {
+                            if (range == null) {
+                                range = new Range(firstBR.getStart());
+                            } else {
+                                range.add(firstBR.getStart());
+                            }
+                        }
+                    } else if (firstBR.getEnd() >= secondBR.getStart() && secondBR.getEnd() >= firstBR.getStart()) {
+                        char start = (char) Math.max(firstBR.getStart(), secondBR.getStart());
+                        char end = (char) Math.min(firstBR.getEnd(), secondBR.getEnd());
+                        if (range == null) {
+                            range = new Range(start, end);
+                        } else {
+                            range.add(start, end);
+                        }
+                    }
+                }
+            }
+            return new Value(range);
         }
     }
 }
