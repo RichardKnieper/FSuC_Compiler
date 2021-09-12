@@ -255,7 +255,7 @@ MethCallNode methCall(): {
     { node.identifier = identifier; return node; }
 }
 
-// range -> "[" <Char> ("-" <Char)? ("," <Char> ("-" <Char)?)* "]"
+// range -> "[" <Char> ("-" <Char)? ("," <Char> ("-" <Char)?)* "]" ("+" (range | <Identifier>))*
 RangeLitNode range(): {
     RangeLitNode node = new RangeLitNode();
     RangeLitNode additionRange = null;
